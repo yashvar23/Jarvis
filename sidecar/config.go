@@ -1,0 +1,174 @@
+package main
+
+import (
+	"encoding/base64"
+	"encoding/json"
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+
+	"gopkg.in/yaml.v3"
+)
+
+// The sidecar shares the ~/.zoya data folder with the brain (they rarely run
+// on the same host); its files are named distinctly so they can't collide with
+// brain files (zoya.pid, sidecar-keys/, the db, etc.). captures/ is shared.
+var configDir = filepath.Join(homeDir(), ".zoya")
+var configFile = filepath.Join(configDir, "sidecar.yaml")
+
+func homeDir() string {
+	h, err := os.UserHomeDir()
+	if err != nil {
+		return os.Getenv("HOME")
+	}
+	return h
+}
+
+func defaultConfig() SidecarConfig {
+	return SidecarConfig{
+		Capabilities: []SidecarCapability{
+			CapTerminal, CapFilesystem, CapClipboard, CapScreenshot, CapSystemInfo, CapAwareness, CapDesktop, CapBrowser, CapOCR, CapWindows, CapPebble, CapSubPebble,
+			CapFileWatch, CapProcesses, CapNotifications,
+		},
+		Terminal: TerminalConfig{
+			BlockedCommands: []string{},
+			TimeoutMs:       30000,
+		},
+		Filesystem: FilesystemConfig{
+			BlockedPaths:  []string{},
+			MaxFileSizeKB: 100,
+		},
+		Browser: BrowserConfig{
+			CDPPort: 9222,
+		},
+		Awareness: AwarenessConfig{
+			ScreenIntervalMs:   7000,
+			WindowIntervalMs:   2000,
+			MinChangeThreshold: 0.02,
+			StuckThresholdMs:   120000,
+			OCREnabled:         true,
+			CaptureDir:         filepath.Join(homeDir(), ".zoya", "captures"),
+		},
+	}
+}
+
+func LoadConfig() (*SidecarConfig, error) {
+	cfg := defaultConfig()
+
+	data, err := os.ReadFile(configFile)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return &cfg, nil
+		}
+		return nil, err
+	}
+
+	if err := yaml.Unmarshal(data, &cfg); err != nil {
+		return nil, fmt.Errorf("parse config: %w", err)
+	}
+
+	// Ensure defaults for zero values
+	if cfg.Terminal.TimeoutMs == 0 {
+		cfg.Terminal.TimeoutMs = 30000
+	}
+	if cfg.Filesystem.MaxFileSizeKB == 0 {
+		cfg.Filesystem.MaxFileSizeKB = 100
+	}
+	if cfg.Browser.CDPPort == 0 {
+		cfg.Browser.CDPPort = 9222
+	}
+	if len(cfg.Capabilities) == 0 {
+		cfg.Capabilities = defaultConfig().Capabilities
+	} else {
+		// Merge in any default capabilities that aren't already present in the
+		// saved config. This makes new capabilities (e.g. CapWindows added in
+		// Phase 2) auto-enable on existing installs without requiring users to
+		// hand-edit ~/.zoya-sidecar/config.yaml.
+		have := make(map[SidecarCapability]bool, len(cfg.Capabilities))
+		for _, c := range cfg.Capabilities {
+			have[c] = true
+		}
+		for _, c := range defaultConfig().Capabilities {
+			if !have[c] {
+				cfg.Capabilities = append(cfg.Capabilities, c)
+			}
+		}
+	}
+
+	// Awareness defaults
+	if cfg.Awareness.ScreenIntervalMs == 0 {
+		cfg.Awareness.ScreenIntervalMs = 7000
+	}
+	if cfg.Awareness.WindowIntervalMs == 0 {
+		cfg.Awareness.WindowIntervalMs = 2000
+	}
+	if cfg.Awareness.MinChangeThreshold == 0 {
+		cfg.Awareness.MinChangeThreshold = 0.02
+	}
+	if cfg.Awareness.StuckThresholdMs == 0 {
+		cfg.Awareness.StuckThresholdMs = 120000
+	}
+	if cfg.Awareness.CaptureDir == "" {
+		cfg.Awareness.CaptureDir = filepath.Join(homeDir(), ".zoya", "captures")
+	}
+
+	return &cfg, nil
+}
+
+func SaveConfig(cfg *SidecarConfig) error {
+	if err := os.MkdirAll(configDir, 0700); err != nil {
+		return err
+	}
+	if err := os.Chmod(configDir, 0700); err != nil {
+		return err
+	}
+	data, err := yaml.Marshal(cfg)
+	if err != nil {
+		return err
+	}
+	// O_NOFOLLOW prevents a hostile symlink at configFile from redirecting
+	// the write to an unrelated target (e.g. ~/.bash_history).
+	f, err := os.OpenFile(configFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC|oNoFollow, 0600)
+	if err != nil {
+		return err
+	}
+	if _, err := f.Write(data); err != nil {
+		f.Close()
+		return err
+	}
+	if err := f.Close(); err != nil {
+		return err
+	}
+	return os.Chmod(configFile, 0600)
+}
+
+func DecodeJWTPayload(token string) (*SidecarTokenClaims, error) {
+	parts := strings.Split(token, ".")
+	if len(parts) != 3 {
+		return nil, fmt.Errorf("invalid JWT format")
+	}
+
+	payload := parts[1]
+	// Convert URL-safe base64 to standard
+	payload = strings.ReplaceAll(payload, "-", "+")
+	payload = strings.ReplaceAll(payload, "_", "/")
+	// Add padding
+	switch len(payload) % 4 {
+	case 2:
+		payload += "=="
+	case 3:
+		payload += "="
+	}
+
+	decoded, err := base64.StdEncoding.DecodeString(payload)
+	if err != nil {
+		return nil, fmt.Errorf("decode JWT payload: %w", err)
+	}
+
+	var claims SidecarTokenClaims
+	if err := json.Unmarshal(decoded, &claims); err != nil {
+		return nil, fmt.Errorf("parse JWT claims: %w", err)
+	}
+	return &claims, nil
+}

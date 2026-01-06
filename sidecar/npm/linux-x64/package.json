@@ -1,0 +1,13 @@
+{
+  "name": "@zoya/sidecar-linux-x64",
+  "version": "0.1.0",
+  "description": "Zoya sidecar binary for Linux x64",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yashvar23/zoya.git",
+    "directory": "sidecar/npm/linux-x64"
+  },
+  "os": ["linux"],
+  "cpu": ["x64"],
+  "files": ["bin"]
+}

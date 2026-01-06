@@ -1,0 +1,422 @@
+import { test, expect, describe, beforeEach, afterEach } from 'bun:test';
+import { join } from 'node:path';
+import { homedir, tmpdir } from 'node:os';
+import { existsSync, readFileSync, writeFileSync, unlinkSync, mkdirSync, rmSync } from 'node:fs';
+import {
+  acquireLock,
+  isLocked,
+  releaseLock,
+  readPid,
+  readLockedPort,
+  writeLockedPort,
+  getPidPath,
+  getLogPath,
+  getLogDir,
+} from './pid.ts';
+
+const ZOYA_DIR = join(homedir(), '.zoya');
+const LOCK_PATH = join(ZOYA_DIR, 'zoya.pid');
+const PID_MODULE = join(import.meta.dir, 'pid.ts');
+const READY_SIGNAL = join(tmpdir(), 'zoya-test-lock-ready');
+const HOLDER_SCRIPT = join(tmpdir(), 'zoya-test-lock-holder.ts');
+
+function cleanup(): void {
+  releaseLock();
+  try { unlinkSync(READY_SIGNAL); } catch {}
+  try { unlinkSync(HOLDER_SCRIPT); } catch {}
+}
+
+/**
+ * Spawn a child process that acquires the flock and holds it until killed.
+ * Returns once the child has confirmed it holds the lock.
+ */
+async function spawnLockHolder(): Promise<{ proc: ReturnType<typeof Bun.spawn>; pid: number }> {
+  try { unlinkSync(READY_SIGNAL); } catch {}
+
+  writeFileSync(HOLDER_SCRIPT, `
+import { acquireLock } from ${JSON.stringify(PID_MODULE)};
+import { writeFileSync } from 'node:fs';
+const ok = acquireLock(process.pid);
+writeFileSync(${JSON.stringify(READY_SIGNAL)}, ok ? String(process.pid) : 'FAIL');
+await Bun.sleep(60000);
+`);
+
+  const proc = Bun.spawn(['bun', HOLDER_SCRIPT], {
+    stdio: ['ignore', 'ignore', 'ignore'],
+  });
+
+  for (let i = 0; i < 50; i++) {
+    await Bun.sleep(100);
+    if (existsSync(READY_SIGNAL)) {
+      const content = readFileSync(READY_SIGNAL, 'utf-8').trim();
+      if (content === 'FAIL') {
+        proc.kill();
+        await proc.exited;
+        throw new Error('Child process failed to acquire lock');
+      }
+      return { proc, pid: parseInt(content, 10) };
+    }
+  }
+  proc.kill();
+  await proc.exited;
+  throw new Error('Timed out waiting for child to acquire lock');
+}
+
+describe('Process Lock Manager', () => {
+  beforeEach(() => cleanup());
+  afterEach(() => cleanup());
+
+  // ── acquireLock ──────────────────────────────────────────────────
+
+  describe('acquireLock', () => {
+    test('returns true and creates lock file', () => {
+      expect(acquireLock(process.pid)).toBe(true);
+      expect(existsSync(LOCK_PATH)).toBe(true);
+    });
+
+    test('writes PID to lock file', () => {
+      acquireLock(process.pid);
+      const content = readFileSync(LOCK_PATH, 'utf-8').trim();
+      expect(content).toBe(String(process.pid));
+    });
+
+    test('creates ~/.zoya dir if missing', () => {
+      // Dir almost certainly exists already, but acquireLock should not fail
+      expect(acquireLock(process.pid)).toBe(true);
+    });
+
+    test('second acquire in same process returns false', () => {
+      // First fd holds an exclusive flock; second open+flock is denied
+      expect(acquireLock(process.pid)).toBe(true);
+      expect(acquireLock(process.pid)).toBe(false);
+    });
+  });
+
+  // ── isLocked ─────────────────────────────────────────────────────
+
+  describe('isLocked', () => {
+    test('returns null when no lock file exists', () => {
+      expect(isLocked()).toBeNull();
+    });
+
+    test('returns null for stale file (file exists, no lock held)', () => {
+      mkdirSync(ZOYA_DIR, { recursive: true });
+      writeFileSync(LOCK_PATH, '99999');
+      // No flock held — probe should succeed → not locked
+      expect(isLocked()).toBeNull();
+    });
+
+    test('returns PID when lock is held by this process', () => {
+      acquireLock(process.pid);
+      // isLocked opens a second fd; flock is denied because our fd holds it
+      expect(isLocked()).toBe(process.pid);
+    });
+  });
+
+  // ── releaseLock ──────────────────────────────────────────────────
+
+  describe('releaseLock', () => {
+    test('releases lock and removes file', () => {
+      acquireLock(process.pid);
+      expect(existsSync(LOCK_PATH)).toBe(true);
+
+      releaseLock();
+      expect(existsSync(LOCK_PATH)).toBe(false);
+      expect(isLocked()).toBeNull();
+    });
+
+    test('is idempotent — safe to call without prior acquire', () => {
+      releaseLock();
+      releaseLock();
+      releaseLock();
+      // Should not throw
+    });
+
+    test('allows re-acquire after release', () => {
+      expect(acquireLock(process.pid)).toBe(true);
+      releaseLock();
+      expect(acquireLock(process.pid)).toBe(true);
+    });
+
+    test('multiple acquire/release cycles work', () => {
+      for (let i = 0; i < 5; i++) {
+        expect(acquireLock(process.pid)).toBe(true);
+        expect(isLocked()).toBe(process.pid);
+        releaseLock();
+        expect(isLocked()).toBeNull();
+      }
+    });
+  });
+
+  // ── readPid ──────────────────────────────────────────────────────
+
+  describe('readPid', () => {
+    test('returns null when no file exists', () => {
+      expect(readPid()).toBeNull();
+    });
+
+    test('returns PID from file', () => {
+      mkdirSync(ZOYA_DIR, { recursive: true });
+      writeFileSync(LOCK_PATH, '12345');
+      expect(readPid()).toBe(12345);
+    });
+
+    test('trims whitespace', () => {
+      mkdirSync(ZOYA_DIR, { recursive: true });
+      writeFileSync(LOCK_PATH, '  42\n');
+      expect(readPid()).toBe(42);
+    });
+
+    test('returns null for non-numeric content', () => {
+      mkdirSync(ZOYA_DIR, { recursive: true });
+      writeFileSync(LOCK_PATH, 'not-a-pid');
+      expect(readPid()).toBeNull();
+    });
+
+    test('returns null for empty file', () => {
+      mkdirSync(ZOYA_DIR, { recursive: true });
+      writeFileSync(LOCK_PATH, '');
+      expect(readPid()).toBeNull();
+    });
+
+    test('returns null for zero', () => {
+      mkdirSync(ZOYA_DIR, { recursive: true });
+      writeFileSync(LOCK_PATH, '0');
+      expect(readPid()).toBeNull();
+    });
+
+    test('returns null for negative PID', () => {
+      mkdirSync(ZOYA_DIR, { recursive: true });
+      writeFileSync(LOCK_PATH, '-1');
+      expect(readPid()).toBeNull();
+    });
+  });
+
+  // ── readLockedPort / writeLockedPort ─────────────────────────────
+
+  describe('readLockedPort', () => {
+    test('returns null when no lock file exists', () => {
+      expect(readLockedPort()).toBeNull();
+    });
+
+    test('returns null for legacy PID-only lock file', () => {
+      mkdirSync(ZOYA_DIR, { recursive: true });
+      writeFileSync(LOCK_PATH, '12345');
+      expect(readLockedPort()).toBeNull();
+    });
+
+    test('returns the port from a two-line lock file', () => {
+      mkdirSync(ZOYA_DIR, { recursive: true });
+      writeFileSync(LOCK_PATH, '12345\n9000\n');
+      expect(readLockedPort()).toBe(9000);
+    });
+
+    test('returns null for out-of-range port', () => {
+      mkdirSync(ZOYA_DIR, { recursive: true });
+      writeFileSync(LOCK_PATH, '12345\n99999\n');
+      expect(readLockedPort()).toBeNull();
+    });
+
+    test('returns null for non-numeric port line', () => {
+      mkdirSync(ZOYA_DIR, { recursive: true });
+      writeFileSync(LOCK_PATH, '12345\nabc\n');
+      expect(readLockedPort()).toBeNull();
+    });
+
+    test('readPid still works for two-line format', () => {
+      mkdirSync(ZOYA_DIR, { recursive: true });
+      writeFileSync(LOCK_PATH, '12345\n9000\n');
+      expect(readPid()).toBe(12345);
+    });
+  });
+
+  describe('writeLockedPort', () => {
+    test('is a no-op when no lock is held by this process', () => {
+      // No acquireLock — lockFd is null.
+      writeLockedPort(9000);
+      expect(existsSync(LOCK_PATH)).toBe(false);
+    });
+
+    test('records port alongside PID when lock is held', () => {
+      acquireLock(process.pid);
+      writeLockedPort(9000);
+      const content = readFileSync(LOCK_PATH, 'utf-8');
+      expect(content.split(/\r?\n/)[0]).toBe(String(process.pid));
+      expect(readLockedPort()).toBe(9000);
+      expect(readPid()).toBe(process.pid);
+    });
+
+    test('ignores invalid ports', () => {
+      acquireLock(process.pid);
+      writeLockedPort(0);
+      writeLockedPort(70000);
+      writeLockedPort(Number.NaN);
+      expect(readLockedPort()).toBeNull();
+      expect(readPid()).toBe(process.pid);
+    });
+
+    test('overwrites an earlier recorded port', () => {
+      acquireLock(process.pid);
+      writeLockedPort(9000);
+      writeLockedPort(3142);
+      expect(readLockedPort()).toBe(3142);
+    });
+  });
+
+  // ── path getters ─────────────────────────────────────────────────
+
+  describe('path getters', () => {
+    test('getPidPath returns ~/.zoya/zoya.pid', () => {
+      expect(getPidPath()).toBe(join(homedir(), '.zoya', 'zoya.pid'));
+    });
+
+    test('getLogPath returns path and creates logs dir', () => {
+      const logPath = getLogPath();
+      expect(logPath).toBe(join(ZOYA_DIR, 'logs', 'zoya.log'));
+      expect(existsSync(join(ZOYA_DIR, 'logs'))).toBe(true);
+    });
+
+    test('getLogDir returns logs directory', () => {
+      expect(getLogDir()).toBe(join(ZOYA_DIR, 'logs'));
+    });
+  });
+
+  // ── cross-process locking ────────────────────────────────────────
+
+  describe('cross-process locking', () => {
+    let childProc: ReturnType<typeof Bun.spawn> | null = null;
+
+    afterEach(async () => {
+      if (childProc) {
+        childProc.kill();
+        await childProc.exited;
+        childProc = null;
+      }
+      cleanup();
+    });
+
+    test('isLocked detects lock held by another process', async () => {
+      const { proc, pid } = await spawnLockHolder();
+      childProc = proc;
+
+      const result = isLocked();
+      expect(result).toBe(pid);
+    }, { timeout: 15000 });
+
+    test('acquireLock fails when another process holds lock', async () => {
+      const { proc } = await spawnLockHolder();
+      childProc = proc;
+
+      expect(acquireLock(process.pid)).toBe(false);
+    }, { timeout: 15000 });
+
+    test('lock is released when holder is SIGKILLed', async () => {
+      const { proc } = await spawnLockHolder();
+      childProc = proc;
+
+      // Lock is held
+      expect(isLocked()).not.toBeNull();
+
+      // SIGKILL — OS closes all fds, releasing the flock
+      proc.kill(9);
+      await proc.exited;
+      childProc = null;
+
+      // Lock is now free
+      expect(isLocked()).toBeNull();
+    }, { timeout: 15000 });
+
+    test('can acquire lock after previous holder crashes', async () => {
+      const { proc } = await spawnLockHolder();
+      childProc = proc;
+
+      proc.kill(9);
+      await proc.exited;
+      childProc = null;
+
+      // New instance should succeed immediately
+      expect(acquireLock(process.pid)).toBe(true);
+      expect(readPid()).toBe(process.pid);
+    }, { timeout: 15000 });
+
+    test('lock survives SIGTERM of holder (graceful)', async () => {
+      const { proc, pid } = await spawnLockHolder();
+      childProc = proc;
+
+      // SIGTERM — child exits, OS releases flock
+      proc.kill(15);
+      await proc.exited;
+      childProc = null;
+
+      // Lock freed after process exits
+      expect(isLocked()).toBeNull();
+      expect(acquireLock(process.pid)).toBe(true);
+    }, { timeout: 15000 });
+  });
+
+  // ── native Windows guard (#252) ──────────────────────────────────
+  //
+  // On native Windows the daemon is unsupported and `flock.c` (POSIX-only)
+  // cannot be compiled. The cc() compile must be deferred so importing the
+  // module never crashes before the CLI's platform guard fires, and any
+  // flock path that *is* reached must surface a clear message rather than a
+  // low-level TinyCC `sys/file.h not found` error.
+
+  describe('native Windows guard', () => {
+    const PROBE_SCRIPT = join(tmpdir(), 'zoya-test-win32-probe.ts');
+    const PROBE_HOME = join(tmpdir(), 'zoya-test-win32-home');
+
+    afterEach(() => {
+      try { unlinkSync(PROBE_SCRIPT); } catch {}
+      try { rmSync(PROBE_HOME, { recursive: true, force: true }); } catch {}
+    });
+
+    /** Run a snippet in a child process with `process.platform` faked to win32. */
+    async function runOnFakeWin32(body: string): Promise<{ stdout: string; stderr: string; exitCode: number }> {
+      writeFileSync(PROBE_SCRIPT, `
+Object.defineProperty(process, 'platform', { value: 'win32', configurable: true });
+${body}
+`);
+      const proc = Bun.spawn(['bun', PROBE_SCRIPT], {
+        stdio: ['ignore', 'pipe', 'pipe'],
+        // Isolate from the real ~/.zoya so the probe can't touch a live lock.
+        env: { ...process.env, HOME: PROBE_HOME, USERPROFILE: PROBE_HOME },
+      });
+      const [stdout, stderr] = await Promise.all([
+        new Response(proc.stdout).text(),
+        new Response(proc.stderr).text(),
+      ]);
+      const exitCode = await proc.exited;
+      return { stdout, stderr, exitCode };
+    }
+
+    // Smoke test only: on a POSIX CI host `<sys/file.h>` exists, so even the
+    // pre-fix eager compile would succeed here — this can only truly fail on
+    // real Windows. The genuine regression guard is the next test.
+    test('importing the module is side-effect-free (smoke)', async () => {
+      const { stdout, stderr, exitCode } = await runOnFakeWin32(`
+await import(${JSON.stringify(PID_MODULE)});
+console.log('IMPORT_OK');
+`);
+      expect(exitCode).toBe(0);
+      expect(stdout).toContain('IMPORT_OK');
+      expect(stderr).not.toContain('sys/file.h');
+    }, { timeout: 15000 });
+
+    // Real regression guard: pre-fix, `acquireLock` ran the eager-compiled
+    // flock against the real POSIX libc (no win32 guard existed), so stderr
+    // would NOT contain the support message — this test fails on the old code.
+    test('acquireLock surfaces a clear unsupported message, not a TinyCC error', async () => {
+      const { stderr, exitCode } = await runOnFakeWin32(`
+const { acquireLock } = await import(${JSON.stringify(PID_MODULE)});
+const ok = acquireLock(process.pid);
+console.log('ACQUIRE=' + ok);
+`);
+      expect(exitCode).toBe(0);
+      // The clear, immediate daemon-support message — not a TinyCC header error.
+      expect(stderr).toContain('not compatible with native Windows');
+      expect(stderr).toContain('WSL2 or Docker');
+      expect(stderr).not.toContain('sys/file.h');
+    }, { timeout: 15000 });
+  });
+});

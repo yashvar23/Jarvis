@@ -1,0 +1,5 @@
+{
+  "name": "@zoyapieces/piece-zoya-ask",
+  "version": "0.0.1",
+  "main": "./dist/src/index.js"
+}

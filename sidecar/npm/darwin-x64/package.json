@@ -1,0 +1,13 @@
+{
+  "name": "@zoya/sidecar-darwin-x64",
+  "version": "0.1.0",
+  "description": "Zoya sidecar binary for macOS x64",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yashvar23/zoya.git",
+    "directory": "sidecar/npm/darwin-x64"
+  },
+  "os": ["darwin"],
+  "cpu": ["x64"],
+  "files": ["bin"]
+}

@@ -1,0 +1,54 @@
+# Version control
+.git/
+.github/
+.claude/
+
+# Dependencies (users install their own)
+node_modules/
+
+# Test files
+**/*.test.ts
+**/test.ts
+**/test-*.ts
+**/test-*.yaml
+**/__tests__/
+
+# Dev-only files
+examples/
+scripts/
+!scripts/ensure-bun.js
+VISION.md
+CLAUDE.md
+**/*.md
+!README.md
+
+# Internal READMEs that document source-tree directories -- shipped users
+# don't need them. Listed explicitly because `!README.md` above re-includes
+# every README in the tree.
+src/workflows/pieces-library/README.md
+
+# UI source (only dist + public needed)
+ui/src/
+ui/index.html
+ui/tailwind.config.ts
+ui/tsconfig.json
+
+# Build artifacts
+*.heapsnapshot
+*.log
+trace.json*
+.env
+.env.*
+
+# Sidecar binaries (Windows-only, users build locally)
+sidecar/
+
+# Heavy WASM/ONNX assets (copied from node_modules via postinstall)
+ui/public/ort/
+ui/public/openwakeword/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

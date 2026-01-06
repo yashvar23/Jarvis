@@ -1,0 +1,22 @@
+changelog:
+  categories:
+    - title: "🚀 Features"
+      labels: [feature]
+    - title: "🐛 Bug Fixes"
+      labels: [bug]
+    - title: "🏗️ Infrastructure"
+      labels: [infrastructure]
+    - title: "📦 Packaging"
+      labels: [packaging]
+    - title: "⚡ Performance"
+      labels: [performance]
+    - title: "♻️ Refactoring"
+      labels: [refactoring]
+    - title: "🔒 Security"
+      labels: [security]
+    - title: "📖 Documentation"
+      labels: [documentation]
+    - title: "Other Changes"
+      labels: ["*"]
+  exclude:
+    labels: [skip-changelog]

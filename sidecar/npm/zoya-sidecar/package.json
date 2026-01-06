@@ -1,0 +1,21 @@
+{
+  "name": "@zoya/sidecar",
+  "version": "0.1.0",
+  "description": "Zoya sidecar client -- connects to the brain and executes RPC requests locally",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yashvar23/zoya.git",
+    "directory": "sidecar/npm/zoya-sidecar"
+  },
+  "bin": {
+    "zoya": "bin/zoya"
+  },
+  "files": ["bin"],
+  "optionalDependencies": {
+    "@zoya/sidecar-darwin-arm64": "0.1.0",
+    "@zoya/sidecar-darwin-x64": "0.1.0",
+    "@zoya/sidecar-linux-x64": "0.1.0",
+    "@zoya/sidecar-linux-arm64": "0.1.0",
+    "@zoya/sidecar-win32-x64": "0.1.0"
+  }
+}

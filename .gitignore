@@ -1,0 +1,64 @@
+# dependencies (bun install)
+node_modules
+
+# output
+out
+dist
+*.tgz
+
+# Built Zoya piece artifacts (created by scripts/build-pieces.ts)
+src/workflows/activepieces/packages/pieces/zoya/*/dist/
+
+# code coverage
+coverage
+*.lcov
+
+# logs
+/logs
+_.log
+report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
+
+# dotenv environment variable files
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# caches
+.eslintcache
+.cache
+*.tsbuildinfo
+
+# IntelliJ based IDEs
+.idea
+
+# Finder (MacOS) folder config
+.DS_Store
+
+# database files
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+data/
+
+# wake word model + WASM files (copied from node_modules)
+ui/public/openwakeword/
+ui/public/ort/
+
+# built UI bundle
+ui/dist/
+
+# sidecar build output
+sidecar/desktop-bridge/bin/
+sidecar/desktop-bridge/obj/
+
+eng.traineddata
+
+# install-method marker — written at install time, never committed
+.install-method
+
+# Ignore agent files
+CLAUDE.md
+AGENTS.md
