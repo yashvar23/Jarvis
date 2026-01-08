@@ -67,3 +67,4 @@ export const ListProjectReleasesRequest = z.object({
 })
 
 export type ListProjectReleasesRequest = z.infer<typeof ListProjectReleasesRequest>
+
