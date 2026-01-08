@@ -480,3 +480,4 @@ export async function testLLMProvider(
     return { ok: false, error: err instanceof Error ? err.message : String(err) };
   }
 }
+
