@@ -7,3 +7,4 @@ export const SignInRequest = z.object({
 })
 
 export type SignInRequest = z.infer<typeof SignInRequest>
+
