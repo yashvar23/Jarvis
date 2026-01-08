@@ -219,3 +219,4 @@ export function buildToolGuide(hasSidecars: boolean): string {
 
   return lines.join('\n');
 }
+
