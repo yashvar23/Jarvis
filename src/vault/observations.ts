@@ -214,3 +214,4 @@ export function getRecentObservations(
 
   return rows.map(parseObservation);
 }
+
