@@ -47,3 +47,4 @@ export function applyQuickOverride(
   else overrides.push(next as typeof overrides[number]);
   return { ...cfg, overrides };
 }
+
