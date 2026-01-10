@@ -50,3 +50,4 @@ export type McpToolDefinition = {
     permission?: Permission
     execute: (args: Record<string, unknown>) => Promise<{ content: Array<{ type: 'text', text: string }> }>
 }
+
