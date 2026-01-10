@@ -182,3 +182,4 @@ function buildIndex(): void {
   _index = new Map(WORKFLOW_EVENT_TYPES.map((m) => [m.type, m]));
   _indexBuilt = true;
 }
+
