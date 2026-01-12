@@ -130,3 +130,4 @@ type BackwardCompatiblePieceMetadata = Omit<PieceMetadata, 'name' | 'version' | 
   i18n?: PieceMetadata['i18n']
 }
 
+
