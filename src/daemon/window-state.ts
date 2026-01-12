@@ -113,3 +113,4 @@ export function clampBoundsToViewport(
   if (x === bounds.x && y === bounds.y) return bounds;
   return { x, y, w: bounds.w, h: bounds.h };
 }
+
