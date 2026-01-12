@@ -22,3 +22,4 @@ export const SaveTriggerEventRequest = z.object({
 })
 
 export type SaveTriggerEventRequest = z.infer<typeof SaveTriggerEventRequest>
+
