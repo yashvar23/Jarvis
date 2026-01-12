@@ -105,3 +105,4 @@ export function reportCompletion(
   child.clearTask();
   child.idle();
 }
+
