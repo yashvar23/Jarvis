@@ -115,3 +115,4 @@ export function matchWindowControl(transcript: string): WindowControl | null {
 
   return { action, target };
 }
+
