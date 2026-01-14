@@ -100,3 +100,4 @@ export type PieceSelectorPieceItem =
 export type PieceSelectorItem = PieceSelectorPieceItem | PrimitiveStepMetadata;
 
 export type HandleSelectActionOrTrigger = (item: PieceSelectorItem) => void;
+
