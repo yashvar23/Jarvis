@@ -167,3 +167,4 @@ export const documentTool: ToolDefinition = {
     }
   },
 };
+
