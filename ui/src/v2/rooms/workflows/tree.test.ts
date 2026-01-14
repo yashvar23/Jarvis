@@ -433,3 +433,4 @@ describe("pathToStep", () => {
     expect(pathToStep(fixture(), "ghost")).toBeNull();
   });
 });
+
