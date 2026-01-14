@@ -90,3 +90,4 @@ export function deleteVectors(ref_type: string, ref_id: string): void {
   const stmt = db.prepare('DELETE FROM vectors WHERE ref_type = ? AND ref_id = ?');
   stmt.run(ref_type, ref_id);
 }
+
