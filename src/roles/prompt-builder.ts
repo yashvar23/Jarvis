@@ -276,3 +276,4 @@ export function buildSystemPromptParts(role: RoleDefinition, context?: PromptCon
 
   return { static: staticPrompt, dynamic: dynamicSections.join('\n') };
 }
+
