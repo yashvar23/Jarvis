@@ -74,3 +74,4 @@ export abstract class BaseHttpClient implements HttpClient {
     this.authenticationConverter.convert(authentication, headers);
   }
 }
+
