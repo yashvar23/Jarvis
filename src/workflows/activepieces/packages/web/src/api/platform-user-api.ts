@@ -19,3 +19,4 @@ export const platformUserApi = {
     return api.post<User>(`/v1/users/${id}`, request);
   },
 };
+
