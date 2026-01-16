@@ -109,3 +109,4 @@ function calculateDelayInMs(amount: number, unit: TimeUnit): number {
   }
   return delayInMs;
 }
+
