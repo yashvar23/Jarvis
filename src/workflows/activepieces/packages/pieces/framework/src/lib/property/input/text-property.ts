@@ -20,3 +20,4 @@ export const LongTextProperty = z.object({
 
 export type LongTextProperty<R extends boolean> = BasePropertySchema &
     TPropertyValue<string, PropertyType.LONG_TEXT, R>;
+
