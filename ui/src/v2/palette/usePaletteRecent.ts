@@ -121,3 +121,4 @@ function toResult(x: unknown): PaletteResult | null {
     status: undefined,
   };
 }
+
