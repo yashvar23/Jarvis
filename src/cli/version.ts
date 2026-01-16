@@ -79,3 +79,4 @@ export function getInstalledVersion(packageRoot: string): string {
   const described = describedRaw && looksLikeVersion(describedRaw) ? describedRaw : null;
   return selectInstalledVersion(null, described, pkgVersion);
 }
+
