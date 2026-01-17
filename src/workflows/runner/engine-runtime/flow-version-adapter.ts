@@ -288,3 +288,4 @@ export function collectCodeActions(version: UpstreamFlowVersion): Array<{
   visit(version.trigger.nextAction);
   return result;
 }
+
