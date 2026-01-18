@@ -98,3 +98,4 @@ describe('orchestrator.executeRealtimeToolCall (auto-approve bridge)', () => {
     expect(out.toLowerCase()).toContain('error');
   });
 });
+
