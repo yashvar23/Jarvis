@@ -242,3 +242,4 @@ export function getWebappInstructionsForMessage(message: string): string {
     return '';
   }
 }
+
