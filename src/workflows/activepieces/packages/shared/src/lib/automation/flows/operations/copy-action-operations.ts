@@ -16,3 +16,4 @@ export function _getActionsForCopy(selectedSteps: string[], flowVersion: FlowVer
         })
         .sort((a, b) => allSteps.indexOf(a) - allSteps.indexOf(b)) as FlowAction[]
 }
+
