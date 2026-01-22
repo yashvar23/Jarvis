@@ -22,3 +22,4 @@ i18n
     returnEmptyString: false,
   });
 export default i18n;
+
