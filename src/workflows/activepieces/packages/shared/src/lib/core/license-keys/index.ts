@@ -48,3 +48,4 @@ export type CreateTrialLicenseKeyRequestBody = z.infer<typeof CreateTrialLicense
 
 
 export type LicenseKeyEntity = z.infer<typeof LicenseKeyEntity>
+
