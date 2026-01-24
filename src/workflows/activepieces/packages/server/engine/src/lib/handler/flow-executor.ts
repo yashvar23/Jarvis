@@ -174,3 +174,4 @@ const applyLogSizeLimitIfExceeded = (
             },
         })
 }
+
