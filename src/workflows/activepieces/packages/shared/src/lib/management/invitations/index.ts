@@ -65,3 +65,4 @@ export const ListUserInvitationsRequest = z.object({
 })
 
 export type ListUserInvitationsRequest = z.infer<typeof ListUserInvitationsRequest>
+
