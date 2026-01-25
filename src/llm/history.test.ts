@@ -130,3 +130,4 @@ describe('compactHistory', () => {
     expect(compactHistory(single, 1_000)).toBe(single);
   });
 });
+
