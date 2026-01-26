@@ -317,3 +317,4 @@ export class LinuxAppController implements AppController {
     return { x, y, width, height };
   }
 }
+
