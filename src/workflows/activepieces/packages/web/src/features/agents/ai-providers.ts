@@ -91,3 +91,4 @@ export type AiProviderInfo = {
   markdown: string;
   logoUrl: string;
 };
+
