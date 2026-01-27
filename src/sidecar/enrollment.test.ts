@@ -130,3 +130,4 @@ test('rotate: fresh sid, old tokens die with the old row', async () => {
     await rm(dir, { recursive: true, force: true });
   }
 });
+
