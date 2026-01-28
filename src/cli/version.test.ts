@@ -224,3 +224,4 @@ describe('CLI --version output', () => {
     expect(stdout).toMatch(/v\d+\.\d+/);
   }, { timeout: 15000 });
 });
+
