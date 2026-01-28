@@ -790,3 +790,4 @@ describe("TriggerManager: engine-managed triggers (Phase J)", () => {
     expect(logs.some((l) => l.includes("engine ON_ENABLE failed"))).toBe(true);
   });
 });
+
