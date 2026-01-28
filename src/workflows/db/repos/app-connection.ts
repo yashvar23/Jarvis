@@ -214,3 +214,4 @@ export function listConnections(
 export function deleteConnection(id: string): void {
   db().run(`DELETE FROM app_connection WHERE id = ?`, [id]);
 }
+
