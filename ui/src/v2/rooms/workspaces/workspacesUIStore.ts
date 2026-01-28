@@ -107,3 +107,4 @@ function subscribe(fn: () => void): () => void {
 export function useWorkspacesUIState(): WorkspacesUIState {
   return useSyncExternalStore(subscribe, getWorkspacesUIState, getWorkspacesUIState);
 }
+
