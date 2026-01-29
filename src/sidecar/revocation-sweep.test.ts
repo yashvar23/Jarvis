@@ -77,3 +77,4 @@ describe('revocation severs live sessions (review finding)', () => {
     expect(manager.isEnrolled(sidecar.id)).toBe(false);
   });
 });
+
