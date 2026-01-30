@@ -178,3 +178,4 @@ if (fullyBlind.length === 0) {
     console.log(`- **${p.pieceDisplay}** (${p.pieceName}) -- ${counts.join(", ")}`);
   }
 }
+
