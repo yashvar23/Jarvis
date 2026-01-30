@@ -81,3 +81,4 @@ build().catch((err) => {
   console.error('[build-sidecar] Error:', err);
   process.exit(1);
 });
+
