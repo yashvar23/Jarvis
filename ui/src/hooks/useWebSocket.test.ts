@@ -148,3 +148,4 @@ describe("formatProviderErrorMessage — status-code brittleness fix", () => {
     expect(r.summary).toContain("Check your API key and model settings");
   });
 });
+
