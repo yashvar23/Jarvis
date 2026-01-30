@@ -267,3 +267,4 @@ describe("manage_workflow: compose", () => {
     expect(out.rawResponse).toContain("truncated");
   });
 });
+
