@@ -24,3 +24,4 @@ export const logsUploadRoute: RouteHandler = async (ctx: RouteContext) => {
   writeFileSync(resolve(dir, `${runId}.bin`), buf);
   return json({ ok: true, bytes: buf.byteLength });
 };
+
