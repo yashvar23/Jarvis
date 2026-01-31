@@ -409,3 +409,4 @@ The drift test (`runtime/test-fixtures-drift.test.ts`) compares the live engine-
 - **`PATCHED_VENDOR_SOURCES`** -- the explicit list of vendored upstream files we patch in this fork. Editing any of them must flip the engine bundle hash.
 - **`CATALOG_SCHEMA_VERSION`** -- a string mixed into the piece-metadata cache key. Bump it whenever you change the catalog projection format.
 - **`SANDBOX_PROCESS`** -- the engine execution mode we use. Child-process IPC, no `isolated-vm`.
+
