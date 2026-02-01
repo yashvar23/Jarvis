@@ -89,3 +89,4 @@ export class CredentialResolver {
 // own files (`google-source.ts`, `telegram-source.ts`). They're constructed
 // during daemon bootstrap and registered on this resolver. Keep new sources
 // in their own file too rather than growing this one.
+
