@@ -57,3 +57,4 @@ export type AccessedItem = {
   iconTextColor?: string;
   iconLetter?: string;
 };
+
