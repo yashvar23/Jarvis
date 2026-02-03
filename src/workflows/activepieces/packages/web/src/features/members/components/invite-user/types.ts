@@ -11,3 +11,4 @@ export type EmailStatusType =
       type: 'new-user';
       user: undefined;
     };
+
