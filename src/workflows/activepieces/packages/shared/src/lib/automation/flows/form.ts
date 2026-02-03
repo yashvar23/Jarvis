@@ -52,3 +52,4 @@ export const ChatUIResponse = z.object({
 export type ChatUIResponse = z.infer<typeof ChatUIResponse>
 
 export const USE_DRAFT_QUERY_PARAM_NAME = 'useDraft'
+
