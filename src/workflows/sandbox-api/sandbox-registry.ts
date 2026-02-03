@@ -108,3 +108,4 @@ export class SandboxRegistry {
     return this.get(claims.sandboxId);
   }
 }
+
