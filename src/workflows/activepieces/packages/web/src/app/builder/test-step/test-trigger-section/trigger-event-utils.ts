@@ -48,3 +48,4 @@ export const triggerEventUtils = {
     return 'polling';
   },
 };
+
