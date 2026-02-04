@@ -112,3 +112,4 @@ describe('cron timezone: DST day-boundary regressions (review findings)', () => 
     expect(next?.toISOString()).toBe('2026-11-02T13:00:00.000Z'); // 8am EST
   });
 });
+
