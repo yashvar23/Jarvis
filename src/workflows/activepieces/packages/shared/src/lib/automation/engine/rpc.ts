@@ -77,3 +77,4 @@ export function createNotifyServer<T extends Contract>(
 function isRpcErrorEnvelope(value: unknown): value is { __rpcError: string } {
     return typeof value === 'object' && value !== null && '__rpcError' in value
 }
+
