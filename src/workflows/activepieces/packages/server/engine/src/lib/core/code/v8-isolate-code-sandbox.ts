@@ -21,3 +21,4 @@ export const v8IsolateCodeSandbox: CodeSandbox = {
         throw new Error(message)
     },
 }
+
