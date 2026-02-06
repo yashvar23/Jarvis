@@ -9,3 +9,4 @@ export const ConcurrencyPool = z.object({
     maxConcurrentJobs: z.number().int().positive(),
 })
 export type ConcurrencyPool = z.infer<typeof ConcurrencyPool>
+
