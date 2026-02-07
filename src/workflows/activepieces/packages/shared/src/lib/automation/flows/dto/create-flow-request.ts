@@ -12,3 +12,4 @@ export const CreateFlowRequest = z.object({
 })
 
 export type CreateFlowRequest = z.infer<typeof CreateFlowRequest>
+
