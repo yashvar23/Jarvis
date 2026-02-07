@@ -76,3 +76,4 @@ describe('BrowserController parameterization', () => {
     expect(ctrl).toBeDefined();
   });
 });
+
