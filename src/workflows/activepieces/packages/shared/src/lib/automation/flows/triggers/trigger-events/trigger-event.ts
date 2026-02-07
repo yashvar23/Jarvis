@@ -18,3 +18,4 @@ export const TriggerEventWithPayload = TriggerEvent.extend({
 })
 
 export type TriggerEventWithPayload = z.infer<typeof TriggerEventWithPayload>
+
