@@ -64,3 +64,4 @@ export class EmergencyController {
     this.onStateChange = cb;
   }
 }
+
