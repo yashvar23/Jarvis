@@ -84,3 +84,4 @@ export async function stopDaemonGracefully(options: StopOptions = {}): Promise<S
   releaseLock();
   return { wasRunning: true, pid, graceful };
 }
+
