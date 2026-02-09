@@ -455,3 +455,4 @@ switch (command) {
     console.log(c.dim('Run "zoya help" for usage information.'));
     process.exit(1);
 }
+
