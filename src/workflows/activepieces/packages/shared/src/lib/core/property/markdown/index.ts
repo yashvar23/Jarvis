@@ -4,3 +4,4 @@ export enum MarkdownVariant {
     WARNING = 'WARNING',
     TIP = 'TIP',
 }
+
