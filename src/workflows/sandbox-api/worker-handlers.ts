@@ -139,3 +139,4 @@ export class DefaultWorkerHandlers
     this.opts.onLogLine?.(entry);
   }
 }
+
