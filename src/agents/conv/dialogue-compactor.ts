@@ -139,3 +139,4 @@ export class DialogueCompactor {
     return response.content?.trim() || '(prior turns omitted)';
   }
 }
+
