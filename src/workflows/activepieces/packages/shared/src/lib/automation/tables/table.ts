@@ -30,3 +30,4 @@ export const PopulatedTable = Table.extend({
 })
 
 export type PopulatedTable = z.infer<typeof PopulatedTable>
+
