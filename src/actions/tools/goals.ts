@@ -374,3 +374,4 @@ function levelDepth(level: string): number {
   };
   return depths[level] ?? 0;
 }
+
