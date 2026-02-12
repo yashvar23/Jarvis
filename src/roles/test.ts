@@ -104,3 +104,4 @@ const isInvalid = validateRole(invalidRole);
 console.log(isInvalid ? '❌ Should have been invalid!' : '✅ Correctly rejected invalid role');
 
 console.log('\n✅ All tests passed!');
+
