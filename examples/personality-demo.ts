@@ -115,3 +115,4 @@ console.log(`   Core traits: ${updated.core_traits.join(', ')}`);
 console.log(`   Shared references: ${updated.relationship.shared_references.join(', ')}\n`);
 
 console.log('=== Demo Complete ===');
+
