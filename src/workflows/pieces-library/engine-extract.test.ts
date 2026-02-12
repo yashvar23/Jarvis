@@ -159,3 +159,4 @@ describe("engine extracts metadata for an npm-installed piece (gated)", () => {
     120_000,
   );
 });
+
