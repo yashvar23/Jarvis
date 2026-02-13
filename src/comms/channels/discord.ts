@@ -232,3 +232,4 @@ export function splitMessage(text: string, maxLength: number): string[] {
 
   return chunks;
 }
+
