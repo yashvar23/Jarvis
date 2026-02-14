@@ -339,3 +339,4 @@ export function getSuggestionStats(startTime: number, endTime: number): { total:
   `).get(startTime, endTime) as { total: number; acted_on: number };
   return { total: row.total, actedOn: row.acted_on ?? 0 };
 }
+
