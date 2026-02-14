@@ -146,3 +146,4 @@ describe('detectInstallMethod — path inference', () => {
     expect(info.method).toBe('unknown');
   });
 });
+
