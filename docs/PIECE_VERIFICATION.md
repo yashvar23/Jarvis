@@ -223,3 +223,4 @@ Community pieces ship pre-built from npm and live under `~/.zoya/pieces/node_mod
 4. Walk Stages 4 / 6 / 7 above. Stages 1-3 don't apply (you didn't write the source).
 
 If the catalog refresh doesn't see the new piece, the bundle cache may be holding a stale entry. The install path invalidates the bundle cache automatically; if it didn't, delete `~/.zoya/cache/piece-metadata.json` and restart.
+
