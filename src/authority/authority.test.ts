@@ -650,3 +650,4 @@ describe('AuthorityLearner', () => {
     expect(learner.getSuggestions().length).toBe(0);
   });
 });
+
