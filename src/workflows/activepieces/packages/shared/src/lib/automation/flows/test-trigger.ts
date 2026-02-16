@@ -22,3 +22,4 @@ export const CancelTestTriggerRequestBody = z.object({
 })
 
 export type CancelTestTriggerRequestBody = z.infer<typeof CancelTestTriggerRequestBody>
+
