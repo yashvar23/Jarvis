@@ -16,3 +16,4 @@ export type MarkDownProperty = BasePropertySchema &
   > & {
     variant?: MarkdownVariant;
   };
+
