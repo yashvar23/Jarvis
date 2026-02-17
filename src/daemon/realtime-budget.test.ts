@@ -118,3 +118,4 @@ describe('RealtimeBudgetTracker file persistence', () => {
     expect(RealtimeBudgetTracker.fromFile(path).getMonthSpend(NOW)).toBe(0);
   });
 });
+
