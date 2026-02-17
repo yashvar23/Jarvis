@@ -23,3 +23,4 @@ export const triggerEventHooks = {
     return { pollResults, refetch };
   },
 };
+
