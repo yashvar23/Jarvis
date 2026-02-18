@@ -103,3 +103,4 @@ export const piecesApi = {
     return api.delete(`/v1/pieces/${id}`);
   },
 };
+
