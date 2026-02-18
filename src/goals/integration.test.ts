@@ -327,3 +327,4 @@ test('getActiveGoalsSummary sorts by level hierarchy', () => {
   expect(fitIndex).toBeLessThan(loseIndex);
   expect(loseIndex).toBeLessThan(runIndex);
 });
+
