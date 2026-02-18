@@ -213,3 +213,4 @@ function ensureApiSuffix(url: string): string {
   const slashed = ensureTrailingSlash(url);
   return slashed.endsWith("/api/") ? slashed : slashed + "api/";
 }
+
