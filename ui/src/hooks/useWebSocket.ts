@@ -1048,3 +1048,4 @@ function buildIntentLabel(
   const trimmed = transcript.trim();
   return trimmed.length > 0 ? `${head}: "${trimmed}"` : head;
 }
+
