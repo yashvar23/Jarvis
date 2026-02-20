@@ -83,3 +83,4 @@ export const DEFAULT_RPC_TIMEOUTS: RPCTimeouts = {
   initial: 30_000,
   max: 300_000,
 };
+
