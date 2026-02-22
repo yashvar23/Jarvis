@@ -73,3 +73,4 @@ export async function chmodWithWarning(filePath: string, mode: number, label: st
     console.warn(`[${label}] Failed to chmod ${filePath} to ${mode.toString(8)}: ${message}`);
   }
 }
+
