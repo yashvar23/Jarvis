@@ -318,3 +318,4 @@ function isInsideContainer(): boolean {
     return false;
   }
 }
+
