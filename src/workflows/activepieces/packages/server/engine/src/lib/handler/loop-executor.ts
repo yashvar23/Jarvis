@@ -75,3 +75,4 @@ export const loopExecutor: BaseExecutor<LoopOnItemsAction> = {
         return newExecutionContext.upsertStep(action.name, stepOutput.setDuration(performance.now() - stepStartTime))
     },
 }
+
