@@ -86,3 +86,4 @@ To re-sync to a different upstream version:
 3. Run `bun run scripts/sync-activepieces.ts` to perform the sync.
 4. Run `bun run check:no-ee` to confirm the EE guard is still green.
 5. Resolve any local patches against new upstream.
+
