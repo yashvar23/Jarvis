@@ -55,3 +55,4 @@ describe('TelemetryService lifecycle', () => {
     await expect(svc.stop()).resolves.toBeUndefined();
   });
 });
+
