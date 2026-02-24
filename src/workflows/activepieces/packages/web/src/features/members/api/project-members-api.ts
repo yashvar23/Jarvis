@@ -21,3 +21,4 @@ export const projectMembersApi = {
     return api.delete<void>(`/v1/project-members/${id}`);
   },
 };
+
