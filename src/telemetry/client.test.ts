@@ -108,3 +108,4 @@ describe('sendPing failure handling (never throws)', () => {
     expect(out.reason).toBe('network');
   });
 });
+
