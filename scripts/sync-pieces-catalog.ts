@@ -504,3 +504,4 @@ function fatal(msg: string): never {
 }
 
 await main();
+
