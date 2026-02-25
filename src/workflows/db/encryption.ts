@@ -173,3 +173,4 @@ export function decryptJson(stored: string, context = "stored value"): unknown {
 export function isEncrypted(stored: string): boolean {
   return stored.startsWith(PREFIX);
 }
+
