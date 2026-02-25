@@ -90,3 +90,4 @@ export const FAILED_STATES = [
 export const isFailedState = (status: FlowRunStatus): boolean => {
     return FAILED_STATES.includes(status)
 }
+
