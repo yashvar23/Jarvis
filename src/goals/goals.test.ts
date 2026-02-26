@@ -398,3 +398,4 @@ describe('Vault — Goals', () => {
     expect(metrics.behind).toBe(1);
   });
 });
+
