@@ -7,3 +7,4 @@
 export interface IAgentService {
   handleMessage(text: string, channel?: string): Promise<string>;
 }
+
