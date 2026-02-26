@@ -267,3 +267,4 @@ updatePersonality({
 - [ ] Personality rollback/versioning
 - [ ] Advanced signal detection using LLMs
 - [ ] User satisfaction scoring
+
