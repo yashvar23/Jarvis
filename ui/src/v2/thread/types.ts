@@ -147,3 +147,4 @@ export type VoiceIntentLite = {
 };
 
 export type ThreadItemKind = ThreadItem["kind"];
+
