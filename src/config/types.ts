@@ -542,3 +542,4 @@ export const USER_OWNED_SECTIONS = [
 ] as const satisfies readonly (keyof ZoyaConfig)[];
 
 export type UserOwnedSection = (typeof USER_OWNED_SECTIONS)[number];
+
