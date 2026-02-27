@@ -170,3 +170,4 @@ describe('user-settings', () => {
     expect(config.personality.core_traits).toEqual(DEFAULT_CONFIG.personality.core_traits);
   });
 });
+
