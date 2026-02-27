@@ -235,3 +235,4 @@ describe("buildExtractPieceMetadataOperation", () => {
     expect(env.operation["pieceName"]).toBe("@activepieces/piece-claude");
   });
 });
+
