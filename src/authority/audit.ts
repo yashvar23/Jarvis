@@ -170,3 +170,4 @@ export class AuditTrail {
     return stats;
   }
 }
+
