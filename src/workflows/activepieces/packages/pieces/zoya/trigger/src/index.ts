@@ -27,3 +27,4 @@ export const zoyaTriggerPiece = createPiece({
   actions: [runWorkflowAction],
   triggers: [onEventTrigger],
 });
+
