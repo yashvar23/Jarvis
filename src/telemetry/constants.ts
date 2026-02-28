@@ -11,3 +11,4 @@ export function telemetryEndpoint(): { url: string; key: string } | null {
   }
   return { url: TELEMETRY_URL, key: TELEMETRY_ANON_KEY };
 }
+
