@@ -19,3 +19,4 @@ export const SwitchPlatformRequest = z.object({
 })
 
 export type SwitchPlatformRequest = z.infer<typeof SwitchPlatformRequest>
+
