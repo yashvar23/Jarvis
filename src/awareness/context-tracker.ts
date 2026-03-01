@@ -347,3 +347,4 @@ function simpleHash(str: string): string {
   }
   return hash.toString(36);
 }
+
