@@ -251,3 +251,4 @@ describe("uninstallPiece", () => {
     expect(existsSync(resolve(base, "package.json"))).toBe(false);
   });
 });
+
