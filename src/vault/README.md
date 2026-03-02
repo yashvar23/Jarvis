@@ -108,3 +108,4 @@ SQLite database with the following tables:
 - `agent_messages`: Inter-agent communication
 - `personality_state`: Personality model storage
 - `conversations`: Conversation tracking
+
