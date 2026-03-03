@@ -237,3 +237,4 @@ export async function enrollDevice(
   const sidecar = db.query('SELECT * FROM sidecars WHERE id = ?').get(id) as SidecarRecord;
   return { token, sidecar, created: !existing };
 }
+
