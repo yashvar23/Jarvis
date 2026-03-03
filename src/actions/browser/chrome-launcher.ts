@@ -276,3 +276,4 @@ export async function stopChrome(running: RunningBrowser): Promise<void> {
 
   console.log(`[ChromeLauncher] Chrome stopped`);
 }
+
