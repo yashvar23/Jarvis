@@ -6,3 +6,4 @@ export enum HttpMethod {
   DELETE = 'DELETE',
   HEAD = 'HEAD',
 }
+
