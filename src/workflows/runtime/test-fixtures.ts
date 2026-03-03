@@ -126,3 +126,4 @@ export function sampleCatalog(): PieceCatalog {
   ];
   return new PieceCatalog(entries);
 }
+
