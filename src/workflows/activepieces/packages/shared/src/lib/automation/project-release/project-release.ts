@@ -15,3 +15,4 @@ export const ProjectRelease = z.object({
 })
 
 export type ProjectRelease = z.infer<typeof ProjectRelease>
+
