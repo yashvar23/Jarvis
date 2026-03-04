@@ -399,3 +399,4 @@ export function detectPlatform(): 'macos' | 'linux' | 'wsl' {
 
   return 'linux';
 }
+
