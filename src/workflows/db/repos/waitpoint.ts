@@ -159,3 +159,4 @@ export function markWaitpointResumed(id: string, now = Date.now()): boolean {
 export function _clearWaitpointsForTests(): void {
   db().exec(`DELETE FROM waitpoint`);
 }
+
