@@ -5,3 +5,4 @@ declare module '@tanstack/query-db-collection' {
     showErrorDialog?: boolean;
   }
 }
+
