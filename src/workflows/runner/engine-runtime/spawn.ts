@@ -116,3 +116,4 @@ export function spawnEngine(opts: SpawnEngineOptions): SpawnedEngine {
     alive: () => isAlive,
   };
 }
+
