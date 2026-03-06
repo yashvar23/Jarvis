@@ -50,3 +50,4 @@ export type GitCommit = {
   author: string;
   date: number;
 };
+
