@@ -54,3 +54,4 @@ export class SignalAdapter implements ChannelAdapter {
     return this.connected;
   }
 }
+
