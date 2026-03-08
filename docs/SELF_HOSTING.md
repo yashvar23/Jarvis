@@ -265,3 +265,4 @@ timezone: "Europe/Rome"
 `GET /health` is unauthenticated and safe to point uptime monitors at. It
 works over the unix socket too, e.g.
 `curl --unix-socket /run/zoya/zoya.sock http://localhost/health`.
+
