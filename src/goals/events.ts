@@ -26,3 +26,4 @@ export type GoalEvent = {
   data: Record<string, unknown>;
   timestamp: number;
 };
+
