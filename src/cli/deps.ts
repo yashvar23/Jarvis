@@ -587,3 +587,4 @@ export async function runDependencyCheck(config: any): Promise<void> {
     }
   }
 }
+
