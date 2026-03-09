@@ -144,3 +144,4 @@ export function parseFlowMetadata(row: FlowRow): Record<string, unknown> | null 
   if (!row.metadata) return null;
   return JSON.parse(row.metadata) as Record<string, unknown>;
 }
+
