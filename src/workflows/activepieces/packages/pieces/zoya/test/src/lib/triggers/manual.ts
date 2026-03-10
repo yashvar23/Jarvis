@@ -39,3 +39,4 @@ export const manualTrigger = createTrigger({
     return [payload];
   },
 });
+
