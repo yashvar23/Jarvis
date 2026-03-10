@@ -341,3 +341,4 @@ export function createScopedToolRegistry(allowedCategories: string[]): ToolRegis
   }
   return registry;
 }
+
