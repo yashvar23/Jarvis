@@ -161,3 +161,4 @@ describe("CredentialResolver", () => {
     expect(got).toBeNull();
   });
 });
+
