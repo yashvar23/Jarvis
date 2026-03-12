@@ -9,3 +9,4 @@ export const CheckboxProperty = z.object({
 
 export type CheckboxProperty<R extends boolean> = BasePropertySchema &
   TPropertyValue<boolean, PropertyType.CHECKBOX, R>;
+
