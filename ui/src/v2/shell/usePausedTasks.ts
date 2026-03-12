@@ -64,3 +64,4 @@ export function usePausedTasks(events: TaskEvent[]): {
 
   return { tasks, refresh };
 }
+
