@@ -282,3 +282,4 @@ describe('DESKTOP_TOOLS', () => {
     expect(String(result)).toContain('Local tool execution is disabled');
   });
 });
+
