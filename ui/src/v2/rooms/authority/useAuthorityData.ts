@@ -325,3 +325,4 @@ export function useAuthorityData() {
     setEmergency,
   };
 }
+
