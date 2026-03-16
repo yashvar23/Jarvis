@@ -17,3 +17,4 @@ export type {
 export { ROW_HEIGHT_MAP, RowHeight } from './types/types';
 export type { Row } from './types/types';
 export { tablesUtils } from './utils/utils';
+
