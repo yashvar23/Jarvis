@@ -90,3 +90,4 @@ export function classifySidecarVersion(reported: string): SidecarUpdateStatus {
   if (compareSemver(v, recommended) < 0) return 'suggested';
   return 'ok';
 }
+
