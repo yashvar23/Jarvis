@@ -349,3 +349,4 @@ export async function runUninstallWizard(packageRoot = PACKAGE_ROOT): Promise<vo
   console.log(c.green('\n✓ Uninstall scheduled.'));
   console.log(c.dim(`  Background cleanup will finish shortly. See ${plan.logPath} if anything fails.`));
 }
+
