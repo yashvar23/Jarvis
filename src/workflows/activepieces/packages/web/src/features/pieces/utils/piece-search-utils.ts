@@ -186,3 +186,4 @@ export const pieceSearchUtils = {
   getPopularPieces,
   getHighlightedPieces,
 };
+
