@@ -21,3 +21,4 @@ describe('sidecar-launcher', () => {
     expect(isLocalhost || isIP).toBe(true);
   });
 });
+
