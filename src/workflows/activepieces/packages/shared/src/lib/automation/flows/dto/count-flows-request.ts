@@ -6,3 +6,4 @@ export const CountFlowsRequest = z.object({
 })
 
 export type CountFlowsRequest = z.infer<typeof CountFlowsRequest>
+
