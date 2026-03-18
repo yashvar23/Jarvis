@@ -194,3 +194,4 @@ export function getMethodCommands(method: InstallMethod): MethodCommands {
       };
   }
 }
+
