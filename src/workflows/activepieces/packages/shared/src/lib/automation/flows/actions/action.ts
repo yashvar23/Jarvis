@@ -379,3 +379,4 @@ export const emptyCondition: ValidBranchCondition = {
     operator: BranchOperator.TEXT_CONTAINS,
     caseSensitive: false,
 }
+
