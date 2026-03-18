@@ -118,3 +118,4 @@ export const authenticationSession = {
 function getDecodedJwt(token: string): UserPrincipal {
   return jwtDecode<UserPrincipal>(token);
 }
+
