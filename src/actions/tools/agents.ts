@@ -391,3 +391,4 @@ function handleTerminate(deps: AgentToolDeps, params: Record<string, unknown>): 
     return `Error: ${err instanceof Error ? err.message : String(err)}`;
   }
 }
+
