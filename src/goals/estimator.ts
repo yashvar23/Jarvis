@@ -183,3 +183,4 @@ Respond with ONLY valid JSON: { "hours": number, "confidence": number (0-1), "re
     }
   }
 }
+
