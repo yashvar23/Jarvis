@@ -9,3 +9,4 @@ export function installEnvProxyDispatcher(): UninstallFn {
     setGlobalDispatcher(new ProxyAgent(proxyUrl))
     return () => setGlobalDispatcher(originalDispatcher)
 }
+
