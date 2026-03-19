@@ -981,3 +981,4 @@ export function createBrowserTools(ctrl: BrowserController): ToolDefinition[] {
     },
   ];
 }
+
