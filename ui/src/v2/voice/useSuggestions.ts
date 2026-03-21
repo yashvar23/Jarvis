@@ -179,3 +179,4 @@ function itemsToTurns(items: ThreadItem[]): Array<{ role: "user" | "assistant"; 
   }
   return out.slice(-5);
 }
+
