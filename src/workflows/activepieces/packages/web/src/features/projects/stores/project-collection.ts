@@ -262,3 +262,4 @@ export const projectHooks = {
     }, [projectId, embedState.isEmbedded, location.pathname]);
   },
 };
+
