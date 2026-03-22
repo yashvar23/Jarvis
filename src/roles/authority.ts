@@ -215,3 +215,4 @@ export function getRolePermissionsSummary(role: RoleDefinition): {
     denied: listDeniedActions(role),
   };
 }
+
