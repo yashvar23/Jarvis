@@ -104,3 +104,4 @@ export type GoalUpdate = {
   dependencies?: string[];
   sort_order?: number;
 };
+
