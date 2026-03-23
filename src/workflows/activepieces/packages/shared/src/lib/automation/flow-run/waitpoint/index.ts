@@ -22,3 +22,4 @@ export const CreateWaitpointResponse = z.object({
     resumeUrl: z.string(),
 })
 export type CreateWaitpointResponse = z.infer<typeof CreateWaitpointResponse>
+
