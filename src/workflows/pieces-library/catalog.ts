@@ -145,3 +145,4 @@ export function findCatalogEntry(id: string): CatalogEntry | null {
 export function catalogById(): Map<string, CatalogEntry> {
   return new Map(CATALOG.map((entry) => [entry.id, entry]));
 }
+
