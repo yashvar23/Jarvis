@@ -51,3 +51,4 @@ export function isLocalBrowserDisabled(): boolean {
 
 export const LOCAL_BROWSER_DISABLED_MSG =
   'Error: The local browser is disabled on this machine (browser.local: false). Browser actions run on a connected sidecar with the "browser" capability - none is currently available. Ask the user to open their Zoya desktop app, then retry. Do NOT retry without a sidecar.';
+
