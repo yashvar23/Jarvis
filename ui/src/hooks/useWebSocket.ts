@@ -1049,3 +1049,4 @@ function buildIntentLabel(
   return trimmed.length > 0 ? `${head}: "${trimmed}"` : head;
 }
 
+
