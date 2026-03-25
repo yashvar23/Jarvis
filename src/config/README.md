@@ -386,3 +386,4 @@ To add new configuration sections:
    ```
 
 The deep merge ensures existing configs get new defaults automatically.
+
