@@ -101,3 +101,4 @@ export function getWorkflowFile(id: string): WorkflowFile | null {
 export function _clearWorkflowFilesForTests(): void {
   db().exec(`DELETE FROM workflow_file`);
 }
+
