@@ -26,3 +26,4 @@ type ContactSalesRequest = {
   goal: string;
   numberOfEmployees: string;
 };
+
