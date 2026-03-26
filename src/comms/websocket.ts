@@ -776,3 +776,4 @@ function matchRoute(pattern: string, pathname: string): Record<string, string> |
 
   return Object.keys(params).length > 0 ? params : null;
 }
+
