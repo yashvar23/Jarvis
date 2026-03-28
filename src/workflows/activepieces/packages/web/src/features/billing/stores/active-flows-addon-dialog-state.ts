@@ -13,3 +13,4 @@ export const useManagePlanDialogStore = create<ActiveFlowsAddonDialogStore>(
     closeDialog: () => set({ isOpen: false }),
   }),
 );
+
