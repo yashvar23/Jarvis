@@ -16,3 +16,4 @@ export type HttpRequest<RequestBody extends HttpRequestBody = any> = {
   responseType?: 'arraybuffer' | 'json' | 'blob' | 'text';
   followRedirects?: boolean;
 };
+
