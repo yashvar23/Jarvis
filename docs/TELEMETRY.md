@@ -123,3 +123,4 @@ Cadence is the same: one ping at startup, then hourly.
 - Run with `ZOYA_SIDECAR_TELEMETRY=0`.
 
 Set `ZOYA_SIDECAR_TELEMETRY_DEBUG=1` to log each ping's outcome.
+
