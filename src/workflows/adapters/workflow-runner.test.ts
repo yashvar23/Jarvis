@@ -256,3 +256,4 @@ describe("ZoyaWorkflowRunnerAdapter", () => {
     expect(out.runId.length).toBeGreaterThan(0);
   });
 });
+
