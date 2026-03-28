@@ -115,3 +115,4 @@ export function hasSecret(name: string): boolean {
   const secrets = loadSecrets();
   return name in secrets;
 }
+
