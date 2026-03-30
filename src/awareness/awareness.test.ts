@@ -377,3 +377,4 @@ describe('ContextGraph', () => {
     expect(entities[0].type).toBe('tool');
   });
 });
+
