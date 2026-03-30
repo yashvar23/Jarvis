@@ -57,3 +57,4 @@ console.log(`  built:  ${engineElapsed} ms`);
 console.log(
   "\nDone. Restart the daemon so the piece-catalog cache is rebuilt against the new artifacts.",
 );
+
