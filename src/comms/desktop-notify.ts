@@ -112,3 +112,4 @@ function sendViaPowerShell(title: string, body: string): boolean {
 export function isDesktopNotifyAvailable(): boolean {
   return detectMethod() !== null;
 }
+
