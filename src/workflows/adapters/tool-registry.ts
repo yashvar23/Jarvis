@@ -36,3 +36,4 @@ export class ZoyaToolRegistryAdapter implements PieceToolRegistry {
     return this.registry.list(category).map((t) => t.name);
   }
 }
+
