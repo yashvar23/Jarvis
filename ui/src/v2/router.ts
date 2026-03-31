@@ -121,3 +121,4 @@ export function openRoom(key: RoomKey): void {
 export function closeRoom(): void {
   navigateV2({ kind: "home" });
 }
+
