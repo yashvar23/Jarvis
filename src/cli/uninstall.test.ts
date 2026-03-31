@@ -215,3 +215,4 @@ describe('buildCleanupScript — executes correctly against a fixture tree', () 
     expect(log).toContain('unlinked wrapper ' + missingWrapper);
   }, 10000);
 });
+
