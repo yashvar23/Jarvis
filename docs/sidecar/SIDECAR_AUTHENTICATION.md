@@ -287,3 +287,4 @@ CREATE TABLE IF NOT EXISTS sidecars (
 | `os`           | Operating system (e.g., `windows`, `linux`, `darwin`)                |
 | `platform`     | Platform identifier (e.g., `win32`, `linux`)                         |
 | `capabilities` | JSON array of capabilities (e.g., `["terminal","desktop","browser"]`) |
+
