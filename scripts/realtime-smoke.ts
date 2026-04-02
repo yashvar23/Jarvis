@@ -119,3 +119,4 @@ ws.addEventListener('error', () => {
 ws.addEventListener('close', (ev: CloseEvent) => {
   if (ev.code !== 1000) console.error(`✗ Socket closed: code=${ev.code} reason="${ev.reason}"`);
 });
+
