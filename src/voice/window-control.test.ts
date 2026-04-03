@@ -150,3 +150,4 @@ describe('matchWindowControl — room aliases', () => {
     expect(matchWindowControl('close!')).toEqual({ action: 'close', target: 'most_recent' });
   });
 });
+
