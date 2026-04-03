@@ -106,3 +106,4 @@ describe('parseRelativeDate', () => {
     expect(ymdhm(r!.ts)).toBe('2026-04-29 14:00');
   });
 });
+
