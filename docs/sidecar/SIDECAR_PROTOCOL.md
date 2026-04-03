@@ -354,3 +354,4 @@ Currently all events are enqueued as `normal` and processed round-robin. When pr
 - Brain sends `ping` frames every 30 seconds
 - Sidecar responds with `pong`
 - If 3 consecutive pongs are missed, brain considers the sidecar disconnected
+
