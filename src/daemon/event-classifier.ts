@@ -237,3 +237,4 @@ export function checkCommitments(): ClassifiedEvent[] {
 
   return events;
 }
+
