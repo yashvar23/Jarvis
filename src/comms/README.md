@@ -327,3 +327,4 @@ await channels.connectAll();
 ## API Reference
 
 See inline TypeScript documentation in each module for detailed API reference.
+
