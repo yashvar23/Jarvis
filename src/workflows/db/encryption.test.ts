@@ -70,3 +70,4 @@ describe("encryption", () => {
     expect(() => decryptJson("enc1:")).toThrow();
   });
 });
+
