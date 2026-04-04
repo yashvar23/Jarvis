@@ -269,3 +269,4 @@ license, and prefer pieces with a known maintainer.
 We trust npm's tarball integrity (Bun verifies SHAs against the lockfile)
 but do not run additional supply-chain checks. A `npm audit`-style step
 would be a useful follow-up.
+
