@@ -647,3 +647,4 @@ export const DESKTOP_TOOLS: ToolDefinition[] = [
   desktopFocusWindowTool,
   desktopFindElementTool,
 ];
+
