@@ -165,3 +165,4 @@ function getPanningModeFromLocalStorage(): 'grab' | 'pan' {
     ? 'grab'
     : 'pan';
 }
+
