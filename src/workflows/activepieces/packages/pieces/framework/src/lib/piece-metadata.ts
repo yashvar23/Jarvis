@@ -145,3 +145,4 @@ export const PiecePackageInformation = z.object({
   version: z.string(),
 })
 export type PiecePackageInformation = z.infer<typeof PiecePackageInformation>
+
