@@ -47,3 +47,4 @@ export const STEALTH_SCRIPT = `
     };
   }
 `;
+
