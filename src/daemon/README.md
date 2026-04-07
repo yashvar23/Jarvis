@@ -230,3 +230,4 @@ Replace placeholder services with real implementations:
 - WebSocket server for external communication
 - Commitment scheduler
 - Vector embedding service
+
