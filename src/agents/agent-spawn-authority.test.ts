@@ -161,3 +161,4 @@ describe('authority engine as prime decider for spawning', () => {
     expect(child.agent.parent_id).toBe(primary.id);
   });
 });
+
