@@ -4430,3 +4430,4 @@ if (import.meta.main) {
   const args = parseArgs();
   await startDaemon(args);
 }
+
