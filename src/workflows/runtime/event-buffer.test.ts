@@ -71,3 +71,4 @@ describe("WorkflowEventBuffer dropped() signal", () => {
     expect(sig.count).toBe(2);
   });
 });
+
