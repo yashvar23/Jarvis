@@ -525,3 +525,4 @@ describe('SarvamSTT.transcribe', () => {
     await expect(stt.transcribe(wav)).rejects.toThrow(/Sarvam STT error \(401\)/);
   });
 });
+
