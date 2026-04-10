@@ -113,3 +113,4 @@ describe('resolveStopPort precedence', () => {
     expect(result).toEqual({ port: DEFAULT_DAEMON_PORT, source: 'config' });
   });
 });
+
