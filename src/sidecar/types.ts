@@ -138,3 +138,4 @@ export interface SidecarInfo {
   /** Compatibility verdict (only while connected): 'ok' | 'suggested' | 'dev' */
   update_status?: SidecarUpdateStatus;
 }
+
