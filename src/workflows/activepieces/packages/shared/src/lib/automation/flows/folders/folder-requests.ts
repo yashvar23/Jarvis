@@ -28,3 +28,4 @@ export const ListFolderRequest = z.object({
 })
 
 export type ListFolderRequest = Omit<z.infer<typeof ListFolderRequest>, 'cursor'> & { cursor: Cursor | undefined }
+
