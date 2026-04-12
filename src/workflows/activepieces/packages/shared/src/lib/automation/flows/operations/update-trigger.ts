@@ -55,3 +55,4 @@ function _updateTrigger(flowVersion: FlowVersion, request: UpdateTriggerRequest)
 }
 
 export { _updateTrigger }
+
