@@ -77,3 +77,4 @@ If upstream moves the win32 constructor, `patch` (and the workflow) will fail.
 Regenerate `zoya.patch`: diff a pristine copy of the new
 `libs/webview/include/webview.h` against the `SW_HIDE` edit above (search for
 `PATCHED (zoya)`), update the hunk, and re-run the script.
+
