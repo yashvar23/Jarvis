@@ -33,3 +33,4 @@ export const useTimeAgo = (date: Date) => {
 
   return timeAgo;
 };
+
