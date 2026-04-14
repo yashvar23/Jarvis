@@ -124,3 +124,4 @@ export type ToolCallContentBlock = z.infer<typeof ToolCallContentBlock>
 
 export const AgentStepBlock = z.union([MarkdownContentBlock, ToolCallContentBlock])
 export type AgentStepBlock = z.infer<typeof AgentStepBlock>
+
