@@ -733,3 +733,4 @@ function bindEngineStream(
   // ignored -- the spawned process is gone, nothing to do about it.
   stream.on("error", () => {});
 }
+
