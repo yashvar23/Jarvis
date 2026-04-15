@@ -198,3 +198,4 @@ export const formatUtils = {
     return parsed.protocol === 'https:';
   },
 };
+
