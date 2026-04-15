@@ -59,3 +59,4 @@ bun test src/personality/personality.test.ts
 ```bash
 bun run examples/personality-demo.ts
 ```
+
