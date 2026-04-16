@@ -315,3 +315,4 @@ describe('pickLatestTag', () => {
     expect(pickLatestTag(stdout)).toBeNull();
   });
 });
+
