@@ -36,3 +36,4 @@ export function getSettingsByPrefix(prefix: string): Record<string, string> {
   }
   return result;
 }
+
