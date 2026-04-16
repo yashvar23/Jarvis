@@ -115,3 +115,4 @@ test('stop() deregisters the exit handler (restart-in-place on a new path is unt
   expect(existsSync(pathA)).toBe(true);  // A's decoy survived (handler deregistered)
   try { unlinkSync(pathA); } catch { /* cleanup */ }
 });
+
