@@ -121,3 +121,4 @@ function formatEventType(type: string): string {
     default: return type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
   }
 }
+
