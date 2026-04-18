@@ -70,3 +70,4 @@ export const LeaderboardRequest = z.object({
     timePeriod: z.nativeEnum(AnalyticsTimePeriod),
 })
 export type LeaderboardRequest = z.infer<typeof LeaderboardRequest>
+
