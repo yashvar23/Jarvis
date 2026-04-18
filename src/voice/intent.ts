@@ -180,3 +180,4 @@ export function intentToRoomKey(intent: Intent): RoomKey | null {
 export function intentIsBackToThread(intent: Intent): boolean {
   return intent.verb === "show" && intent.object?.type === "thread";
 }
+
