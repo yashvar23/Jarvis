@@ -167,3 +167,4 @@ dist/
   Bun.write(`${projectPath}/tsconfig.json`, tsconfig);
   Bun.write(`${projectPath}/.gitignore`, gitignore);
 }
+
