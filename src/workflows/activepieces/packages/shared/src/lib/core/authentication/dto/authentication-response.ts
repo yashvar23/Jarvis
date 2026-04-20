@@ -16,3 +16,4 @@ export const AuthenticationResponse = UserWithoutPassword.merge(
 )
 export type AuthenticationResponse = z.infer<typeof AuthenticationResponse>
 
+
