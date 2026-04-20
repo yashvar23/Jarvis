@@ -594,3 +594,4 @@ rmSync(work, { recursive: true, force: true });
 
 info(`Done. Vendored ${totalFiles} files into ${relative(REPO_ROOT, VENDOR_DIR)}/.`);
 info("Next: run `bun run check:no-ee` to confirm the EE guard is still green.");
+
