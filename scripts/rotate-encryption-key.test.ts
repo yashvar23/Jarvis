@@ -212,3 +212,4 @@ describe("rotate-encryption-key", () => {
     expect(res.stderr).toMatch(/nothing to rotate/i);
   });
 });
+
