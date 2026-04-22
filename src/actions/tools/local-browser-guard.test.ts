@@ -64,3 +64,4 @@ describe('browser.local: false', () => {
     expect(await browserClickTool.execute({ element_id: 1 })).toBe(LOCAL_BROWSER_DISABLED_MSG);
   });
 });
+
