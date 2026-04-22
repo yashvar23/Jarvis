@@ -128,3 +128,4 @@ export function deleteDocument(id: string): boolean {
   const result = db.prepare('DELETE FROM documents WHERE id = ?').run(id);
   return result.changes > 0;
 }
+
