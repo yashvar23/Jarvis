@@ -256,3 +256,4 @@ function applyAdditiveColumnMigrations(db: Database): void {
     db.exec(m.ddl);
   }
 }
+
