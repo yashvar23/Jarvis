@@ -244,3 +244,4 @@ export const JobData = z.union([
 ])
 export type JobData = z.infer<typeof JobData>
 export type JobPayload = z.infer<typeof JobPayload>
+
