@@ -221,3 +221,4 @@ export const useGradientFromPieces = (
 
   return { gradient, piecesMetadata: uniqueMetadata };
 };
+
