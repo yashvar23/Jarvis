@@ -367,3 +367,4 @@ describe('Path Expansion', () => {
     expect(loaded.daemon.db_path).toBe('/absolute/db.db');
   });
 });
+
