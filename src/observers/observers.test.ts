@@ -110,3 +110,4 @@ describe('Integration observers', () => {
     expect(sync.isRunning()).toBe(false);
   });
 });
+
