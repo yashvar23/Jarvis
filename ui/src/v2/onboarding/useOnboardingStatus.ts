@@ -187,3 +187,4 @@ function phaseFlagsChanged(a: OnboardingStatus, b: OnboardingStatus): boolean {
     a.tutorial_dismissed !== b.tutorial_dismissed
   );
 }
+
