@@ -175,3 +175,4 @@ describe("renderReport", () => {
     expect(markdown).not.toMatch(/[—–→⇒←]/);
   });
 });
+
