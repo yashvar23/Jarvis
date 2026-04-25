@@ -247,3 +247,4 @@ describe('recordUsage resilience', () => {
     expect(String(warnings[0]![0])).toContain('Failed to record usage');
   });
 });
+
