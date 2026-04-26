@@ -37,3 +37,4 @@ describe('resolveTelemetryEnabled', () => {
     expect(resolveTelemetryEnabled(ON, { DO_NOT_TRACK: '0' }).enabled).toBe(true);
   });
 });
+
