@@ -355,3 +355,4 @@ export function skipInterview(): void {
   // settings wizard. The skip flag lives on the onboarding config
   // separately (handled by the API route caller).
 }
+
