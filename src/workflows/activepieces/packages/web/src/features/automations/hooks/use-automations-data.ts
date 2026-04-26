@@ -444,3 +444,4 @@ function emptyTablePage(): SeekPage<Table> {
 }
 
 const STALE_TIME = 30_000;
+
