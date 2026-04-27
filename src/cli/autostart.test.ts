@@ -200,3 +200,4 @@ describe('decodeLaunchctlOutput', () => {
     expect(decodeLaunchctlOutput(undefined)).toBe('');
   });
 });
+
