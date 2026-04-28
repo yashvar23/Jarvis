@@ -52,3 +52,4 @@ export class MacAppController implements AppController {
     this.notImplemented('focusWindow');
   }
 }
+
