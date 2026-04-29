@@ -39,3 +39,4 @@ export type BasicAuthProperty =
     PropertyType.BASIC_AUTH,
     true
   >;
+
