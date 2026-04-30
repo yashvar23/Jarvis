@@ -158,3 +158,4 @@ export const DESCRIPTION_OVERRIDE: Record<string, string> = {
     "Send messages and react to Telegram bot updates. Requires a bot token.",
   claude: "Chat completions via the Anthropic Claude API.",
 };
+
