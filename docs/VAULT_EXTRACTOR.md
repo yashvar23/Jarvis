@@ -336,3 +336,4 @@ Assistant: "I'll remember that Anna's birthday is March 15th!"
 - [ ] Streaming extraction for long conversations
 - [ ] Multi-language support
 - [ ] Fact expiration and staleness tracking
+
