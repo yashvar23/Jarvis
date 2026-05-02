@@ -96,3 +96,4 @@ export const UpdateMeResponse = z.object({
 })
 
 export type UpdateMeResponse = z.infer<typeof UpdateMeResponse>
+
