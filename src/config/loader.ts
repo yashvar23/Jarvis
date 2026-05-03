@@ -213,3 +213,4 @@ export function resolveListen(daemon: { port: number; listen?: string }): Listen
   }
   throw new Error(`Unsupported daemon.listen value: ${listen} (expected "unix:/abs/path.sock")`);
 }
+
