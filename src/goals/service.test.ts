@@ -136,3 +136,4 @@ describe('GoalService', () => {
     expect(events.length).toBe(0);
   });
 });
+
