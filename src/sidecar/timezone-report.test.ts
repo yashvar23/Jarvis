@@ -106,3 +106,4 @@ describe('timezone validation (review finding: untrusted sidecar input)', () => 
     expect(sanitizeIanaTimezone('Europe/Rome\nevil: true')).toBeUndefined();
   });
 });
+
