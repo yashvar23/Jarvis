@@ -84,3 +84,4 @@ function extractUsage(reply: LLMResponse): { promptTokens?: number; completionTo
   if (typeof r.usage.completionTokens === "number") out.completionTokens = r.usage.completionTokens;
   return out;
 }
+
