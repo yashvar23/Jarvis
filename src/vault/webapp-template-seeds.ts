@@ -114,3 +114,4 @@ export function seedWebappTemplates(): void {
   const overrideNote = userCount > 0 ? ` (${userCount} user override${userCount > 1 ? 's' : ''})` : '';
   console.log(`[WebappTemplates] Seeded ${count} webapp templates${overrideNote}`);
 }
+
