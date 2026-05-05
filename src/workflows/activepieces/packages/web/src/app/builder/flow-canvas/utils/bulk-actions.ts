@@ -129,3 +129,4 @@ export const canvasBulkActions = {
   pasteNodes,
   toggleSkipSelectedNodes,
 };
+
