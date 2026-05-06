@@ -117,3 +117,4 @@ export async function maybeRunUrlReset(): Promise<void> {
     window.history.replaceState(null, "", url.pathname + url.search + url.hash);
   }
 }
+
