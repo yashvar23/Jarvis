@@ -32,3 +32,4 @@ export const ListFieldsRequestQuery = z.object({
 export type CreateFieldRequest = z.infer<typeof CreateFieldRequest>
 export type UpdateFieldRequest = z.infer<typeof UpdateFieldRequest>
 export type ListFieldsRequestQuery = z.infer<typeof ListFieldsRequestQuery>
+
