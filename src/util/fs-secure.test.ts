@@ -70,3 +70,4 @@ describe('secureParentDirectory', () => {
     await expect(secureParentDirectory('config.yaml')).resolves.toBeUndefined();
   });
 });
+
