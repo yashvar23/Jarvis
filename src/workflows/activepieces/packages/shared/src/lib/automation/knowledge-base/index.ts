@@ -9,3 +9,4 @@ const KnowledgeBaseFile = z.object({
 })
 
 export type KnowledgeBaseFile = z.infer<typeof KnowledgeBaseFile>
+
