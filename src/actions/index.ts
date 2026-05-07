@@ -18,3 +18,4 @@ export { WSLBridge } from './terminal/wsl-bridge.ts';
 // Tools exports
 export { ToolRegistry } from './tools/registry.ts';
 export type { ToolDefinition, ToolParameter } from './tools/registry.ts';
+
