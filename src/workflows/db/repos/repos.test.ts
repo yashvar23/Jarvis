@@ -384,3 +384,4 @@ describe("mergeRunOutputsIntoSampleData (auto-capture)", () => {
     expect(skipped).toEqual([]);
   });
 });
+
