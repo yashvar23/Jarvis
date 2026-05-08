@@ -143,3 +143,4 @@ export async function cmdRevoke(args: string[], io: CliIo = defaultIo): Promise<
     return 1;
   }
 }
+
