@@ -340,3 +340,4 @@ function cheapEditDistance(a: string, b: string): number {
   diffs += Math.abs(a.length - b.length);
   return diffs;
 }
+
