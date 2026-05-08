@@ -221,3 +221,4 @@ describe('GoalEstimator', () => {
     expect(est!.similar_past_goals.length).toBe(2);
   });
 });
+
