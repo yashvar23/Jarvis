@@ -6,3 +6,4 @@ export type ProcessorFn<INPUT = any, OUTPUT = any> = (
     property: PieceProperty,
     value: INPUT,
 ) => OUTPUT
+
