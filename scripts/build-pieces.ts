@@ -32,3 +32,4 @@ for (const r of results) {
 console.log(
   `\n${builtCount} rebuilt, ${cachedCount} cached (total ${results.length} piece(s)) in ${elapsed} ms.`,
 );
+
