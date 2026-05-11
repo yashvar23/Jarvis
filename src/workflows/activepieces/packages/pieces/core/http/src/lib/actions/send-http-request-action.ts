@@ -442,3 +442,4 @@ const handleBinaryResponse = (
 const isBinaryBody = (body: string | ArrayBuffer | Buffer) => {
   return body instanceof ArrayBuffer || Buffer.isBuffer(body);
 };
+
