@@ -137,3 +137,4 @@ test('getKnowledgeForMessage handles no matches gracefully', () => {
   const context = getKnowledgeForMessage('Tell me about quantum physics');
   expect(context).toBe('');
 });
+
