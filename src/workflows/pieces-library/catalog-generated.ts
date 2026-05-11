@@ -6600,3 +6600,4 @@ export const GENERATED: GeneratedCatalogEntry[] = [
     licenseSpdx: "",
   },
 ];
+
