@@ -145,3 +145,4 @@ write round-trip can't silently persist `[]` and disable the backstop.
 bounded numeric, `monthly_budget_usd` non-negative-or-null, `blocked_categories`
 an array of strings. The merge preserves the stored `api_key` when the patch
 omits it (the GET endpoint redacts it, so a UI round-trip never sees the value).
+
