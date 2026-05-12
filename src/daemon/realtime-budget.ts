@@ -100,3 +100,4 @@ export class RealtimeBudgetTracker {
     this.store.save({ month: key, spentUsd: base + cost });
   }
 }
+
