@@ -115,3 +115,4 @@ function vaultToPieceStatus(s: VaultCommitmentStatus): PieceCommitmentStatus {
   // pending / completed / failed pass through
   return s as PieceCommitmentStatus;
 }
+
