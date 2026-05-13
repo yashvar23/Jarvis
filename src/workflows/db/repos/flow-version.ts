@@ -561,3 +561,4 @@ export function lockVersion(id: string): FlowVersion {
   if (!row) throw new Error(`lockVersion: row missing after update (id=${id})`);
   return rowToFlowVersion(row);
 }
+
