@@ -87,3 +87,4 @@ export type SiteBuilderConfig = {
   auto_commit: boolean;
   max_concurrent_servers: number;
 };
+
