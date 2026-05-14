@@ -62,3 +62,4 @@ export function getAppController(): AppController {
       throw new Error(`Unsupported platform: ${platform}`);
   }
 }
+
