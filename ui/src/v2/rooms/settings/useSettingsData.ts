@@ -966,3 +966,4 @@ export function useSettingsData() {
 }
 
 export type SettingsHook = ReturnType<typeof useSettingsData>;
+
