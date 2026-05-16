@@ -11,7 +11,7 @@ beforeEach(() => {
   workDir = mkdtempSync(join(tmpdir(), 'zoya-update-test-'));
   // Provide a package.json so getInstalledVersion doesn't return '0.0.0'.
   writeFileSync(join(workDir, 'package.json'), JSON.stringify({
-    name: '@zoya/brain',
+    name: 'zoya',
     version: '1.0.0',
   }));
 });
@@ -88,7 +88,7 @@ describe('runUpdate — refusal paths', () => {
 });
 
 describe('runUpdate — bun-global', () => {
-  test('dispatches `bun update -g @zoya/brain`', async () => {
+  test('dispatches `bun update -g zoya`', async () => {
     const { spawn, calls } = recordingSpawner([{ exitCode: 0, stdout: 'installed' }]);
     const result = await runUpdate({
       packageRoot: workDir,
@@ -100,7 +100,7 @@ describe('runUpdate — bun-global', () => {
     expect(result.outcome).toBe('updated');
     expect(result.exitCode).toBe(0);
     expect(calls).toHaveLength(1);
-    expect(calls[0]!.cmd).toEqual(['bun', 'update', '-g', '@zoya/brain']);
+    expect(calls[0]!.cmd).toEqual(['bun', 'update', '-g', 'zoya']);
   });
 
   test('reports failure when bun exits non-zero', async () => {

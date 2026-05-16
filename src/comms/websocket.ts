@@ -325,7 +325,7 @@ export class WebSocketServer {
         // 2. WebSocket upgrade — validate Origin to block cross-origin connections
         //    (e.g., dev server iframes on different ports attempting ws://localhost:3142/ws).
         //    Allow when Origin's host matches the request Host header, which covers
-        //    reverse-proxy deployments (Opencove, Cloudflare tunnel, ngrok, etc.).
+        //    reverse-proxy deployments (Cloudflare tunnel, ngrok, etc.).
         if (pathname === '/ws') {
           const origin = req.headers.get('origin');
           if (origin) {

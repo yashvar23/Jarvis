@@ -1,5 +1,5 @@
 {
-  "name": "@zoya/brain",
+  "name": "zoya",
   "version": "0.8.1",
   "description": "ZOYA — An always-on autonomous AI daemon.",
   "module": "src/daemon/index.ts",

@@ -20,7 +20,7 @@ try {
 
 // ── Stamp install-method marker for global installs ─────────────────
 //
-// When `bun install -g @zoya/brain` runs, the package root usually ends
+// When `bun install -g zoya` runs, the package root usually ends
 // up under ~/.bun/install/global. The uninstall/update commands (and usage
 // telemetry) need to know this later so update/uninstall dispatch correctly
 // and telemetry reports "bun-global" rather than "unknown".

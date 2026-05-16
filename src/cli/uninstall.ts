@@ -198,7 +198,7 @@ for (const wrapperPath of payload.cliWrapperPaths) {
 
 if (payload.runBunUninstall) {
   try {
-    const r = spawnSync(payload.bunPath, ['uninstall', '-g', '@zoya/brain'], {
+    const r = spawnSync(payload.bunPath, ['uninstall', '-g', 'zoya'], {
       stdio: 'pipe',
       env: { ...process.env },
     });
@@ -279,7 +279,7 @@ function printPlan(plan: CleanupPlan): void {
     console.log(c.dim(`  • Remove CLI wrapper: ${wrapperPath}`));
   }
   if (plan.runBunUninstall) {
-    console.log(c.dim(`  • Run: bun uninstall -g @zoya/brain`));
+    console.log(c.dim(`  • Run: bun uninstall -g zoya`));
   }
   if (plan.method === 'dev') {
     console.log(c.dim(`  • Developer checkout at ${plan.packageRoot} will be LEFT IN PLACE.`));

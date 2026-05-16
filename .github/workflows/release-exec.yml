@@ -128,7 +128,7 @@ jobs:
           if [ "$DRY_RUN" = "true" ]; then FLAGS="$FLAGS --dry-run"; fi
           if echo "${{ steps.version.outputs.VERSION }}" | grep -q '-'; then FLAGS="$FLAGS --tag next"; fi
           VERSION="${{ steps.version.outputs.VERSION }}"
-          pkg="@zoya/brain"
+          pkg="zoya"
 
           if ! npm publish --access public $FLAGS; then
             if [ "$DRY_RUN" != "true" ] && npm view "${pkg}@${VERSION}" version >/dev/null 2>&1; then

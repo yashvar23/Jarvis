@@ -3,7 +3,7 @@
  *
  * Dispatches based on how ZOYA was installed:
  *   docker      refuse, point user at host-side `docker pull`
- *   bun-global  `bun update -g @zoya/brain`
+ *   bun-global  `bun update -g zoya`
  *   script      checkout the latest release tag + bun install
  *   dev         refuse, tell user to `git pull` themselves
  *   unknown     refuse with guidance
@@ -138,7 +138,7 @@ function updateUnknown(info: InstallMethodInfo): UpdateResult {
   console.log('  or redirect you to `docker pull`. Run `zoya doctor` to see what was detected.');
   console.log('');
   console.log('  Update manually with one of:');
-  console.log(c.dim('    bun update -g @zoya/brain              # if installed via bun'));
+  console.log(c.dim('    bun update -g zoya              # if installed via bun'));
   console.log(c.dim('    curl -fsSL .../install.sh | bash             # if installed via the script'));
   console.log(c.dim('    docker pull <image>                          # if installed via docker'));
   console.log('');
@@ -155,9 +155,9 @@ function updateBunGlobal(
   currentVersion: string,
   spawn: Spawner,
 ): UpdateResult {
-  console.log(c.dim('Running `bun update -g @zoya/brain`...\n'));
+  console.log(c.dim('Running `bun update -g zoya`...\n'));
 
-  const result = spawn(['bun', 'update', '-g', '@zoya/brain']);
+  const result = spawn(['bun', 'update', '-g', 'zoya']);
 
   if (result.exitCode !== 0) {
     console.log(c.red('✗ Update failed:'));

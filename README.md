@@ -5,11 +5,8 @@
 **An always-on autonomous AI daemon**
 
 [![CI](https://github.com/yashvar23/zoya/actions/workflows/test.yml/badge.svg)](https://github.com/yashvar23/zoya/actions/workflows/test.yml)
-[![bun](https://img.shields.io/npm/v/@zoya/brain?label=bun&logo=bun&color=%23f9f1e1)](https://bun.sh/packages/@zoya/brain)
 [![License](https://img.shields.io/badge/license-RSALv2-blue)](LICENSE)
 [![Runtime](https://img.shields.io/badge/runtime-Bun-%23f9f1e1)](https://bun.sh)
-[![Discord](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fdiscord.com%2Fapi%2Fv10%2Finvites%2FytG2PHQ6rW%3Fwith_counts%3Dtrue&query=%24.approximate_member_count&label=Discord&logo=discord&color=5865F2&suffix=%20members)](https://discord.gg/ytG2PHQ6rW)
-[![Website](https://img.shields.io/badge/website-zoya.dev-black)](https://zoya.dev)
 
 *An always-on autonomous AI daemon with desktop awareness, multi-agent hierarchy, visual workflows, and goal pursuit.*
 
@@ -28,7 +25,6 @@ ZOYA is not a chatbot with tools. It is a persistent daemon that sees your scree
   - [🔍 What Makes ZOYA Different](#-what-makes-zoya-different)
   - [⚡ Quick Start](#-quick-start)
   - [🪨 Ambient mode (recommended)](#-ambient-mode-recommended)
-  - [☁️ Managed Hosting](#️-managed-hosting)
   - [💡 Use Cases](#-use-cases)
   - [📋 Requirements](#-requirements)
   - [📦 Installation](#-installation)
@@ -76,7 +72,7 @@ ZOYA is not a chatbot with tools. It is a persistent daemon that sees your scree
 ## ⚡ Quick Start
 
 ```bash
-bun install -g @zoya/brain   # Install the daemon
+bun install -g zoya   # Install the daemon
 zoya start -d                   # Start as background daemon
 ```
 
@@ -102,18 +98,6 @@ What you get:
 Currently **Windows-only** (cross-platform ports planned). The `localhost:3142` dashboard still works as a fallback / debug surface.
 
 > **Opt out:** set `ZOYA_AMBIENT_UI=0` to disable the pebble + sidecar voice loop (useful for headless servers, CI, or users who only want the web dashboard).
-
----
-
-## ☁️ Managed Hosting
-
-Don't want to deal with servers, DNS, or TLS certificates? We've partnered with **[opencove.host](https://opencove.host)** — a managed hosting platform built specifically for ZOYA.
-
-- **No self-hosting hassle** — no server to provision, no dependencies to install
-- **Dedicated domain included** — no need to buy a domain or configure DNS and TLS
-- **Up and running in under 5 minutes** — spin up your ZOYA instance and start using it immediately
-
-Visit [opencove.host](https://opencove.host) to get started.
 
 ---
 
@@ -147,7 +131,7 @@ Visit [opencove.host](https://opencove.host) to get started.
 ### bun (recommended)
 
 ```bash
-bun install -g @zoya/brain
+bun install -g zoya
 zoya start
 ```
 
@@ -223,7 +207,7 @@ The dashboard is available at `http://localhost:3142` once the daemon is running
 
 | Install method | `zoya update` dispatches to |
 | --- | --- |
-| Bun global (`bun install -g @zoya/brain`) | `bun update -g @zoya/brain` |
+| Bun global (`bun install -g zoya`) | `bun update -g zoya` |
 | `install.sh` (git clone under `~/.zoya/daemon`) | `git pull --ff-only` + `bun install` |
 | Docker | Refused — run `docker pull <image> && docker rm -f zoya && docker run ...` on the host |
 | Developer checkout | Refused — run `git pull` yourself |
@@ -236,12 +220,12 @@ Run `zoya doctor` to see what was detected and the exact commands for your insta
 
 | Install method | `zoya uninstall` dispatches to |
 | --- | --- |
-| Bun global | `bun uninstall -g @zoya/brain` + side-effect cleanup |
+| Bun global | `bun uninstall -g zoya` + side-effect cleanup |
 | `install.sh` | `rm -rf ~/.zoya/daemon` + CLI wrapper + side-effect cleanup |
 | Docker | Refused — run `docker rm -f zoya` (and optionally `docker volume rm zoya-data`) on the host |
 | Developer checkout | Side-effect cleanup only — your checkout is left in place |
 
-> **Tip:** If you already ran `bun uninstall -g @zoya/brain` without going through `zoya uninstall`, your daemon may still be running and `~/.zoya` is still on disk. Run `zoya doctor` before uninstalling to see what will be cleaned up, or stop the daemon and remove `~/.zoya` manually.
+> **Tip:** If you already ran `bun uninstall -g zoya` without going through `zoya uninstall`, your daemon may still be running and `~/.zoya` is still on disk. Run `zoya doctor` before uninstalling to see what will be cleaned up, or stop the daemon and remove `~/.zoya` manually.
 
 ---
 
@@ -422,7 +406,7 @@ bun run db:init         # Initialize or reset the database
 - **LLM**: Anthropic Claude, OpenAI GPT, Google Gemini, Ollama
 - **Desktop sidecar**: Go (JWT auth, WebSocket RPC, platform-specific automation)
 - **Voice**: openwakeword (ONNX), Edge TTS / ElevenLabs
-- **Package**: `@zoya/brain` (published to npm registry, installable via bun)
+- **Package**: `zoya` (published to npm registry, installable via bun)
 
 ---
 

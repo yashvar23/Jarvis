@@ -145,7 +145,7 @@ export function detectInstallMethod(
 export function describeInstallMethod(info: InstallMethodInfo): string {
   const labels: Record<InstallMethod, string> = {
     docker: 'Docker container',
-    'bun-global': 'Bun global install (@zoya/brain)',
+    'bun-global': 'Bun global install (zoya)',
     script: 'install.sh (git clone under ~/.zoya/daemon)',
     dev: 'Developer checkout',
     unknown: 'Unknown',
@@ -174,8 +174,8 @@ export function getMethodCommands(method: InstallMethod): MethodCommands {
       };
     case 'bun-global':
       return {
-        update: 'zoya update   # runs `bun update -g @zoya/brain`',
-        uninstall: 'zoya uninstall   # runs `bun uninstall -g @zoya/brain` and cleans up',
+        update: 'zoya update   # runs `bun update -g zoya`',
+        uninstall: 'zoya uninstall   # runs `bun uninstall -g zoya` and cleans up',
       };
     case 'script':
       return {

@@ -18,7 +18,7 @@ function makeTempDir(name: string): string {
 }
 
 async function writePackageJson(dir: string, version: string): Promise<void> {
-  await Bun.write(join(dir, 'package.json'), JSON.stringify({ name: '@zoya/brain', version }, null, 2));
+  await Bun.write(join(dir, 'package.json'), JSON.stringify({ name: 'zoya', version }, null, 2));
 }
 
 async function writeFakeGit(dir: string, script: string): Promise<void> {

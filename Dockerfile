@@ -45,17 +45,7 @@ RUN if [ -n "$VERSION" ]; then \
     fi
 
 # Copy ONNX wake-word models and WASM runtime from node_modules into ui/public/
-RUN mkdir -p ui/public/openwakeword/models ui/public/ort && \
-    cp node_modules/openwakeword-wasm-browser/models/melspectrogram.onnx \
-       node_modules/openwakeword-wasm-browser/models/embedding_model.onnx \
-       node_modules/openwakeword-wasm-browser/models/silero_vad.onnx \
-       node_modules/openwakeword-wasm-browser/models/hey_zoya_v0.1.onnx \
-       ui/public/openwakeword/models/ && \
-    cp node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.jsep.wasm \
-       node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.wasm \
-       node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.jsep.mjs \
-       node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.mjs \
-       ui/public/ort/
+RUN bun run copy:models
 
 # Build the dashboard UI bundle
 RUN bun build ui/index.html --outdir ui/dist
