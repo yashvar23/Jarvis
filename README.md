@@ -26,7 +26,6 @@ JARVIS is not a chatbot with tools. It is a persistent daemon that sees your scr
   - [🔍 What Makes JARVIS Different](#-what-makes-jarvis-different)
   - [⚡ Quick Start](#-quick-start)
   - [🪨 Ambient mode (recommended)](#-ambient-mode-recommended)
-  - [☁️ Managed Hosting](#️-managed-hosting)
   - [💡 Use Cases](#-use-cases)
   - [📋 Requirements](#-requirements)
   - [📦 Installation](#-installation)
