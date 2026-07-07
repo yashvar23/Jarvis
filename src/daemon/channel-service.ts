@@ -9,7 +9,7 @@
 
 import type { Service, ServiceStatus } from './services.ts';
 import type { AgentService } from './agent-service.ts';
-import type { ZoyaConfig } from '../config/types.ts';
+import type { JarvisConfig } from '../config/types.ts';
 import type { ChannelAdapter, ChannelMessage } from '../comms/channels/telegram.ts';
 import type { STTProvider } from '../comms/voice.ts';
 
@@ -28,7 +28,7 @@ export type ApprovalCommandHandler = (action: 'approve' | 'deny', shortId: strin
 export class ChannelService implements Service {
   name = 'channels';
   private _status: ServiceStatus = 'stopped';
-  private config: ZoyaConfig;
+  private config: JarvisConfig;
   private agentService: AgentService;
   private manager: ChannelManager;
   private sttProvider: STTProvider | null = null;
@@ -42,7 +42,7 @@ export class ChannelService implements Service {
   /** Handler for approval commands (approve/deny) from external channels */
   private approvalHandler: ApprovalCommandHandler | null = null;
 
-  constructor(config: ZoyaConfig, agentService: AgentService) {
+  constructor(config: JarvisConfig, agentService: AgentService) {
     this.config = config;
     this.agentService = agentService;
     this.manager = new ChannelManager();
@@ -313,7 +313,7 @@ export async function routePerChannel(
     if (!lastRecipient) {
       failed.push({
         channel: name,
-        error: `no known recipient for "${name}" -- message Zoya from that channel once to seed it`,
+        error: `no known recipient for "${name}" -- message Jarvis from that channel once to seed it`,
       });
       continue;
     }
@@ -326,4 +326,3 @@ export async function routePerChannel(
   }
   return { delivered, failed };
 }
-

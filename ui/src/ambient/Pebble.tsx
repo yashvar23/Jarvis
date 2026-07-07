@@ -220,7 +220,7 @@ export function Pebble() {
             </button>
           </div>
           <div className="thread-body">
-            <span className="thread-from">zoya</span>
+            <span className="thread-from">jarvis</span>
             {state === "listening" ? "listening — go ahead." : "ready when you are."}
           </div>
           <div className="thread-actions">

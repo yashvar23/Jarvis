@@ -21,5 +21,3 @@ export const userApi = {
     return api.delete<{ success: boolean }>('/v1/users/me/profile-picture');
   },
 };
-
-

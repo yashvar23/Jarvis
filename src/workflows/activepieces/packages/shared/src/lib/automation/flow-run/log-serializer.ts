@@ -5,4 +5,3 @@ export const logSerializer = {
         return Buffer.from(JSON.stringify(log, null))
     },
 }
-

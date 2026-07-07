@@ -103,7 +103,7 @@ func TestFileObserverExcludedPrefix(t *testing.T) {
 
 func TestFileObserverExcludesPaths(t *testing.T) {
 	dir := t.TempDir()
-	excluded := filepath.Join(dir, ".zoya")
+	excluded := filepath.Join(dir, ".jarvis")
 	if err := os.MkdirAll(excluded, 0o755); err != nil {
 		t.Fatal(err)
 	}

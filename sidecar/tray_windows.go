@@ -172,7 +172,7 @@ func runWithTray(ctx context.Context, cancel context.CancelFunc, client *Sidecar
 // createTrayIcon registers the hidden helper window and adds the tray icon.
 // Returns false on failure (the sidecar still runs, just without a tray icon).
 func createTrayIcon() bool {
-	className, _ := syscall.UTF16PtrFromString("ZoyaSidecarTray")
+	className, _ := syscall.UTF16PtrFromString("JarvisSidecarTray")
 	hInstance, _, _ := procGetModuleHandleW.Call(0)
 
 	wc := pblWndClassEx{
@@ -208,7 +208,7 @@ func createTrayIcon() bool {
 	trayNID.UFlags = trayNifMessage | trayNifIcon | trayNifTip
 	trayNID.UCallbackMessage = trayCallbackMsg
 	trayNID.HIcon = hIcon
-	tip, _ := syscall.UTF16FromString("ZOYA Sidecar")
+	tip, _ := syscall.UTF16FromString("JARVIS Sidecar")
 	copy(trayNID.SzTip[:], tip)
 
 	r, _, _ := procShellNotifyIconW.Call(trayNimAdd, uintptr(unsafe.Pointer(&trayNID)))
@@ -301,7 +301,7 @@ func showTrayMenu(hwnd uintptr) {
 	procAppendMenuW.Call(hMenu, trayMfString|trayMfGrayed|trayMfDisabled, 0, uintptr(unsafe.Pointer(statusLabel)))
 	procAppendMenuW.Call(hMenu, trayMfSeparator, 0, 0)
 
-	appendTrayItem(hMenu, "Zoya", trayMenuChatID)
+	appendTrayItem(hMenu, "Jarvis", trayMenuChatID)
 	appendTrayItem(hMenu, "Settings", trayMenuSettingsID)
 	appendTrayItem(hMenu, "Logs", trayMenuLogsID)
 	procAppendMenuW.Call(hMenu, trayMfSeparator, 0, 0)

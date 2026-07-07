@@ -1,4 +1,4 @@
-import type { ZoyaConfig, RealtimeReasoningEffort } from './types.ts';
+import type { JarvisConfig, RealtimeReasoningEffort } from './types.ts';
 import { IMPACT_MAP, type ActionCategory } from '../roles/authority.ts';
 
 /**
@@ -42,7 +42,7 @@ const VALID_EFFORTS: RealtimeReasoningEffort[] = ['minimal', 'low', 'medium', 'h
  * user-named instance like `"openai-personal"` with `kind: 'openai'` is
  * accepted - as is the default-named `"openai"` entry without an explicit kind.
  */
-function findOpenAIProviderKey(config: ZoyaConfig): string {
+function findOpenAIProviderKey(config: JarvisConfig): string {
   const providers = config.llm?.providers;
   if (!providers) return '';
   for (const [name, entry] of Object.entries(providers)) {
@@ -70,7 +70,7 @@ function findOpenAIProviderKey(config: ZoyaConfig): string {
  * in the DB + keychain - there is no config.yaml or env fallback.
  */
 export function resolveRealtimeVoice(
-  config: ZoyaConfig,
+  config: JarvisConfig,
 ): RealtimeVoiceResolution {
   const rt = config.voice?.realtime;
 
@@ -118,4 +118,3 @@ export function resolveRealtimeVoice(
     },
   };
 }
-

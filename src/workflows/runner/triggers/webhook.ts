@@ -2,7 +2,7 @@
  * WebhookManager — manages inbound webhook endpoints for workflow triggers
  *
  * Each workflow can have a unique webhook path. Requests are validated
- * against an optional HMAC-SHA256 secret (X-Zoya-Signature header).
+ * against an optional HMAC-SHA256 secret (X-Jarvis-Signature header).
  */
 
 // ── Types ──
@@ -100,7 +100,7 @@ export class WebhookManager {
 
     // Validate HMAC signature if a secret is configured
     if (route.secret) {
-      const signature = req.headers.get('x-zoya-signature') ?? req.headers.get('X-Zoya-Signature');
+      const signature = req.headers.get('x-jarvis-signature') ?? req.headers.get('X-Jarvis-Signature');
 
       if (!signature) {
         return new Response(JSON.stringify({ error: 'Missing signature header' }), {
@@ -189,4 +189,3 @@ function timingSafeEqual(a: string, b: string): boolean {
   }
   return diff === 0;
 }
-

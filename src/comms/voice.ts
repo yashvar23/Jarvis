@@ -439,4 +439,3 @@ export function splitIntoSentences(text: string): string[] {
     .filter(s => s.length > 0);
   return sentences.length > 0 ? sentences : [text];
 }
-

@@ -28,14 +28,14 @@ import type {
   VaultEntitySnapshot,
   VaultEntityType,
   VaultSearchInput,
-} from "../zoya-pieces/types";
+} from "../jarvis-pieces/types";
 
 import { findEntities, getEntity, type Entity, type EntityType } from "../../vault/entities";
 import { findCommitments, type Commitment, type CommitmentStatus as VaultCommitmentStatus } from "../../vault/commitments";
 import { getRecentCaptures } from "../../vault/awareness";
 import type { ScreenCaptureRow } from "../../awareness/types";
 
-export class ZoyaContextProviderAdapter implements PieceContextProvider {
+export class JarvisContextProviderAdapter implements PieceContextProvider {
   async vaultSearch(input: VaultSearchInput): Promise<VaultEntitySnapshot[]> {
     const query: { type?: EntityType; nameContains?: string } = {};
     if (input.type !== undefined) query.type = input.type;
@@ -115,4 +115,3 @@ function vaultToPieceStatus(s: VaultCommitmentStatus): PieceCommitmentStatus {
   // pending / completed / failed pass through
   return s as PieceCommitmentStatus;
 }
-

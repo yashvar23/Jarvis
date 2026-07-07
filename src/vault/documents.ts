@@ -1,7 +1,7 @@
 /**
  * Vault Documents — CRUD for vault-stored documents
  *
- * Documents are files ZOYA creates (reports, plans, analyses, etc.)
+ * Documents are files JARVIS creates (reports, plans, analyses, etc.)
  * stored in the vault SQLite database instead of on disk.
  */
 
@@ -128,4 +128,3 @@ export function deleteDocument(id: string): boolean {
   const result = db.prepare('DELETE FROM documents WHERE id = ?').run(id);
   return result.changes > 0;
 }
-

@@ -43,4 +43,3 @@ export type RoleDefinition = {
   heartbeat_instructions?: string;
   sub_roles?: SubRoleTemplate[];
 };
-

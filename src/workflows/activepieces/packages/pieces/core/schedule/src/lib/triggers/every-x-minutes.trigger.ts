@@ -45,5 +45,3 @@ export const everyXMinutesTrigger = createTrigger({
     console.log('onDisable');
   },
 });
-
-

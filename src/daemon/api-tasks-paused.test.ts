@@ -143,4 +143,3 @@ describe('GET /api/tasks/paused', () => {
     expect(body.tasks[0]!.question).toBe('');
   });
 });
-

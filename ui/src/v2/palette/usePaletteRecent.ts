@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { PaletteResult } from "./types";
 
-const STORAGE_KEY = "zoya:palette-recent";
+const STORAGE_KEY = "jarvis:palette-recent";
 const MAX = 5;
 
 /**
@@ -121,4 +121,3 @@ function toResult(x: unknown): PaletteResult | null {
     status: undefined,
   };
 }
-

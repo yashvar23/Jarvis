@@ -23,7 +23,7 @@ export function IntegrationsTab({
           pollRef.current = null;
         }
         setPhase("idle");
-        onToast("Connected. Restart Zoya to activate Gmail and Calendar observers.", "ok");
+        onToast("Connected. Restart Jarvis to activate Gmail and Calendar observers.", "ok");
         data.refresh();
       }
     },
@@ -87,7 +87,7 @@ export function IntegrationsTab({
           pollRef.current = null;
           setPhase("idle");
           onToast(
-            "Connected. Restart Zoya to activate Gmail and Calendar observers.",
+            "Connected. Restart Jarvis to activate Gmail and Calendar observers.",
             "ok",
           );
           data.refresh();

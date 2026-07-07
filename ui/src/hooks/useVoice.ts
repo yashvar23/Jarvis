@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { RealtimeVoiceController } from "../lib/RealtimeVoiceController";
-import { uuid } from "../lib/uuid";
 
 const SPEECH_WAKE_INTERRUPT_COMMANDS = new Set([
   "stop",
@@ -23,22 +22,22 @@ function normalizeTranscript(transcript: string): string {
     .trim();
 }
 
-function getWakePrefix(normalized: string): "hey zoya " | "zoya " | null {
-  if (normalized.startsWith("hey zoya ")) return "hey zoya ";
-  if (normalized.startsWith("zoya ")) return "zoya ";
+function getWakePrefix(normalized: string): "hey jarvis " | "jarvis " | null {
+  if (normalized.startsWith("hey jarvis ")) return "hey jarvis ";
+  if (normalized.startsWith("jarvis ")) return "jarvis ";
   return null;
 }
 
 /**
  * Strict matcher used during TTS playback (voiceState === "speaking").
- * Accepts bare wake phrases ("zoya", "hey zoya") or wake + a short
- * whitelisted interrupt command. Prevents Zoya's own TTS from self-triggering
- * when the reply contains the word "zoya" inside a sentence.
+ * Accepts bare wake phrases ("jarvis", "hey jarvis") or wake + a short
+ * whitelisted interrupt command. Prevents Jarvis's own TTS from self-triggering
+ * when the reply contains the word "jarvis" inside a sentence.
  */
 export function matchesSpeechWakePhrase(transcript: string): boolean {
   const normalized = normalizeTranscript(transcript);
   if (!normalized) return false;
-  if (normalized === "zoya" || normalized === "hey zoya") return true;
+  if (normalized === "jarvis" || normalized === "hey jarvis") return true;
 
   const prefix = getWakePrefix(normalized);
   if (!prefix) return false;
@@ -51,14 +50,14 @@ export function matchesSpeechWakePhrase(transcript: string): boolean {
 
 /**
  * Loose matcher used when idle. Accepts any utterance that starts with the
- * wake phrase, so natural "hey zoya turn off the lights" wakes in one breath
+ * wake phrase, so natural "hey jarvis turn off the lights" wakes in one breath
  * without waiting for Chrome to emit a bare-wake interim first.
- * NOT safe to use while Zoya is speaking — use matchesSpeechWakePhrase there.
+ * NOT safe to use while Jarvis is speaking — use matchesSpeechWakePhrase there.
  */
 export function matchesSpeechWakePrefix(transcript: string): boolean {
   const normalized = normalizeTranscript(transcript);
   if (!normalized) return false;
-  if (normalized === "zoya" || normalized === "hey zoya") return true;
+  if (normalized === "jarvis" || normalized === "hey jarvis") return true;
   return getWakePrefix(normalized) != null;
 }
 
@@ -153,7 +152,7 @@ export function shouldSpeechWakeBeRunning(inputs: {
   if (!isMicAvailable || !wakeWordEnabled || !speechRecognitionAvailable) return false;
   // Run in every state except active recording (which owns the mic for the
   // live transcript recognizer). Includes processing/wake_detected/speaking
-  // so "Zoya" can interrupt mid-thought, not just kick off from idle.
+  // so "Jarvis" can interrupt mid-thought, not just kick off from idle.
   if (voiceState === "recording" || voiceState === "error") return false;
   if (wakeEngine === "openwakeword") return false;
   return true; // "webspeech" or "auto" with the API available
@@ -241,7 +240,7 @@ export type UseVoiceReturn = {
   // Called by useWebSocket for TTS events
   handleTTSBinary: (data: ArrayBuffer) => void;
   handleTTSStart: (requestId: string, containsWake?: boolean) => void;
-  /** Mid-turn flip: a later sentence in the same TTS turn contains "Zoya". */
+  /** Mid-turn flip: a later sentence in the same TTS turn contains "Jarvis". */
   handleTTSContainsWake: () => void;
   handleTTSEnd: () => void;
   handleError: (message?: string) => void;
@@ -311,12 +310,12 @@ export function useVoice({ wsRef, wakeWordEnabled = true, wakeEngine = "openwake
   // configured value without re-creating on every render.
   const speakingTailCooldownMsRef = useRef(speakingTailCooldownMs);
   useEffect(() => { speakingTailCooldownMsRef.current = speakingTailCooldownMs; }, [speakingTailCooldownMs]);
-  // True if the in-flight TTS turn contains "Zoya" anywhere. The
+  // True if the in-flight TTS turn contains "Jarvis" anywhere. The
   // daemon sets this in tts_start, and may flip false→true mid-turn via
   // tts_text when a later sentence introduces the wake word. Reset on
   // tts_end / state→idle. When true, the wake recognizer is suppressed
   // for the duration of the speaking state. When false, the recognizer
-  // stays running so a real human "Zoya" can interrupt the reply.
+  // stays running so a real human "Jarvis" can interrupt the reply.
   const ttsContainsWakeRef = useRef(false);
   const startRecordingRef = useRef<(autoStop?: boolean) => void>(() => {});
   const autoStopRef = useRef(false);
@@ -512,7 +511,7 @@ export function useVoice({ wsRef, wakeWordEnabled = true, wakeEngine = "openwake
       const engine = new WakeWordEngine({
         baseAssetUrl: "/openwakeword/models",
         ortWasmPath: "/ort/",
-        keywords: ["hey_zoya"],
+        keywords: ["hey_jarvis"],
         detectionThreshold: 0.3,
         cooldownMs: 2000,
         debug: true,
@@ -548,7 +547,7 @@ export function useVoice({ wsRef, wakeWordEnabled = true, wakeEngine = "openwake
       wakeEngineRef.current = engine;
       await engine.start();
       setIsWakeWordReady(true);
-      console.log("[Voice] Wake word engine ready — say 'Hey ZOYA'");
+      console.log("[Voice] Wake word engine ready — say 'Hey JARVIS'");
     } catch (err) {
       console.warn("[Voice] Wake word init failed:", err);
       setIsWakeWordReady(false);
@@ -622,7 +621,7 @@ export function useVoice({ wsRef, wakeWordEnabled = true, wakeEngine = "openwake
         // Don't process wakes while we're already capturing the user
         // (recording owns the transcript recognizer). All other states
         // — including processing and wake_detected — accept wake events
-        // so "Zoya" can interrupt mid-thought.
+        // so "Jarvis" can interrupt mid-thought.
         const sNow = voiceStateRef.current;
         if (sNow === "recording") return;
         // Realtime voice streams the mic straight to OpenAI, which owns
@@ -632,7 +631,7 @@ export function useVoice({ wsRef, wakeWordEnabled = true, wakeEngine = "openwake
         // session, forcing a re-wake mid-conversation. Ignore browser-SR matches
         // during any active realtime turn. (Idle wake still works to start one.)
         if (realtimeActiveRef.current && sNow !== "idle") return;
-        // During speaking with "Zoya" in the TTS text: ignore wake
+        // During speaking with "Jarvis" in the TTS text: ignore wake
         // matches; the recognizer is hearing its own voice through the
         // speakers. The daemon flips this flag; UI honors it.
         if (sNow === "speaking" && ttsContainsWakeRef.current) return;
@@ -641,7 +640,7 @@ export function useVoice({ wsRef, wakeWordEnabled = true, wakeEngine = "openwake
         if (isWithinSpeakingTailCooldown(Date.now(), speakingExitedAtRef.current, speakingTailCooldownMsRef.current)) return;
 
         // Strict matcher during speaking to keep TTS echo from self-triggering;
-        // loose prefix matcher when idle so "hey zoya <command>" wakes in one breath.
+        // loose prefix matcher when idle so "hey jarvis <command>" wakes in one breath.
         const matcher = voiceStateRef.current === "speaking"
           ? matchesSpeechWakePhrase
           : matchesSpeechWakePrefix;
@@ -748,7 +747,7 @@ export function useVoice({ wsRef, wakeWordEnabled = true, wakeEngine = "openwake
     try {
       speechWakeRef.current.start();
       speechWakeStateRef.current = "starting";
-      console.log("[Voice] Speech wake recognizer starting — say 'Zoya' or 'Hey Zoya'");
+      console.log("[Voice] Speech wake recognizer starting — say 'Jarvis' or 'Hey Jarvis'");
     } catch {
       // The browser throws if start() is called in an invalid state; the
       // reconcile effect will retry on the next relevant change.
@@ -780,7 +779,7 @@ export function useVoice({ wsRef, wakeWordEnabled = true, wakeEngine = "openwake
   // selector. Imperatively drives the OpenWakeWord side here; the speech-wake
   // recognizer is driven by the reconcile effect below. Muting forces "none";
   // a containsWake speaking turn also forces "none" because TTS playing
-  // "Zoya" through speakers would self-trigger via the mic.
+  // "Jarvis" through speakers would self-trigger via the mic.
   useEffect(() => {
     // Block local wake engines during a containsWake speaking turn (echo) AND
     // during ANY active realtime turn — realtime streams the mic to OpenAI and
@@ -1060,7 +1059,7 @@ export function useVoice({ wsRef, wakeWordEnabled = true, wakeEngine = "openwake
     const currentRoom = getCurrentRoom?.() ?? "home";
 
     if (browserText) {
-      const requestId = uuid();
+      const requestId = crypto.randomUUID();
       ws.send(JSON.stringify({
         type: "voice_text",
         payload: { requestId, text: browserText, currentRoom },
@@ -1077,7 +1076,7 @@ export function useVoice({ wsRef, wakeWordEnabled = true, wakeEngine = "openwake
       return;
     }
 
-    const requestId = uuid();
+    const requestId = crypto.randomUUID();
     const wavBuffer = encodeWav(pcmChunksRef.current, sampleRateRef.current);
 
     // Signal start
@@ -1409,4 +1408,3 @@ export function useVoice({ wsRef, wakeWordEnabled = true, wakeEngine = "openwake
     forceIdle,
   };
 }
-

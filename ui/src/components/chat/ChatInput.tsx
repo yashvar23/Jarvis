@@ -62,7 +62,7 @@ export function ChatInput({ onSend, disabled, voice }: Props) {
     if (voice.ttsAudioPlaying) return "Stop speaking";
     if (voice.voiceState === "recording") return "Click to send";
     const engineSuffix = ` · ${engineLabel(voice.activeWakeEngine)}`;
-    if (voice.isWakeWordReady) return `Say "Hey ZOYA" or click to speak${engineSuffix}`;
+    if (voice.isWakeWordReady) return `Say "Hey JARVIS" or click to speak${engineSuffix}`;
     return `Click to speak${engineSuffix}`;
   };
 

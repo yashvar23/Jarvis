@@ -7,4 +7,3 @@ export const healthApi = {
     return api.get<GetSystemHealthChecksResponse>('/v1/health/system');
   },
 };
-

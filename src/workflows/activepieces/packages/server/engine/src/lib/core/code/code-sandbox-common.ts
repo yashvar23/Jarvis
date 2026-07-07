@@ -45,4 +45,3 @@ type RunScriptParams = {
     functions: Record<string, Function>
 
 }
-

@@ -147,4 +147,3 @@ export function validateBinaryFrame(data: Buffer): BinaryValidationResult {
 
   return { valid: true, refId, payload };
 }
-

@@ -1,7 +1,7 @@
 /**
  * ResearchQueue — Background Research Engine
  *
- * Manages a queue of topics for ZOYA to research during idle time.
+ * Manages a queue of topics for JARVIS to research during idle time.
  * Topics come from conversations, explicit requests, or the agent itself.
  * The heartbeat picks up the next topic when nothing urgent is happening.
  */
@@ -153,4 +153,3 @@ export class ResearchQueue {
     }
   }
 }
-

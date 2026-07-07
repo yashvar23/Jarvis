@@ -45,7 +45,7 @@ export type TaskRequest = {
    * One-line goal the conv LLM extracted from the user's message. Used as a
    * routing hint and added to the task tier's system context, but the task
    * tier actually sees the user's ORIGINAL verbatim message as its user
-   * prompt (see TaskRunner). This avoids losing Zoya-specific cues that
+   * prompt (see TaskRunner). This avoids losing Jarvis-specific cues that
    * a paraphrasing conv LLM might strip out.
    */
   intent: string;
@@ -106,4 +106,3 @@ export type TaskRecord = {
 export function newTaskId(): string {
   return `task_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 }
-

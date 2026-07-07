@@ -1,6 +1,6 @@
 /**
  * NL workflow composer. Builds a draft flow from a plain-English description
- * by prompting the configured Zoya LLM with the piece catalog + a schema
+ * by prompting the configured Jarvis LLM with the piece catalog + a schema
  * the response must conform to.
  *
  * The composer never edits live state on its own; it returns a parsed +
@@ -19,7 +19,7 @@ import type { PieceLookup } from "../../workflows/runtime/piece-catalog.ts";
  * prompt -> `{ text }`. The daemon supplies an instance backed by
  * `LLMManager`; tests inject a stub. Kept inline (instead of importing the
  * legacy `PieceLlmClient` type) so the composer doesn't depend on the
- * deleted zoya-pieces tree.
+ * deleted jarvis-pieces tree.
  */
 export interface ComposerLlmClient {
   chat(input: { prompt: string; system?: string }): Promise<{ text: string }>;
@@ -87,11 +87,11 @@ export interface ComposerSpecialistRole {
 }
 
 /** Canonical short name of the sub-agent delegation piece. */
-const AGENT_PIECE_SHORT = "zoya-agent";
+const AGENT_PIECE_SHORT = "jarvis-agent";
 /** The delegate action on the agent piece, whose `role` we constrain. */
 const DELEGATE_ACTION = "delegate";
 /** Canonical short name of the generic tool-invocation piece. */
-const TOOL_PIECE_SHORT = "zoya-tool";
+const TOOL_PIECE_SHORT = "jarvis-tool";
 /** The invoke action on the tool piece, whose `params` we validate. */
 const INVOKE_ACTION = "invoke";
 /**
@@ -105,12 +105,12 @@ const REGEX_CONDITION_OPERATORS = new Set(["TEXT_MATCHES_REGEX", "TEXT_DOES_NOT_
 /**
  * Internal pieces that exist only for engine smoke-tests / plumbing checks and
  * must never appear in a real composed flow. They're hidden from the prompt
- * catalog AND rejected in validation -- the LLM was picking `zoya-test:echo`
+ * catalog AND rejected in validation -- the LLM was picking `jarvis-test:echo`
  * as a no-op fallback step, but echo's `value` is JSON-typed so a placeholder
  * like "ignored" fails with "Expected JSON" and the run dies. A fallback that
  * should do nothing is better expressed as an empty branch (null child).
  */
-const COMPOSER_EXCLUDED_PIECES = new Set(["zoya-test", "zoya-validate"]);
+const COMPOSER_EXCLUDED_PIECES = new Set(["jarvis-test", "jarvis-validate"]);
 
 /** True if `pieceFullName` is an internal piece the composer must not use. */
 function isComposerExcludedPiece(pieceFullName: string): boolean {
@@ -120,7 +120,7 @@ function isComposerExcludedPiece(pieceFullName: string): boolean {
   return false;
 }
 
-/** One parameter of a Zoya tool, as surfaced to the composer. */
+/** One parameter of a Jarvis tool, as surfaced to the composer. */
 export interface ComposerToolParam {
   name: string;
   type: string;
@@ -129,8 +129,8 @@ export interface ComposerToolParam {
 }
 
 /**
- * A Zoya tool's invocation contract: its name plus the parameters it accepts.
- * The composer lists these so the LLM wires `zoya-tool { toolName, params }`
+ * A Jarvis tool's invocation contract: its name plus the parameters it accepts.
+ * The composer lists these so the LLM wires `jarvis-tool { toolName, params }`
  * with the params a tool actually needs, and validates that the required ones
  * are present -- otherwise the model guesses (e.g. `{ query }` for a tool that
  * needs `{ action }`) and the step 500s at runtime.
@@ -145,8 +145,8 @@ export interface ComposeDeps {
   llm: ComposerLlmClient;
   pieceRegistry: PieceLookup;
   /**
-   * Optional list of registered Zoya tool names. When present, surfaced in
-   * the planner prompt so the LLM can wire `zoya-tool { toolName: '...' }`
+   * Optional list of registered Jarvis tool names. When present, surfaced in
+   * the planner prompt so the LLM can wire `jarvis-tool { toolName: '...' }`
    * for asks like "send a Gmail" without us having to declare every external
    * service as a piece.
    */
@@ -155,14 +155,14 @@ export interface ComposeDeps {
    * Optional richer tool listing: each tool plus its parameter schema. When
    * present this supersedes `toolNames` in the prompt (the LLM sees which
    * params each tool requires) and enables compile-time validation of a
-   * `zoya-tool:invoke` step's `params`. Falls back to `toolNames` (names
+   * `jarvis-tool:invoke` step's `params`. Falls back to `toolNames` (names
    * only) when absent.
    */
   tools?: ComposerToolSpec[];
   /**
    * Optional set of specialist sub-agent roles. When present the composer
    * (a) lists the valid role ids in the prompt so the LLM picks a real one for
-   * a `zoya-agent:delegate` step, and (b) rejects any `delegate` step whose
+   * a `jarvis-agent:delegate` step, and (b) rejects any `delegate` step whose
    * `role` isn't in this set — feeding the mismatch back into the retry loop.
    * Without this the LLM would guess names like "researcher" that don't exist
    * (the real id is "research-analyst"), producing a flow that errors on every
@@ -320,7 +320,7 @@ function logAttempt(attempt: number, status: string, detail: string | null): voi
 
 function buildSystemPrompt(catalog: string, toolsText: string, rolesText: string): string {
   return [
-    "You are the Zoya workflow composer. Convert the user's description into a workflow definition.",
+    "You are the Jarvis workflow composer. Convert the user's description into a workflow definition.",
     "",
     "Output a single JSON object with this exact shape:",
     '{ "displayName": "<short title>",',
@@ -338,7 +338,7 @@ function buildSystemPrompt(catalog: string, toolsText: string, rolesText: string
     "  - Use type='EMPTY' for manual / on-demand flows. Use type='PIECE_TRIGGER' for scheduled, webhook, or event-driven.",
     "  - For schedule triggers: pieceName='schedule', input.cron_expression='<5-field cron>' (e.g. '0 8 * * *' for 8am daily).",
     "  - For webhook triggers: pieceName='webhook', input.secret optional.",
-    "  - For event triggers: pieceName='zoya-trigger', triggerName='on_event', input.eventType='<event type>'.",
+    "  - For event triggers: pieceName='jarvis-trigger', triggerName='on_event', input.eventType='<event type>'.",
     "  - For action steps, type MUST be 'PIECE' and settings MUST include pieceName + actionName.",
     "  - To iterate over a list, emit a LOOP_ON_ITEMS step:",
     '      { "name": "loop_1", "type": "LOOP_ON_ITEMS", "settings": { "items": "{{step_1.list}}" }, "firstLoopAction": { ...body chain... }, "nextAction": { ...post-loop... } }',
@@ -364,7 +364,7 @@ function buildSystemPrompt(catalog: string, toolsText: string, rolesText: string
     "    the branch evaluates backwards. To check whether a search/list returned results, prefer a step whose output is a real list and",
     "    use LIST_IS_NOT_EMPTY; if you only have a string, test its actual empty-wording with TEXT_CONTAINS.",
     "  - Use {{trigger.field}} and {{step_N.field}} templates to wire data between steps.",
-    "  - For zoya-trigger:on_event, the trigger output is an event envelope shaped",
+    "  - For jarvis-trigger:on_event, the trigger output is an event envelope shaped",
     "    { id, eventType, payload, timestamp } -- the actual event data lives under `payload`.",
     "    Reference payload fields as {{trigger.payload.<field>}}, NOT {{trigger.<field>}}.",
     "    Example: clipboard text is {{trigger.payload.content}}; an email's subject is {{trigger.payload.subject}}.",
@@ -374,10 +374,10 @@ function buildSystemPrompt(catalog: string, toolsText: string, rolesText: string
     "    safe choice is `{{step}}` (the whole output) and let downstream steps drill in.",
     "  - Every required input field MUST be present.",
     "  - The composed flow is created DISABLED. Do NOT claim the flow is running; the user reviews and publishes it explicitly.",
-    "  - When the user asks for an integration that isn't a registered piece (Gmail, Slack, ...), use the `zoya-tool` piece with `toolName` set to a registered Zoya tool. Available tools are listed below.",
+    "  - When the user asks for an integration that isn't a registered piece (Gmail, Slack, ...), use the `jarvis-tool` piece with `toolName` set to a registered Jarvis tool. Available tools are listed below.",
     rolesText
-      ? "  - To hand a goal to a sub-agent, use the `zoya-agent` piece's `delegate` action. Its optional `input.role` MUST be one of the specialist role ids listed below VERBATIM (e.g. `research-analyst`, not `researcher`). If none fits, OMIT `role` and the default agent handles it."
-      : "  - To hand a goal to a sub-agent, use the `zoya-agent` piece's `delegate` action with `input.goal`. Omit `input.role` to use the default agent.",
+      ? "  - To hand a goal to a sub-agent, use the `jarvis-agent` piece's `delegate` action. Its optional `input.role` MUST be one of the specialist role ids listed below VERBATIM (e.g. `research-analyst`, not `researcher`). If none fits, OMIT `role` and the default agent handles it."
+      : "  - To hand a goal to a sub-agent, use the `jarvis-agent` piece's `delegate` action with `input.goal`. Omit `input.role` to use the default agent.",
     "  - Output ONLY the JSON. No markdown. No explanation.",
     "",
     "Available pieces:",
@@ -390,7 +390,7 @@ function buildSystemPrompt(catalog: string, toolsText: string, rolesText: string
 }
 
 /**
- * Render the Zoya tool listing for the prompt. Prefers the richer `tools`
+ * Render the Jarvis tool listing for the prompt. Prefers the richer `tools`
  * (name + params, with required ones flagged) so the LLM wires correct
  * `params`; falls back to a bare name list when only names are available.
  */
@@ -400,7 +400,7 @@ function renderTools(
 ): string {
   if (tools && tools.length > 0) {
     const header =
-      "Available Zoya tools (call via `zoya-tool { toolName, params: { ... } }`; include EVERY param marked REQUIRED):";
+      "Available Jarvis tools (call via `jarvis-tool { toolName, params: { ... } }`; include EVERY param marked REQUIRED):";
     const lines = [header];
     for (const t of tools) {
       lines.push(`  - ${t.name}${t.description ? `: ${firstLine(t.description)}` : ""}`);
@@ -414,7 +414,7 @@ function renderTools(
   }
   if (toolNames && toolNames.length > 0) {
     return [
-      "Available Zoya tools (call via `zoya-tool { toolName, params }`):",
+      "Available Jarvis tools (call via `jarvis-tool { toolName, params }`):",
       ...toolNames.map((n) => `  - ${n}`),
     ].join("\n");
   }
@@ -422,7 +422,7 @@ function renderTools(
 }
 
 /**
- * List the valid specialist role ids for a `zoya-agent:delegate` step. The
+ * List the valid specialist role ids for a `jarvis-agent:delegate` step. The
  * id is what `input.role` must equal verbatim; the name/description are hints
  * so the LLM maps the user's intent ("research AI news") to the right id
  * ("research-analyst") instead of inventing one.
@@ -430,7 +430,7 @@ function renderTools(
 function renderSpecialistRoles(roles: ComposerSpecialistRole[] | undefined): string {
   if (!roles || roles.length === 0) return "";
   return [
-    "Available specialist sub-agent roles (for `zoya-agent:delegate` -> `input.role`; use the id verbatim):",
+    "Available specialist sub-agent roles (for `jarvis-agent:delegate` -> `input.role`; use the id verbatim):",
     ...roles.map((r) => {
       const desc = r.description ? `: ${firstLine(r.description)}` : "";
       const label = r.name && r.name !== r.id ? ` (${r.name})` : "";
@@ -459,7 +459,7 @@ function renderCatalog(registry: PieceLookup): string {
       lines.push(`    trigger ${trigger.name}: ${trigger.description}`);
       lines.push(...renderSchemaLines(trigger.inputSchema, 6));
       // Triggers carry the upstream-native `sampleData`; some pieces
-      // also set `outputSample` (Zoya extension). Either is a valid
+      // also set `outputSample` (Jarvis extension). Either is a valid
       // hint -- prefer sampleData when present.
       lines.push(...renderOutputLines((trigger as { sampleData?: unknown; outputSample?: unknown }).sampleData ?? (trigger as { outputSample?: unknown }).outputSample, 6));
       // Dynamic-output triggers: emit a per-value sample block so the
@@ -491,9 +491,9 @@ function renderCatalog(registry: PieceLookup): string {
   lines.push("- schedule: settings={pieceName:'schedule', input:{cron_expression:'0 8 * * *'}} fires on cron.");
   lines.push("- webhook:  settings={pieceName:'webhook',  input:{secret:'<optional HMAC secret>'}} fires on HTTP POST to /api/webhooks/<flow_id>.");
 
-  // Workflow event-type catalog (used by zoya-trigger:on_event flows).
+  // Workflow event-type catalog (used by jarvis-trigger:on_event flows).
   lines.push("");
-  lines.push("Available event types for zoya-trigger:on_event (settings.input.eventType):");
+  lines.push("Available event types for jarvis-trigger:on_event (settings.input.eventType):");
   lines.push("  Each event's payload fields below are accessed from downstream steps via {{trigger.payload.<field>}} (the trigger wraps the payload in an envelope -- see the wiring rules above).");
   for (const meta of WORKFLOW_EVENT_TYPES) {
     lines.push(`- ${meta.type}: ${meta.description}`);
@@ -744,11 +744,11 @@ function validateStep(
   }
 
   // Resolve short names to canonical npm names. The system prompt
-  // tells the LLM to use forms like `zoya-trigger` and `zoya-tool`
+  // tells the LLM to use forms like `jarvis-trigger` and `jarvis-tool`
   // (because that's the short identity humans use), but the catalog
   // is keyed by the full npm package name like
-  // `@zoyapieces/piece-zoya-trigger`. Without this resolution the
-  // composer would lose every Zoya-piece flow on a validation error
+  // `@jarvispieces/piece-jarvis-trigger`. Without this resolution the
+  // composer would lose every Jarvis-piece flow on a validation error
   // even though the LLM picked the right piece.
   //
   // Resolution: try the exact name first; on miss walk the catalog
@@ -816,7 +816,7 @@ function validateStep(
     }
   }
 
-  // Delegate-role check: a `zoya-agent:delegate` step's optional `role` must
+  // Delegate-role check: a `jarvis-agent:delegate` step's optional `role` must
   // name a specialist that actually exists. The LLM otherwise invents plausible
   // ids ("researcher") that have no role file, so the flow errors on every run.
   // Only enforced when the caller supplied the valid set; skipped for templated
@@ -840,7 +840,7 @@ function validateStep(
     }
   }
 
-  // Invoke-params check: a `zoya-tool:invoke` step names a tool in
+  // Invoke-params check: a `jarvis-tool:invoke` step names a tool in
   // `input.toolName` and passes `input.params`. Multi-action tools require an
   // `action` param (and others); the LLM otherwise guesses params like
   // `{ query }` and the step 500s with "Required parameter 'X' missing". When
@@ -1000,4 +1000,3 @@ function stripJsonFence(text: string): string {
   }
   return s;
 }
-

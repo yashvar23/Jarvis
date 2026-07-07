@@ -74,7 +74,7 @@ describe('AgentInstance default authority', () => {
 });
 
 describe('spawnSubAgent authority gate', () => {
-  // Regression for "Zoya says it cannot spawn sub-agents despite max
+  // Regression for "Jarvis says it cannot spawn sub-agents despite max
   // authority": the default personal-assistant role ships the delegation
   // tool but no sub_roles, and the old sub_roles-derived flag refused
   // every spawn from it.
@@ -161,4 +161,3 @@ describe('authority engine as prime decider for spawning', () => {
     expect(child.agent.parent_id).toBe(primary.id);
   });
 });
-

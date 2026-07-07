@@ -82,4 +82,3 @@ describe('User Profile Followup', () => {
     expect(maybeCreateUserProfileFollowupPrompt()).toBeNull();
   });
 });
-

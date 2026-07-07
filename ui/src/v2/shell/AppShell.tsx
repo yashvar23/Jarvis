@@ -309,7 +309,7 @@ function AppShellLive() {
   // continues in the background; both paths produce identical thread items.
   // From any "busy" state (speaking/processing/wake_detected), tapping
   // interrupts the in-flight turn and starts a fresh recording — the user
-  // shouldn't have to wait for Zoya to finish thinking to talk over it.
+  // shouldn't have to wait for Jarvis to finish thinking to talk over it.
   const handleTapOrb = useCallback(() => {
     if (voice.muted) return;
     if (voice.voiceState === "recording") {
@@ -402,7 +402,7 @@ function AppShellLive() {
       live.injectCard({
         objectType: "memory",
         ref: "tutorial-sample-memory",
-        title: "Sample memory: Yash's onboarding",
+        title: "Sample memory: Vieri's onboarding",
         summary:
           "This is what an InlineCard looks like. I bring objects up like this whenever I reference something concrete in the conversation.",
         meta: "onboarding · sample",
@@ -575,7 +575,7 @@ function AppShellLive() {
   const latestAssistantReply = useMemo(() => {
     for (let i = live.items.length - 1; i >= 0; i--) {
       const item = live.items[i]!;
-      if (item.kind === "zoya-speech" && item.text) {
+      if (item.kind === "jarvis-speech" && item.text) {
         return {
           text: item.text,
           isStreaming: item.status === "speaking",
@@ -607,7 +607,7 @@ function AppShellLive() {
         composerDisabled={!live.isConnected}
         composerPlaceholder={
           live.isConnected
-            ? "Ask Zoya, or press / to summon a tool…"
+            ? "Ask Jarvis, or press / to summon a tool…"
             : "Waiting for daemon…"
         }
         onSubmit={(text) =>
@@ -719,12 +719,12 @@ type MockVariant<T = ThreadItem> = T extends ThreadItem ? Omit<T, "id" | "t"> : 
 
 const MOCK_APPEND_VARIANTS: MockVariant[] = [
   {
-    kind: "zoya-speech",
+    kind: "jarvis-speech",
     text: "Heads up — the overnight researcher just pushed a second draft. Want to see it?",
     status: "done",
   },
   {
-    kind: "zoya-thought",
+    kind: "jarvis-thought",
     text: "Rechecking calendar conflicts for the Thursday invite.",
   },
   {

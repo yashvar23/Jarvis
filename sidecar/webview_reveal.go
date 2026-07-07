@@ -27,10 +27,10 @@ func revealWebviewOnLoad(w webview.WebView) {
 			_ = platformSetWindowVisible(handle, true)
 		}
 	}
-	w.Init(`(function(){try{var r=function(){if(window.__zoya_reveal)window.__zoya_reveal();};` +
+	w.Init(`(function(){try{var r=function(){if(window.__jarvis_reveal)window.__jarvis_reveal();};` +
 		`if(document.readyState==='complete'){setTimeout(r,80);}` +
 		`else{window.addEventListener('load',function(){setTimeout(r,80);});}}catch(e){}})();`)
-	_ = w.Bind("__zoya_reveal", func() { show() })
+	_ = w.Bind("__jarvis_reveal", func() { show() })
 	go func() {
 		time.Sleep(5 * time.Second)
 		w.Dispatch(func() { show() })

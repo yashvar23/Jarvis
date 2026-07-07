@@ -16,4 +16,3 @@ export enum EndpointScope {
     PLATFORM = 'PLATFORM',
     PROJECT = 'PROJECT',
 }
-

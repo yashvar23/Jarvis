@@ -1,6 +1,6 @@
-# ZOYA Configuration System
+# J.A.R.V.I.S. Configuration System
 
-Type-safe YAML configuration management for Project ZOYA
+Type-safe YAML configuration management for Project J.A.R.V.I.S.
 
 ## Overview
 
@@ -13,7 +13,7 @@ The configuration system provides:
 
 ## Configuration File
 
-Default location: `~/.zoya/config.yaml`
+Default location: `~/.jarvis/config.yaml`
 
 See `config.example.yaml` in the project root for a full example.
 
@@ -24,7 +24,7 @@ See `config.example.yaml` in the project root for a full example.
 ```typescript
 import { loadConfig } from './config/index.ts';
 
-// Load from default location (~/.zoya/config.yaml)
+// Load from default location (~/.jarvis/config.yaml)
 const config = await loadConfig();
 
 // Load from custom path
@@ -38,24 +38,19 @@ console.log(config.personality.core_traits);  // string[]
 
 ### Saving Configuration
 
-There is intentionally **no `saveConfig`**. `config.yaml` is a read-only
-SYSTEM config (daemon.*, auth, google) that the brain never writes; in hosted
-mode it is root-owned and managed by the hosting server.
-
-All user-owned sections (personality, voice, stt/tts, authority, channels,
-onboarding, ... — see `USER_OWNED_SECTIONS` in `types.ts`) persist to the
-vault DB settings store instead:
-
 ```typescript
-import { saveUserSection } from '../daemon/user-settings.ts';
+import { saveConfig } from './config/index.ts';
 
-config.tts = { ...config.tts, enabled: true };
-saveUserSection('tts', config.tts);
+// Modify config
+config.daemon.port = 8888;
+config.llm.primary = 'openai';
+
+// Save to default location
+await saveConfig(config);
+
+// Save to custom path
+await saveConfig(config, '/path/to/config.yaml');
 ```
-
-A legacy `config.yaml` that still carries user sections seeds the DB once at
-daemon boot (`importLegacyUserSettings`), after which the file's copies are
-ignored (`loadConfig` discards them, exactly like the `llm` block).
 
 ### Using Default Config
 
@@ -75,8 +70,8 @@ Daemon server configuration.
 ```typescript
 daemon: {
   port: number;          // WebSocket server port (default: 7777)
-  data_dir: string;      // Data directory path (default: ~/.zoya)
-  db_path: string;       // SQLite database path (default: ~/.zoya/zoya.db)
+  data_dir: string;      // Data directory path (default: ~/.jarvis)
+  db_path: string;       // SQLite database path (default: ~/.jarvis/jarvis.db)
 }
 ```
 
@@ -111,7 +106,7 @@ llm: {
 
 ### `personality`
 
-Core personality traits that guide ZOYA behavior.
+Core personality traits that guide J.A.R.V.I.S. behavior.
 
 ```typescript
 personality: {
@@ -159,8 +154,8 @@ Roles are loaded from `./roles/` directory.
 ```yaml
 daemon:
   port: 7777
-  data_dir: "~/.zoya"
-  db_path: "~/.zoya/zoya.db"
+  data_dir: "~/.jarvis"
+  db_path: "~/.jarvis/jarvis.db"
 
 llm:
   primary: "anthropic"
@@ -248,30 +243,34 @@ console.log(`Database path: ${config.daemon.db_path}`);
 
 ### Dynamic Configuration Updates
 
-Inside the daemon, mutate the live in-memory config (it is the DB-merged,
-authoritative view) and persist the touched section:
-
 ```typescript
-import { saveUserSection } from '../daemon/user-settings.ts';
+import { loadConfig, saveConfig } from './config/index.ts';
 
-ctx.config.personality.core_traits.push('humorous');
-saveUserSection('personality', ctx.config.personality);
+// Load current config
+const config = await loadConfig();
+
+// Update settings
+config.daemon.port = 8888;
+config.llm.primary = 'openai';
+config.personality.core_traits.push('humorous');
+
+// Save changes
+await saveConfig(config);
+
+console.log('Configuration updated!');
 ```
-
-System keys (`daemon.*`) cannot be changed at runtime — edit `config.yaml`
-and restart (self-host), or let the hosting server rewrite it (hosted).
 
 ## Setup Instructions
 
 1. **Copy Example Config**:
    ```bash
-   mkdir -p ~/.zoya
-   cp config.example.yaml ~/.zoya/config.yaml
+   mkdir -p ~/.jarvis
+   cp config.example.yaml ~/.jarvis/config.yaml
    ```
 
 2. **Edit Configuration**:
    ```bash
-   nano ~/.zoya/config.yaml
+   nano ~/.jarvis/config.yaml
    ```
 
 3. **Add API Keys**:
@@ -322,7 +321,7 @@ If you have an existing config and the schema changes:
 
 ## Best Practices
 
-1. **Never commit API keys**: Add `~/.zoya/config.yaml` to `.gitignore`
+1. **Never commit API keys**: Add `~/.jarvis/config.yaml` to `.gitignore`
 2. **Use environment variables**: For CI/CD and production deployments
 3. **Keep backups**: Copy config before major changes
 4. **Validate on load**: Check that required API keys are present
@@ -333,9 +332,9 @@ If you have an existing config and the schema changes:
 The configuration is fully typed:
 
 ```typescript
-import type { ZoyaConfig } from './config/index.ts';
+import type { JarvisConfig } from './config/index.ts';
 
-function validateConfig(config: ZoyaConfig): boolean {
+function validateConfig(config: JarvisConfig): boolean {
   // TypeScript ensures all required fields exist
   if (config.daemon.port < 1024 || config.daemon.port > 65535) {
     return false;
@@ -355,7 +354,7 @@ To add new configuration sections:
 
 1. **Update Types** (`src/config/types.ts`):
    ```typescript
-   export type ZoyaConfig = {
+   export type JarvisConfig = {
      // ... existing fields
      new_section: {
        setting1: string;
@@ -363,7 +362,7 @@ To add new configuration sections:
      };
    };
 
-   export const DEFAULT_CONFIG: ZoyaConfig = {
+   export const DEFAULT_CONFIG: JarvisConfig = {
      // ... existing defaults
      new_section: {
        setting1: 'default_value',
@@ -386,4 +385,3 @@ To add new configuration sections:
    ```
 
 The deep merge ensures existing configs get new defaults automatically.
-

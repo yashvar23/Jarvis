@@ -120,7 +120,7 @@ interface ActionResult {
  * Authority Room data hook — polls 5 endpoints in parallel + exposes
  * write actions for approve/deny, config mutations, learning accept/
  * dismiss, emergency state changes, and the new quick-override (voice
- * "grant Zoya email access" path).
+ * "grant Jarvis email access" path).
  *
  * Designed so failures in any one endpoint don't block the others —
  * the Room renders partial data when, say, learning suggestions fail
@@ -325,4 +325,3 @@ export function useAuthorityData() {
     setEmergency,
   };
 }
-

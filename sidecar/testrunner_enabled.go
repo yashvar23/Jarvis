@@ -16,9 +16,9 @@ import (
 // that exercise capabilities CI cannot reach (Vision on macOS, WinRT on
 // Windows, real screen capture, etc.). Operator workflow:
 //
-//   make build-test                         # produces zoya-sidecar-test
-//   scp zoya-sidecar-test mac:~/          # or windows:
-//   ./zoya-sidecar-test --test capture    # exercises full save + OCR loop
+//   make build-test                         # produces jarvis-sidecar-test
+//   scp jarvis-sidecar-test mac:~/          # or windows:
+//   ./jarvis-sidecar-test --test capture    # exercises full save + OCR loop
 func runTests(args []string) int {
 	if len(args) == 0 {
 		printTestHelp()
@@ -56,14 +56,14 @@ func runTests(args []string) int {
 }
 
 func printTestHelp() {
-	fmt.Printf(`zoya-sidecar platform test runner (built %s/%s)
+	fmt.Printf(`jarvis-sidecar platform test runner (built %s/%s)
 
 Usage:
-  zoya-sidecar --test help                  This text
-  zoya-sidecar --test preflight             Print capability availability + reasons
-  zoya-sidecar --test ocr <image-path>      Run platformOCR against a PNG
-  zoya-sidecar --test capture               Live screen capture -> save -> OCR
-  zoya-sidecar --test all                   preflight + capture (no path needed)
+  jarvis-sidecar --test help                  This text
+  jarvis-sidecar --test preflight             Print capability availability + reasons
+  jarvis-sidecar --test ocr <image-path>      Run platformOCR against a PNG
+  jarvis-sidecar --test capture               Live screen capture -> save -> OCR
+  jarvis-sidecar --test all                   preflight + capture (no path needed)
 `, runtime.GOOS, runtime.GOARCH)
 }
 
@@ -122,7 +122,7 @@ func testCapture() int {
 
 	captureDir := cfg.Awareness.CaptureDir
 	if captureDir == "" {
-		captureDir = filepath.Join(os.TempDir(), "zoya-sidecar-test-captures")
+		captureDir = filepath.Join(os.TempDir(), "jarvis-sidecar-test-captures")
 	}
 	fmt.Printf("Capture dir: %s\n", captureDir)
 

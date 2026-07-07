@@ -43,5 +43,3 @@ export const DeleteTagRequest = z.object({
 })
 
 export type DeleteTagRequest = z.infer<typeof DeleteTagRequest>
-
-

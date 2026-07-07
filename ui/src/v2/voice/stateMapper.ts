@@ -44,5 +44,3 @@ export function mapVoiceState(
       return "idle";
   }
 }
-
-

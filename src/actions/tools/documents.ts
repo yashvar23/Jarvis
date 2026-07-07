@@ -95,7 +95,7 @@ export const documentTool: ToolDefinition = {
         return [
           `Document created: "${doc.title}" (${doc.format}, ${doc.body.length} chars)`,
           '',
-          `<!-- zoya:document id="${doc.id}" title="${doc.title}" format="${doc.format}" size="${doc.body.length}" -->`,
+          `<!-- jarvis:document id="${doc.id}" title="${doc.title}" format="${doc.format}" size="${doc.body.length}" -->`,
           '',
           preview ? `Preview:\n${preview}` : '',
         ].filter(Boolean).join('\n');
@@ -167,4 +167,3 @@ export const documentTool: ToolDefinition = {
     }
   },
 };
-

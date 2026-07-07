@@ -128,7 +128,7 @@ export async function ensurePortReleased(
  * Returns null when the file is absent, invalid, or the field is missing
  * — callers decide what default to apply.
  */
-export function readConfiguredPort(configPath = join(homedir(), '.zoya', 'config.yaml')): number | null {
+export function readConfiguredPort(configPath = join(homedir(), '.jarvis', 'config.yaml')): number | null {
   try {
     if (!existsSync(configPath)) return null;
     const text = readFileSync(configPath, 'utf-8');
@@ -158,49 +158,24 @@ function validPort(value: unknown): number | null {
 
 export type StopPortSource = 'lockfile' | 'env' | 'cli' | 'config' | 'default';
 
-export type StopPortResolution =
-  | { port: number; source: StopPortSource }
-  /**
-   * The config binds a unix socket (`daemon.listen: unix:...`) and no TCP
-   * port was recorded in the lockfile: there is NO port to verify or clear.
-   * `zoya stop` must be pid-only - SIGTERM/SIGKILLing whatever same-user
-   * process happens to listen on daemon.port/3142 would murder an unrelated
-   * service on a hosted box.
-   */
-  | { port: null; source: 'unix-socket' };
+export type StopPortResolution = {
+  port: number;
+  source: StopPortSource;
+};
 
 /**
- * Read `daemon.listen` from the YAML config; returns the unix socket path
- * when one is configured, else null.
- */
-export function readConfiguredUnixListen(configPath = join(homedir(), '.zoya', 'config.yaml')): string | null {
-  try {
-    if (!existsSync(configPath)) return null;
-    const text = readFileSync(configPath, 'utf-8');
-    const doc = YAML.parseDocument(text, { merge: true });
-    if (doc.errors.length > 0) return null;
-    const parsed = doc.toJS() as { daemon?: { listen?: unknown } } | null;
-    const listen = parsed?.daemon?.listen;
-    if (typeof listen === 'string' && listen.trim().startsWith('unix:')) return listen.trim().slice('unix:'.length);
-    return null;
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Resolve which port `zoya stop` should verify.
+ * Resolve which port `jarvis stop` should verify.
  *
  * Precedence (highest first):
  *   1. The port the running daemon recorded in its lockfile (authoritative).
- *   2. `ZOYA_PORT` env var (matches `applyEnvOverrides` in the config loader).
+ *   2. `JARVIS_PORT` env var (matches `applyEnvOverrides` in the config loader).
  *   3. An explicit `--port N` passed on the stop command line.
- *   4. `daemon.port` from `~/.zoya/config.yaml`.
+ *   4. `daemon.port` from `~/.jarvis/config.yaml`.
  *   5. The hardcoded default (3142).
  *
  * The lockfile wins over everything because it reflects the port the daemon
  * actually bound to, not what config/env said at some point in the past. The
- * env var beats `--port` so a user with a persistent `ZOYA_PORT` in their
+ * env var beats `--port` so a user with a persistent `JARVIS_PORT` in their
  * shell doesn't get caught out by forgetting to pass the flag.
  */
 export function resolveStopPort(options?: {
@@ -213,14 +188,7 @@ export function resolveStopPort(options?: {
   const locked = validPort(readLockedPort());
   if (locked !== null) return { port: locked, source: 'lockfile' };
 
-  // Unix-socket mode records no port (there is none). Every other source
-  // (env/cli/config/default) describes a TCP port the daemon never bound,
-  // so port cleanup must be skipped entirely.
-  if (readConfiguredUnixListen(options?.configPath) !== null) {
-    return { port: null, source: 'unix-socket' };
-  }
-
-  const fromEnv = validPort(env.ZOYA_PORT);
+  const fromEnv = validPort(env.JARVIS_PORT);
   if (fromEnv !== null) return { port: fromEnv, source: 'env' };
 
   const fromCli = validPort(options?.cliPort);
@@ -231,4 +199,3 @@ export function resolveStopPort(options?: {
 
   return { port: DEFAULT_DAEMON_PORT, source: 'default' };
 }
-

@@ -47,4 +47,3 @@ export const TriggerSource = z.object({
 })
 
 export type TriggerSource = z.infer<typeof TriggerSource>
-

@@ -99,4 +99,3 @@ describe('quick-override', () => {
     expect(grantedDecision.requiresApproval).toBe(false);
   });
 });
-

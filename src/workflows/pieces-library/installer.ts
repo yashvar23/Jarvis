@@ -1,5 +1,5 @@
 /**
- * Pieces installer + manifest. Manages `~/.zoya/pieces/`:
+ * Pieces installer + manifest. Manages `~/.jarvis/pieces/`:
  *
  *   installed.json   -- source of truth for what should be installed
  *   package.json     -- synthesized from installed.json, fed to bun install
@@ -21,17 +21,17 @@ import { resolve, join } from "node:path";
 import { homedir } from "node:os";
 import { catalogById, type CatalogEntry } from "./catalog";
 
-const ROOT_ENV = "ZOYA_PIECES_DIR";
+const ROOT_ENV = "JARVIS_PIECES_DIR";
 
-/** Default `~/.zoya/pieces`. Override with `ZOYA_PIECES_DIR` for tests. */
+/** Default `~/.jarvis/pieces`. Override with `JARVIS_PIECES_DIR` for tests. */
 export function piecesBaseDir(): string {
   const override = process.env[ROOT_ENV];
   if (override) return resolve(override);
-  return resolve(homedir(), ".zoya", "pieces");
+  return resolve(homedir(), ".jarvis", "pieces");
 }
 
 export interface InstalledPiece {
-  /** Zoya-side id; matches the catalog entry's `id`. */
+  /** Jarvis-side id; matches the catalog entry's `id`. */
   id: string;
   /** npm package name. Stored so uninstall doesn't need the catalog. */
   npmPackage: string;
@@ -132,7 +132,7 @@ export function synthesizePackageJson(manifest: InstalledManifest): string {
   return (
     JSON.stringify(
       {
-        name: "zoya-pieces",
+        name: "jarvis-pieces",
         private: true,
         type: "commonjs",
         dependencies: deps,
@@ -274,4 +274,3 @@ function runBunInstall(cwd: string): Promise<void> {
     child.on("error", rej);
   });
 }
-

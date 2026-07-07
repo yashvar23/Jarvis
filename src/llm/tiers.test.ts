@@ -75,4 +75,3 @@ describe('validateTierMap', () => {
     expect(validateTierMap({ high: { provider: 'anthropic' } })).toBeNull();
   });
 });
-

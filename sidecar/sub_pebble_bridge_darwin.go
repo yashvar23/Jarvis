@@ -3,7 +3,7 @@
 package main
 
 // C→Go bridge for the macOS sub-pebble overlay (separate file per the cgo
-// //export-vs-C-definitions rule). Called from ZoyaSubView.mouseDown on the
+// //export-vs-C-definitions rule). Called from JarvisSubView.mouseDown on the
 // main thread; Go does the disc hit-test with the shared geometry.
 
 import "C"

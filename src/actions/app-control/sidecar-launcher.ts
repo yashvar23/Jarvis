@@ -25,7 +25,7 @@ const DEFAULT_PORT = 9224;
 
 /**
  * Find the desktop-bridge.exe sidecar on disk.
- * Checks: ~/.zoya/sidecar/ then repo build output.
+ * Checks: ~/.jarvis/sidecar/ then repo build output.
  */
 export function findSidecarExecutable(): string | null {
   const candidates: string[] = [];
@@ -39,17 +39,17 @@ export function findSidecarExecutable(): string | null {
       if (userProfile && !userProfile.includes('%')) {
         const drive = userProfile.charAt(0).toLowerCase();
         const rest = userProfile.slice(2).replace(/\\/g, '/');
-        const wslPath = `/mnt/${drive}${rest}/.zoya/sidecar/desktop-bridge.exe`;
+        const wslPath = `/mnt/${drive}${rest}/.jarvis/sidecar/desktop-bridge.exe`;
         candidates.push(wslPath);
       }
     } catch {
       // Fall back to common paths
     }
 
-    candidates.push('/mnt/c/Users/' + (process.env.USER ?? 'user') + '/.zoya/sidecar/desktop-bridge.exe');
+    candidates.push('/mnt/c/Users/' + (process.env.USER ?? 'user') + '/.jarvis/sidecar/desktop-bridge.exe');
   } else {
     // Native Windows
-    candidates.push(join(homedir(), '.zoya', 'sidecar', 'desktop-bridge.exe'));
+    candidates.push(join(homedir(), '.jarvis', 'sidecar', 'desktop-bridge.exe'));
   }
 
   // Also check repo build output (both custom -o path and default dotnet publish path)
@@ -284,4 +284,3 @@ function sendTcpRaw(host: string, port: number, data: string, timeoutMs: number)
     });
   });
 }
-

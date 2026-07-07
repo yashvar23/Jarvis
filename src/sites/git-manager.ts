@@ -238,4 +238,3 @@ export class GitManager {
     return stdout;
   }
 }
-

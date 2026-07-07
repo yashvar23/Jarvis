@@ -339,10 +339,10 @@ describe("SandboxApi routes (B2: connections, store, flows)", () => {
     signer = new EngineTokenSigner();
     registry = new SandboxRegistry();
     resolver = new CredentialResolver();
-    // Stub Zoya source so zoya:test resolves to a fake OAuth2 connection.
+    // Stub Jarvis source so jarvis:test resolves to a fake OAuth2 connection.
     resolver.register({
       id: "test",
-      canResolve: (e) => e === "zoya:test",
+      canResolve: (e) => e === "jarvis:test",
       resolve: async () => ({
         type: "OAUTH2",
         value: { access_token: "tok", refresh_token: "" },
@@ -361,11 +361,11 @@ describe("SandboxApi routes (B2: connections, store, flows)", () => {
     _clearStoreForTests();
   });
 
-  test("GET /v1/worker/app-connections/:externalId resolves a Zoya source", async () => {
-    const r = await authedFetch("/v1/worker/app-connections/zoya%3Atest");
+  test("GET /v1/worker/app-connections/:externalId resolves a Jarvis source", async () => {
+    const r = await authedFetch("/v1/worker/app-connections/jarvis%3Atest");
     expect(r.status).toBe(200);
     const body = (await r.json()) as { externalId: string; status: string; value: { type?: string; access_token?: string } };
-    expect(body.externalId).toBe("zoya:test");
+    expect(body.externalId).toBe("jarvis:test");
     expect(body.status).toBe("ACTIVE");
     expect(body.value.type).toBe("OAUTH2");
     expect(body.value.access_token).toBe("tok");
@@ -477,7 +477,7 @@ describe("SandboxApi routes (B3: files, waitpoints, logs)", () => {
   }
 
   beforeAll(async () => {
-    process.env.ZOYA_WORKFLOW_DATA_DIR = `/tmp/zoya-sandbox-test-${Math.random().toString(36).slice(2, 10)}`;
+    process.env.JARVIS_WORKFLOW_DATA_DIR = `/tmp/jarvis-sandbox-test-${Math.random().toString(36).slice(2, 10)}`;
     initWorkflowDb(":memory:");
     signer = new EngineTokenSigner();
     registry = new SandboxRegistry();
@@ -506,7 +506,7 @@ describe("SandboxApi routes (B3: files, waitpoints, logs)", () => {
   afterAll(async () => {
     await api.stop();
     closeWorkflowDb();
-    delete process.env.ZOYA_WORKFLOW_DATA_DIR;
+    delete process.env.JARVIS_WORKFLOW_DATA_DIR;
   });
 
   test("POST /v1/step-files stores blob and returns a /v1/step-files/<id> URL", async () => {
@@ -676,7 +676,7 @@ describe("SandboxApi routes (B3: files, waitpoints, logs)", () => {
   });
 });
 
-describe("SandboxApi routes (G: zoya-tool/notify/context)", () => {
+describe("SandboxApi routes (G: jarvis-tool/notify/context)", () => {
   let api: SandboxApi;
   let signer: EngineTokenSigner;
   let registry: SandboxRegistry;
@@ -751,8 +751,8 @@ describe("SandboxApi routes (G: zoya-tool/notify/context)", () => {
     contextCalls = [];
   });
 
-  test("POST /v1/zoya/tools/invoke calls injected fn and returns its reply", async () => {
-    const r = await authedFetch("/v1/zoya/tools/invoke", {
+  test("POST /v1/jarvis/tools/invoke calls injected fn and returns its reply", async () => {
+    const r = await authedFetch("/v1/jarvis/tools/invoke", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ toolName: "vault_search", params: { query: "x" } }),
@@ -765,8 +765,8 @@ describe("SandboxApi routes (G: zoya-tool/notify/context)", () => {
     expect(toolsCalls[0]?.params).toEqual({ query: "x" });
   });
 
-  test("POST /v1/zoya/tools/invoke 400 on missing toolName", async () => {
-    const r = await authedFetch("/v1/zoya/tools/invoke", {
+  test("POST /v1/jarvis/tools/invoke 400 on missing toolName", async () => {
+    const r = await authedFetch("/v1/jarvis/tools/invoke", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ params: {} }),
@@ -774,8 +774,8 @@ describe("SandboxApi routes (G: zoya-tool/notify/context)", () => {
     expect(r.status).toBe(400);
   });
 
-  test("POST /v1/zoya/tools/invoke 400 on non-object params", async () => {
-    const r = await authedFetch("/v1/zoya/tools/invoke", {
+  test("POST /v1/jarvis/tools/invoke 400 on non-object params", async () => {
+    const r = await authedFetch("/v1/jarvis/tools/invoke", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ toolName: "x", params: [1, 2] }),
@@ -783,8 +783,8 @@ describe("SandboxApi routes (G: zoya-tool/notify/context)", () => {
     expect(r.status).toBe(400);
   });
 
-  test("POST /v1/zoya/notify dispatches and surfaces delivery report", async () => {
-    const r = await authedFetch("/v1/zoya/notify", {
+  test("POST /v1/jarvis/notify dispatches and surfaces delivery report", async () => {
+    const r = await authedFetch("/v1/jarvis/notify", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -800,8 +800,8 @@ describe("SandboxApi routes (G: zoya-tool/notify/context)", () => {
     expect(notifyCalls[0]?.priority).toBe("high");
   });
 
-  test("POST /v1/zoya/notify defaults channels to ['auto'] and priority to 'normal'", async () => {
-    const r = await authedFetch("/v1/zoya/notify", {
+  test("POST /v1/jarvis/notify defaults channels to ['auto'] and priority to 'normal'", async () => {
+    const r = await authedFetch("/v1/jarvis/notify", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: "hello" }),
@@ -811,8 +811,8 @@ describe("SandboxApi routes (G: zoya-tool/notify/context)", () => {
     expect(notifyCalls[0]?.priority).toBe("normal");
   });
 
-  test("POST /v1/zoya/notify 400 on unknown channel", async () => {
-    const r = await authedFetch("/v1/zoya/notify", {
+  test("POST /v1/jarvis/notify 400 on unknown channel", async () => {
+    const r = await authedFetch("/v1/jarvis/notify", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: "x", channels: ["pagers"] }),
@@ -820,8 +820,8 @@ describe("SandboxApi routes (G: zoya-tool/notify/context)", () => {
     expect(r.status).toBe(400);
   });
 
-  test("POST /v1/zoya/context/vault-search forwards filter to provider", async () => {
-    const r = await authedFetch("/v1/zoya/context/vault-search", {
+  test("POST /v1/jarvis/context/vault-search forwards filter to provider", async () => {
+    const r = await authedFetch("/v1/jarvis/context/vault-search", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ query: "alice", type: "person", limit: 10 }),
@@ -836,8 +836,8 @@ describe("SandboxApi routes (G: zoya-tool/notify/context)", () => {
     });
   });
 
-  test("POST /v1/zoya/context/vault-search 400 on invalid type", async () => {
-    const r = await authedFetch("/v1/zoya/context/vault-search", {
+  test("POST /v1/jarvis/context/vault-search 400 on invalid type", async () => {
+    const r = await authedFetch("/v1/jarvis/context/vault-search", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ type: "robot" }),
@@ -845,8 +845,8 @@ describe("SandboxApi routes (G: zoya-tool/notify/context)", () => {
     expect(r.status).toBe(400);
   });
 
-  test("POST /v1/zoya/context/vault-get-entity forwards id", async () => {
-    const r = await authedFetch("/v1/zoya/context/vault-get-entity", {
+  test("POST /v1/jarvis/context/vault-get-entity forwards id", async () => {
+    const r = await authedFetch("/v1/jarvis/context/vault-get-entity", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: "ent_123" }),
@@ -856,8 +856,8 @@ describe("SandboxApi routes (G: zoya-tool/notify/context)", () => {
     expect(contextCalls[0]?.input).toBe("ent_123");
   });
 
-  test("POST /v1/zoya/context/awareness-recent forwards limit/since", async () => {
-    const r = await authedFetch("/v1/zoya/context/awareness-recent", {
+  test("POST /v1/jarvis/context/awareness-recent forwards limit/since", async () => {
+    const r = await authedFetch("/v1/jarvis/context/awareness-recent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ limit: 5, since: 1000 }),
@@ -867,8 +867,8 @@ describe("SandboxApi routes (G: zoya-tool/notify/context)", () => {
     expect(contextCalls[0]?.input).toEqual({ limit: 5, since: 1000 });
   });
 
-  test("POST /v1/zoya/context/commitments-list forwards status filter", async () => {
-    const r = await authedFetch("/v1/zoya/context/commitments-list", {
+  test("POST /v1/jarvis/context/commitments-list forwards status filter", async () => {
+    const r = await authedFetch("/v1/jarvis/context/commitments-list", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: "in_progress" }),
@@ -878,8 +878,8 @@ describe("SandboxApi routes (G: zoya-tool/notify/context)", () => {
     expect(contextCalls[0]?.input).toEqual({ status: "in_progress" });
   });
 
-  test("POST /v1/zoya/context/commitments-list 400 on invalid status", async () => {
-    const r = await authedFetch("/v1/zoya/context/commitments-list", {
+  test("POST /v1/jarvis/context/commitments-list 400 on invalid status", async () => {
+    const r = await authedFetch("/v1/jarvis/context/commitments-list", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: "blocked" }),
@@ -924,7 +924,7 @@ describe("SandboxApi routes (G unconfigured -> 503)", () => {
   });
 
   test("tools.invoke without toolsInvoke fn returns 503", async () => {
-    const r = await authedFetch("/v1/zoya/tools/invoke", {
+    const r = await authedFetch("/v1/jarvis/tools/invoke", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ toolName: "x", params: {} }),
@@ -933,7 +933,7 @@ describe("SandboxApi routes (G unconfigured -> 503)", () => {
   });
 
   test("notify without notify fn returns 503", async () => {
-    const r = await authedFetch("/v1/zoya/notify", {
+    const r = await authedFetch("/v1/jarvis/notify", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: "x" }),
@@ -943,10 +943,10 @@ describe("SandboxApi routes (G unconfigured -> 503)", () => {
 
   test("context routes without provider return 503", async () => {
     for (const path of [
-      "/v1/zoya/context/vault-search",
-      "/v1/zoya/context/vault-get-entity",
-      "/v1/zoya/context/awareness-recent",
-      "/v1/zoya/context/commitments-list",
+      "/v1/jarvis/context/vault-search",
+      "/v1/jarvis/context/vault-get-entity",
+      "/v1/jarvis/context/awareness-recent",
+      "/v1/jarvis/context/commitments-list",
     ]) {
       const r = await authedFetch(path, {
         method: "POST",
@@ -958,7 +958,7 @@ describe("SandboxApi routes (G unconfigured -> 503)", () => {
   });
 });
 
-describe("SandboxApi routes (H: zoya-agent/trigger)", () => {
+describe("SandboxApi routes (H: jarvis-agent/trigger)", () => {
   let api: SandboxApi;
   let signer: EngineTokenSigner;
   let registry: SandboxRegistry;
@@ -1035,8 +1035,8 @@ describe("SandboxApi routes (H: zoya-agent/trigger)", () => {
     pollReply = { events: [], cursor: 0 };
   });
 
-  test("POST /v1/zoya/agent/delegate forwards goal/role/maxIterations", async () => {
-    const r = await authedFetch("/v1/zoya/agent/delegate", {
+  test("POST /v1/jarvis/agent/delegate forwards goal/role/maxIterations", async () => {
+    const r = await authedFetch("/v1/jarvis/agent/delegate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ goal: "summarize inbox", role: "researcher", maxIterations: 5 }),
@@ -1049,8 +1049,8 @@ describe("SandboxApi routes (H: zoya-agent/trigger)", () => {
     expect(agentCalls[0]).toEqual({ goal: "summarize inbox", role: "researcher", maxIterations: 5 });
   });
 
-  test("POST /v1/zoya/agent/delegate 400 on missing goal", async () => {
-    const r = await authedFetch("/v1/zoya/agent/delegate", {
+  test("POST /v1/jarvis/agent/delegate 400 on missing goal", async () => {
+    const r = await authedFetch("/v1/jarvis/agent/delegate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ role: "x" }),
@@ -1058,8 +1058,8 @@ describe("SandboxApi routes (H: zoya-agent/trigger)", () => {
     expect(r.status).toBe(400);
   });
 
-  test("POST /v1/zoya/agent/delegate 400 on non-integer maxIterations", async () => {
-    const r = await authedFetch("/v1/zoya/agent/delegate", {
+  test("POST /v1/jarvis/agent/delegate 400 on non-integer maxIterations", async () => {
+    const r = await authedFetch("/v1/jarvis/agent/delegate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ goal: "x", maxIterations: 1.5 }),
@@ -1067,14 +1067,14 @@ describe("SandboxApi routes (H: zoya-agent/trigger)", () => {
     expect(r.status).toBe(400);
   });
 
-  test("POST /v1/zoya/events/poll forwards eventType+filter+since", async () => {
+  test("POST /v1/jarvis/events/poll forwards eventType+filter+since", async () => {
     pollReply = {
       events: [
         { id: "e1", eventType: "awareness.context_changed", payload: { app: "vscode" }, timestamp: 100 },
       ],
       cursor: 100,
     };
-    const r = await authedFetch("/v1/zoya/events/poll", {
+    const r = await authedFetch("/v1/jarvis/events/poll", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -1093,8 +1093,8 @@ describe("SandboxApi routes (H: zoya-agent/trigger)", () => {
     expect(pollCalls[0]?.filter).toEqual({ app: "vscode" });
   });
 
-  test("POST /v1/zoya/events/poll 400 on missing eventType", async () => {
-    const r = await authedFetch("/v1/zoya/events/poll", {
+  test("POST /v1/jarvis/events/poll 400 on missing eventType", async () => {
+    const r = await authedFetch("/v1/jarvis/events/poll", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ since: 0 }),
@@ -1102,8 +1102,8 @@ describe("SandboxApi routes (H: zoya-agent/trigger)", () => {
     expect(r.status).toBe(400);
   });
 
-  test("POST /v1/zoya/events/poll 400 on negative since", async () => {
-    const r = await authedFetch("/v1/zoya/events/poll", {
+  test("POST /v1/jarvis/events/poll 400 on negative since", async () => {
+    const r = await authedFetch("/v1/jarvis/events/poll", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ eventType: "x", since: -1 }),
@@ -1111,8 +1111,8 @@ describe("SandboxApi routes (H: zoya-agent/trigger)", () => {
     expect(r.status).toBe(400);
   });
 
-  test("POST /v1/zoya/workflows/start dispatches with flowId and payload", async () => {
-    const r = await authedFetch("/v1/zoya/workflows/start", {
+  test("POST /v1/jarvis/workflows/start dispatches with flowId and payload", async () => {
+    const r = await authedFetch("/v1/jarvis/workflows/start", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ flowId: "flow_abc", payload: { x: 1 } }),
@@ -1125,10 +1125,10 @@ describe("SandboxApi routes (H: zoya-agent/trigger)", () => {
     expect(startCalls[0]?.payload).toEqual({ x: 1 });
   });
 
-  test("POST /v1/zoya/workflows/start 400 when flowId is missing", async () => {
+  test("POST /v1/jarvis/workflows/start 400 when flowId is missing", async () => {
     // `flowName` resolution was removed when the piece switched to a
     // single id-only flow_ref. `flowId` is now the only valid input.
-    const r = await authedFetch("/v1/zoya/workflows/start", {
+    const r = await authedFetch("/v1/jarvis/workflows/start", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ payload: {} }),
@@ -1136,8 +1136,8 @@ describe("SandboxApi routes (H: zoya-agent/trigger)", () => {
     expect(r.status).toBe(400);
   });
 
-  test("POST /v1/zoya/workflows/start 400 when flowId is empty", async () => {
-    const r = await authedFetch("/v1/zoya/workflows/start", {
+  test("POST /v1/jarvis/workflows/start 400 when flowId is empty", async () => {
+    const r = await authedFetch("/v1/jarvis/workflows/start", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ flowId: "" }),
@@ -1197,7 +1197,7 @@ describe("SandboxApi routes (workflows/start error mapping)", () => {
   });
 
   async function start(): Promise<Response> {
-    return authedFetch("/v1/zoya/workflows/start", {
+    return authedFetch("/v1/jarvis/workflows/start", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ flowId: "flow_target" }),
@@ -1267,7 +1267,7 @@ describe("SandboxApi routes (H unconfigured -> 503)", () => {
   });
 
   test("agent.delegate without fn returns 503", async () => {
-    const r = await authedFetch("/v1/zoya/agent/delegate", {
+    const r = await authedFetch("/v1/jarvis/agent/delegate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ goal: "x" }),
@@ -1276,7 +1276,7 @@ describe("SandboxApi routes (H unconfigured -> 503)", () => {
   });
 
   test("events.poll without fn returns 503", async () => {
-    const r = await authedFetch("/v1/zoya/events/poll", {
+    const r = await authedFetch("/v1/jarvis/events/poll", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ eventType: "x", since: 0 }),
@@ -1285,7 +1285,7 @@ describe("SandboxApi routes (H unconfigured -> 503)", () => {
   });
 
   test("workflows.start without fn returns 503", async () => {
-    const r = await authedFetch("/v1/zoya/workflows/start", {
+    const r = await authedFetch("/v1/jarvis/workflows/start", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ flowId: "x" }),
@@ -1294,7 +1294,7 @@ describe("SandboxApi routes (H unconfigured -> 503)", () => {
   });
 });
 
-describe("SandboxApi /v1/zoya/* envelope hardening (G+H review #7)", () => {
+describe("SandboxApi /v1/jarvis/* envelope hardening (G+H review #7)", () => {
   let api: SandboxApi;
   let signer: EngineTokenSigner;
   let registry: SandboxRegistry;
@@ -1345,19 +1345,19 @@ describe("SandboxApi /v1/zoya/* envelope hardening (G+H review #7)", () => {
   });
 
   const JSON_POST_PATHS = [
-    "/v1/zoya/llm/chat",
-    "/v1/zoya/tools/invoke",
-    "/v1/zoya/notify",
-    "/v1/zoya/context/vault-search",
-    "/v1/zoya/context/vault-get-entity",
-    "/v1/zoya/context/awareness-recent",
-    "/v1/zoya/context/commitments-list",
-    "/v1/zoya/agent/delegate",
-    "/v1/zoya/events/poll",
-    "/v1/zoya/workflows/start",
+    "/v1/jarvis/llm/chat",
+    "/v1/jarvis/tools/invoke",
+    "/v1/jarvis/notify",
+    "/v1/jarvis/context/vault-search",
+    "/v1/jarvis/context/vault-get-entity",
+    "/v1/jarvis/context/awareness-recent",
+    "/v1/jarvis/context/commitments-list",
+    "/v1/jarvis/agent/delegate",
+    "/v1/jarvis/events/poll",
+    "/v1/jarvis/workflows/start",
   ] as const;
 
-  test("each /v1/zoya/* POST returns 400 on malformed JSON", async () => {
+  test("each /v1/jarvis/* POST returns 400 on malformed JSON", async () => {
     for (const path of JSON_POST_PATHS) {
       const r = await authedFetch(path, {
         method: "POST",
@@ -1368,7 +1368,7 @@ describe("SandboxApi /v1/zoya/* envelope hardening (G+H review #7)", () => {
     }
   });
 
-  test("each /v1/zoya/* POST returns 400 on a non-object body", async () => {
+  test("each /v1/jarvis/* POST returns 400 on a non-object body", async () => {
     for (const path of JSON_POST_PATHS) {
       const r = await authedFetch(path, {
         method: "POST",
@@ -1380,8 +1380,8 @@ describe("SandboxApi /v1/zoya/* envelope hardening (G+H review #7)", () => {
     }
   });
 
-  test("/v1/zoya/events/poll headOnly mode skips 'since' and returns the head cursor", async () => {
-    const r = await authedFetch("/v1/zoya/events/poll", {
+  test("/v1/jarvis/events/poll headOnly mode skips 'since' and returns the head cursor", async () => {
+    const r = await authedFetch("/v1/jarvis/events/poll", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ eventType: "x", headOnly: true }),
@@ -1392,8 +1392,8 @@ describe("SandboxApi /v1/zoya/* envelope hardening (G+H review #7)", () => {
     expect(body.events.length).toBe(0);
   });
 
-  test("/v1/zoya/events/poll without 'since' and without headOnly returns 400", async () => {
-    const r = await authedFetch("/v1/zoya/events/poll", {
+  test("/v1/jarvis/events/poll without 'since' and without headOnly returns 400", async () => {
+    const r = await authedFetch("/v1/jarvis/events/poll", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ eventType: "x" }),
@@ -1401,8 +1401,8 @@ describe("SandboxApi /v1/zoya/* envelope hardening (G+H review #7)", () => {
     expect(r.status).toBe(400);
   });
 
-  test("each /v1/zoya/* POST handles a 256KB+ payload without crashing", async () => {
-    // The store route caps at 500KB; the zoya routes have no explicit cap
+  test("each /v1/jarvis/* POST handles a 256KB+ payload without crashing", async () => {
+    // The store route caps at 500KB; the jarvis routes have no explicit cap
     // but should still parse and reject on field-validation rather than
     // crashing the server. We send a fat valid JSON body and assert the
     // server replies (any 4xx/2xx is fine -- we're not asserting outcome,
@@ -1418,4 +1418,3 @@ describe("SandboxApi /v1/zoya/* envelope hardening (G+H review #7)", () => {
     }
   });
 });
-

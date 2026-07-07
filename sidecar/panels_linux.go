@@ -9,7 +9,7 @@ package main
 #include <gdk/gdk.h>
 #include <cairo.h>
 
-static void zoya_panel_apply_flags(
+static void jarvis_panel_apply_flags(
     void* gtkwin_ptr,
     int alwaysOnTop,
     int clickThrough,
@@ -55,14 +55,14 @@ static void zoya_panel_apply_flags(
     }
 }
 
-static void zoya_panel_focus(void* gtkwin_ptr) {
+static void jarvis_panel_focus(void* gtkwin_ptr) {
     if (!gtkwin_ptr) return;
     GtkWindow* w = GTK_WINDOW(gtkwin_ptr);
     if (!GTK_IS_WINDOW(w)) return;
     gtk_window_present(w);
 }
 
-static void zoya_panel_destroy(void* gtkwin_ptr) {
+static void jarvis_panel_destroy(void* gtkwin_ptr) {
     if (!gtkwin_ptr) return;
     GtkWindow* w = GTK_WINDOW(gtkwin_ptr);
     if (!GTK_IS_WINDOW(w)) return;
@@ -70,7 +70,7 @@ static void zoya_panel_destroy(void* gtkwin_ptr) {
 }
 
 // 0=normal, 1=minimized, 2=maximized — matches platformSetWindowState.
-static void zoya_panel_set_window_state(void* gtkwin_ptr, int state) {
+static void jarvis_panel_set_window_state(void* gtkwin_ptr, int state) {
     if (!gtkwin_ptr) return;
     GtkWindow* w = GTK_WINDOW(gtkwin_ptr);
     if (!GTK_IS_WINDOW(w)) return;
@@ -86,14 +86,14 @@ static void zoya_panel_set_window_state(void* gtkwin_ptr, int state) {
     }
 }
 
-static void zoya_panel_set_visible(void* gtkwin_ptr, int visible) {
+static void jarvis_panel_set_visible(void* gtkwin_ptr, int visible) {
     if (!gtkwin_ptr) return;
     GtkWidget* w = GTK_WIDGET(gtkwin_ptr);
     if (!GTK_IS_WIDGET(w)) return;
     if (visible) gtk_widget_show(w); else gtk_widget_hide(w);
 }
 
-static void zoya_panel_set_click_through(void* gtkwin_ptr, int clickThrough) {
+static void jarvis_panel_set_click_through(void* gtkwin_ptr, int clickThrough) {
     if (!gtkwin_ptr) return;
     GtkWindow* w = GTK_WINDOW(gtkwin_ptr);
     if (!GTK_IS_WINDOW(w)) return;
@@ -111,7 +111,7 @@ static void zoya_panel_set_click_through(void* gtkwin_ptr, int clickThrough) {
 
 // Cursor position in screen-root coords. Uses the default GdkDisplay's
 // default seat → pointing device, which works on both X11 and Wayland.
-static void zoya_panel_cursor_pos(int* x, int* y) {
+static void jarvis_panel_cursor_pos(int* x, int* y) {
     GdkDisplay* display = gdk_display_get_default();
     if (!display) { *x = 0; *y = 0; return; }
     GdkSeat* seat = gdk_display_get_default_seat(display);
@@ -124,7 +124,7 @@ static void zoya_panel_cursor_pos(int* x, int* y) {
     *y = gy;
 }
 
-static void zoya_panel_move_window(void* gtkwin_ptr, int x, int y) {
+static void jarvis_panel_move_window(void* gtkwin_ptr, int x, int y) {
     if (!gtkwin_ptr) return;
     GtkWindow* w = GTK_WINDOW(gtkwin_ptr);
     if (!GTK_IS_WINDOW(w)) return;
@@ -136,7 +136,7 @@ static void zoya_panel_move_window(void* gtkwin_ptr, int x, int y) {
 // rects is a flat array of 4 ints per rectangle (x, y, w, h). count is the
 // rectangle count. Sets both the input shape (clicks pass through outside
 // the union) and the visible shape on X11 (pixels outside aren't drawn).
-static void zoya_panel_set_regions(void* gtkwin_ptr, int* rects, int count) {
+static void jarvis_panel_set_regions(void* gtkwin_ptr, int* rects, int count) {
     if (!gtkwin_ptr) return;
     GtkWindow* w = GTK_WINDOW(gtkwin_ptr);
     if (!GTK_IS_WINDOW(w)) return;
@@ -177,7 +177,7 @@ func applyPlatformFlags(handle unsafe.Pointer, spec PanelSpec) error {
 	if handle == nil {
 		return fmt.Errorf("nil GtkWindow*")
 	}
-	C.zoya_panel_apply_flags(
+	C.jarvis_panel_apply_flags(
 		handle,
 		boolToCInt(spec.AlwaysOnTop),
 		boolToCInt(spec.ClickThrough),
@@ -192,13 +192,13 @@ func platformFocusWindow(handle unsafe.Pointer) error {
 	if handle == nil {
 		return fmt.Errorf("nil GtkWindow*")
 	}
-	C.zoya_panel_focus(handle)
+	C.jarvis_panel_focus(handle)
 	return nil
 }
 
 func platformGetCursorPos() (int, int, error) {
 	var x, y C.int
-	C.zoya_panel_cursor_pos(&x, &y)
+	C.jarvis_panel_cursor_pos(&x, &y)
 	return int(x), int(y), nil
 }
 
@@ -206,7 +206,7 @@ func platformMoveWindow(handle unsafe.Pointer, x, y int) error {
 	if handle == nil {
 		return fmt.Errorf("nil GtkWindow*")
 	}
-	C.zoya_panel_move_window(handle, C.int(x), C.int(y))
+	C.jarvis_panel_move_window(handle, C.int(x), C.int(y))
 	return nil
 }
 
@@ -227,7 +227,7 @@ func platformSetClickThrough(handle unsafe.Pointer, clickThrough bool) error {
 	if handle == nil {
 		return fmt.Errorf("nil GtkWindow*")
 	}
-	C.zoya_panel_set_click_through(handle, boolToCInt(clickThrough))
+	C.jarvis_panel_set_click_through(handle, boolToCInt(clickThrough))
 	return nil
 }
 
@@ -244,7 +244,7 @@ func platformReassertTopmost(handle unsafe.Pointer) error {
 	if handle == nil {
 		return nil
 	}
-	C.zoya_panel_focus(handle)
+	C.jarvis_panel_focus(handle)
 	return nil
 }
 
@@ -252,7 +252,7 @@ func platformDestroyWindow(handle unsafe.Pointer) error {
 	if handle == nil {
 		return fmt.Errorf("nil GtkWindow*")
 	}
-	C.zoya_panel_destroy(handle)
+	C.jarvis_panel_destroy(handle)
 	return nil
 }
 
@@ -271,7 +271,7 @@ func platformSetWindowState(handle unsafe.Pointer, state PanelWindowState) error
 	default:
 		return fmt.Errorf("unknown window state: %q", state)
 	}
-	C.zoya_panel_set_window_state(handle, s)
+	C.jarvis_panel_set_window_state(handle, s)
 	return nil
 }
 
@@ -292,7 +292,7 @@ func platformSetWindowVisible(handle unsafe.Pointer, visible bool) error {
 	if visible {
 		v = 1
 	}
-	C.zoya_panel_set_visible(handle, v)
+	C.jarvis_panel_set_visible(handle, v)
 	return nil
 }
 
@@ -303,7 +303,7 @@ func platformSetInteractiveRegions(handle unsafe.Pointer, rects []PanelRect) err
 	if len(rects) == 0 {
 		// Empty region — apply via 0-count call so cairo creates the empty
 		// region inside the C side.
-		C.zoya_panel_set_regions(handle, nil, 0)
+		C.jarvis_panel_set_regions(handle, nil, 0)
 		return nil
 	}
 	flat := make([]C.int, 0, len(rects)*4)
@@ -315,6 +315,6 @@ func platformSetInteractiveRegions(handle unsafe.Pointer, rects []PanelRect) err
 			C.int(r.H),
 		)
 	}
-	C.zoya_panel_set_regions(handle, &flat[0], C.int(len(rects)))
+	C.jarvis_panel_set_regions(handle, &flat[0], C.int(len(rects)))
 	return nil
 }

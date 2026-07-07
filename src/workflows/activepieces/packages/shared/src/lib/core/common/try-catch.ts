@@ -39,4 +39,3 @@ export function tryCatchSync<T, E = Error>(
 export type TypedResult<T> =
     | { success: true, data: T }
     | { success: false, message: string }
-

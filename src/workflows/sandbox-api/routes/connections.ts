@@ -6,14 +6,14 @@
  * and `connection.value.<auth-shape>` to satisfy the piece's authentication.
  *
  * Resolution order (delegated to `CredentialResolver`):
- *   1. `zoya:*` external ids -> live Zoya-managed credential sources
+ *   1. `jarvis:*` external ids -> live Jarvis-managed credential sources
  *      (Google OAuth, Telegram bot token, Discord bot token, ...).
  *   2. Otherwise -> the `app_connection` table.
  *
  * Failures map to HTTP:
  *   - 404 when the connection doesn't exist or its source returns null.
  *
- * Per CredentialResolver contract for Zoya-managed Google connections, the
+ * Per CredentialResolver contract for Jarvis-managed Google connections, the
  * resolved value's `refresh_token` is intentionally empty; pieces that need a
  * fresh access token must call back into this endpoint to request one.
  */
@@ -51,7 +51,7 @@ export function createConnectionsRoute(deps: ConnectionsRouteDeps): RouteHandler
     const projectId = queryProject ?? ctx.claims.projectId;
 
     // The engine doesn't tell us which piece is asking, but our resolver only
-    // needs the pieceName for app_connection lookups. For zoya:* external
+    // needs the pieceName for app_connection lookups. For jarvis:* external
     // ids the resolver short-circuits before pieceName is read; for other ids
     // we fall back to "*" (treated as a wildcard at the repo level if
     // available, otherwise empty pieceName which fails the repo's UNIQUE
@@ -92,4 +92,3 @@ export function createConnectionsRoute(deps: ConnectionsRouteDeps): RouteHandler
     return json(response);
   };
 }
-

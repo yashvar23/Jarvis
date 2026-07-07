@@ -37,7 +37,7 @@ describe("composeFlow", () => {
           name: "step_1",
           type: "PIECE",
           settings: {
-            pieceName: "zoya-ask",
+            pieceName: "jarvis-ask",
             actionName: "ask",
             input: { prompt: "Summarize my inbox: {{trigger.body}}" },
           },
@@ -45,7 +45,7 @@ describe("composeFlow", () => {
             name: "step_2",
             type: "PIECE",
             settings: {
-              pieceName: "zoya-notify",
+              pieceName: "jarvis-notify",
               actionName: "notify",
               input: { message: "{{step_1.text}}" },
             },
@@ -137,7 +137,7 @@ describe("composeFlow", () => {
         nextAction: {
           name: "step_1",
           type: "PIECE",
-          settings: { pieceName: "zoya-ask", actionName: "ask", input: {} }, // prompt is required
+          settings: { pieceName: "jarvis-ask", actionName: "ask", input: {} }, // prompt is required
         },
       },
     });
@@ -180,9 +180,9 @@ describe("composeFlow", () => {
       { name: "X", description: "anything" },
     );
     const sys = llm.calls[0]?.system ?? "";
-    expect(sys).toContain("zoya-ask");
-    expect(sys).toContain("zoya-notify");
-    expect(sys).toContain("zoya-trigger");
+    expect(sys).toContain("jarvis-ask");
+    expect(sys).toContain("jarvis-notify");
+    expect(sys).toContain("jarvis-trigger");
     expect(sys).toContain("schedule");
     expect(sys).toContain("webhook");
   });
@@ -199,7 +199,7 @@ describe("composeFlow", () => {
     );
     const sys = llm.calls[0]?.system ?? "";
     expect(sys).toContain("{{trigger.payload.<field>}}");
-    expect(sys).toContain("zoya-trigger:on_event");
+    expect(sys).toContain("jarvis-trigger:on_event");
     // The wiring example for clipboard text should be present in the
     // rule bullet to anchor the pattern.
     expect(sys).toContain("{{trigger.payload.content}}");
@@ -214,15 +214,15 @@ describe("composeFlow", () => {
     // tries to prevent.
     const onEventCatalog = new PieceCatalog([
       {
-        name: "@zoyapieces/piece-zoya-trigger",
-        displayName: "Zoya: Trigger",
+        name: "@jarvispieces/piece-jarvis-trigger",
+        displayName: "Jarvis: Trigger",
         description: "",
         actions: {},
         triggers: {
           on_event: {
             name: "on_event",
             displayName: "On event",
-            description: "Fires on a Zoya event.",
+            description: "Fires on a Jarvis event.",
             sampleData: { id: "s", eventType: "awareness.context_changed", payload: { app: "x" }, timestamp: 0 },
             dynamicSampleData: {
               propName: "eventType",
@@ -266,8 +266,8 @@ describe("composeFlow", () => {
     // in via the editor's flow picker after the flow is composed.
     const registry = new PieceCatalog([
       {
-        name: "@zoyapieces/piece-zoya-trigger",
-        displayName: "Zoya: Trigger",
+        name: "@jarvispieces/piece-jarvis-trigger",
+        displayName: "Jarvis: Trigger",
         description: "",
         actions: {
           run_workflow: {
@@ -295,7 +295,7 @@ describe("composeFlow", () => {
           name: "step_1",
           type: "PIECE",
           settings: {
-            pieceName: "@zoyapieces/piece-zoya-trigger",
+            pieceName: "@jarvispieces/piece-jarvis-trigger",
             actionName: "run_workflow",
             // The model emits an empty string per the prompt hint.
             // Validation MUST accept this even though the field is
@@ -337,7 +337,7 @@ describe("composeFlow", () => {
         nextAction: {
           name: "Step 1",
           type: "PIECE",
-          settings: { pieceName: "zoya-ask", actionName: "ask", input: { prompt: "hi" } },
+          settings: { pieceName: "jarvis-ask", actionName: "ask", input: { prompt: "hi" } },
         },
       },
     });
@@ -360,7 +360,7 @@ describe("composeFlow", () => {
     const sys = llm.calls[0]?.system ?? "";
     expect(sys).toContain("gmail_send");
     expect(sys).toContain("vault_search");
-    expect(sys).toContain("Available Zoya tools");
+    expect(sys).toContain("Available Jarvis tools");
   });
 
   test("system prompt mentions the DISABLED-default contract", async () => {
@@ -549,9 +549,9 @@ describe("composeFlow", () => {
     function agentCatalog(): PieceLookup {
       const entries: PieceCatalogEntry[] = [
         {
-          name: "@zoyapieces/piece-zoya-agent",
-          displayName: "Zoya: Agent",
-          description: "Run a Zoya sub-agent with a goal.",
+          name: "@jarvispieces/piece-jarvis-agent",
+          displayName: "Jarvis: Agent",
+          description: "Run a Jarvis sub-agent with a goal.",
           actions: {
             delegate: {
               name: "delegate",
@@ -585,7 +585,7 @@ describe("composeFlow", () => {
             name: "step_1",
             type: "PIECE",
             settings: {
-              pieceName: "zoya-agent",
+              pieceName: "jarvis-agent",
               actionName: "delegate",
               input: { goal: "research AI news", ...(role !== undefined ? { role } : {}) },
             },
@@ -673,13 +673,13 @@ describe("composeFlow", () => {
     });
   });
 
-  describe("zoya-tool invoke param validation", () => {
+  describe("jarvis-tool invoke param validation", () => {
     function toolCatalog(): PieceLookup {
       const entries: PieceCatalogEntry[] = [
         {
-          name: "@zoyapieces/piece-zoya-tool",
-          displayName: "Zoya: Tool",
-          description: "Invoke a registered Zoya tool.",
+          name: "@jarvispieces/piece-jarvis-tool",
+          displayName: "Jarvis: Tool",
+          description: "Invoke a registered Jarvis tool.",
           actions: {
             invoke: {
               name: "invoke",
@@ -719,7 +719,7 @@ describe("composeFlow", () => {
           nextAction: {
             name: "step_1",
             type: "PIECE",
-            settings: { pieceName: "zoya-tool", actionName: "invoke", input: { toolName, params } },
+            settings: { pieceName: "jarvis-tool", actionName: "invoke", input: { toolName, params } },
           },
         },
       });
@@ -794,14 +794,14 @@ describe("composeFlow", () => {
     function catalogWithTestPiece(): PieceLookup {
       const entries: PieceCatalogEntry[] = [
         {
-          name: "zoya-ask",
-          displayName: "Zoya: Ask",
+          name: "jarvis-ask",
+          displayName: "Jarvis: Ask",
           description: "Send a prompt to the LLM.",
           actions: { ask: { name: "ask", displayName: "Ask", description: "Ask.", inputSchema: { fields: [{ name: "prompt", label: "Prompt", type: "long_text", required: true }] } } },
         },
         {
-          name: "@zoyapieces/piece-zoya-test",
-          displayName: "Zoya: Test",
+          name: "@jarvispieces/piece-jarvis-test",
+          displayName: "Jarvis: Test",
           description: "Internal test piece.",
           actions: { echo: { name: "echo", displayName: "Echo", description: "Echo input.", inputSchema: { fields: [{ name: "value", label: "Value", type: "json", required: false }] } } },
         },
@@ -809,15 +809,15 @@ describe("composeFlow", () => {
       return new PieceCatalog(entries);
     }
 
-    test("zoya-test is hidden from the prompt catalog", async () => {
+    test("jarvis-test is hidden from the prompt catalog", async () => {
       const llm = new StubLlm(JSON.stringify({ displayName: "X", trigger: { name: "trigger", type: "EMPTY" } }));
       await composeFlow({ llm, pieceRegistry: catalogWithTestPiece() }, { name: "X", description: "x" });
       const sys = llm.calls[0]?.system ?? "";
-      expect(sys).toContain("zoya-ask");
-      expect(sys).not.toContain("zoya-test");
+      expect(sys).toContain("jarvis-ask");
+      expect(sys).not.toContain("jarvis-test");
     });
 
-    test("rejects a step that uses zoya-test:echo even if the model names it directly", async () => {
+    test("rejects a step that uses jarvis-test:echo even if the model names it directly", async () => {
       const reply = JSON.stringify({
         displayName: "X",
         trigger: {
@@ -826,7 +826,7 @@ describe("composeFlow", () => {
           nextAction: {
             name: "step_1",
             type: "PIECE",
-            settings: { pieceName: "zoya-test", actionName: "echo", input: { value: "ignored" } },
+            settings: { pieceName: "jarvis-test", actionName: "echo", input: { value: "ignored" } },
           },
         },
       });
@@ -836,7 +836,7 @@ describe("composeFlow", () => {
       );
       expect(result.ok).toBe(false);
       if (!result.ok) {
-        expect(result.errors.some((e) => /internal piece "zoya-test"/.test(e))).toBe(true);
+        expect(result.errors.some((e) => /internal piece "jarvis-test"/.test(e))).toBe(true);
       }
     });
   });
@@ -851,7 +851,7 @@ describe("composeFlow", () => {
           nextAction: {
             name: "step_1",
             type: "PIECE",
-            settings: { pieceName: "zoya-ask", actionName: "ask", input: { prompt: "hi" } },
+            settings: { pieceName: "jarvis-ask", actionName: "ask", input: { prompt: "hi" } },
             nextAction: {
               name: "router_1",
               type: "ROUTER",
@@ -863,7 +863,7 @@ describe("composeFlow", () => {
                 ],
               },
               children: [
-                { name: "b_match", type: "PIECE", settings: { pieceName: "zoya-notify", actionName: "notify", input: { message: "hit" } } },
+                { name: "b_match", type: "PIECE", settings: { pieceName: "jarvis-notify", actionName: "notify", input: { message: "hit" } } },
                 null,
               ],
             },
@@ -934,7 +934,7 @@ describe("composeFlow", () => {
           nextAction: {
             name: "step_1",
             type: "PIECE",
-            settings: { pieceName: "zoya-ask", actionName: "ask", input: { prompt: "list things" } },
+            settings: { pieceName: "jarvis-ask", actionName: "ask", input: { prompt: "list things" } },
             nextAction: {
               name: "loop_1",
               type: "LOOP_ON_ITEMS",
@@ -942,11 +942,11 @@ describe("composeFlow", () => {
               firstLoopAction: {
                 name: "body_1",
                 type: "PIECE",
-                settings: { pieceName: "zoya-notify", actionName: "notify", input: { message: "{{loop_1.item}}" } },
+                settings: { pieceName: "jarvis-notify", actionName: "notify", input: { message: "{{loop_1.item}}" } },
                 nextAction: {
                   name: "body_2",
                   type: "PIECE",
-                  settings: { pieceName: "zoya-ask", actionName: "ask", input: { prompt: "{{loop_1.item}}" } },
+                  settings: { pieceName: "jarvis-ask", actionName: "ask", input: { prompt: "{{loop_1.item}}" } },
                 },
               },
             },
@@ -987,7 +987,7 @@ describe("composeFlow", () => {
               {
                 name: "branch_hit",
                 type: "PIECE",
-                settings: { pieceName: "zoya-notify", actionName: "notify", input: { message: "matched" } },
+                settings: { pieceName: "jarvis-notify", actionName: "notify", input: { message: "matched" } },
               },
               null,
             ],
@@ -1021,12 +1021,12 @@ describe("composeFlow", () => {
             firstLoopAction: {
               name: "body_1",
               type: "PIECE",
-              settings: { pieceName: "zoya-notify", actionName: "notify", input: { message: "{{loop_1.item}}" } },
+              settings: { pieceName: "jarvis-notify", actionName: "notify", input: { message: "{{loop_1.item}}" } },
             },
             nextAction: {
               name: "after_1",
               type: "PIECE",
-              settings: { pieceName: "zoya-ask", actionName: "ask", input: { prompt: "done" } },
+              settings: { pieceName: "jarvis-ask", actionName: "ask", input: { prompt: "done" } },
             },
           },
         },
@@ -1046,15 +1046,15 @@ describe("composeFlow", () => {
 
   describe("system prompt surfaces output samples", () => {
     // A catalog whose two actions cover both shapes: an object output
-    // (zoya-tool.invoke returns { result, toolName }) and a bare-array
+    // (jarvis-tool.invoke returns { result, toolName }) and a bare-array
     // output (vault_search returns a list). The composer should render
     // both so the LLM has real field names instead of guessing.
     function catalogWithOutputs(): PieceLookup {
       const entries: PieceCatalogEntry[] = [
         {
-          name: "zoya-tool",
-          displayName: "Zoya: Tool",
-          description: "Invoke a registered Zoya tool.",
+          name: "jarvis-tool",
+          displayName: "Jarvis: Tool",
+          description: "Invoke a registered Jarvis tool.",
           actions: {
             invoke: {
               name: "invoke",
@@ -1066,8 +1066,8 @@ describe("composeFlow", () => {
           },
         },
         {
-          name: "zoya-context",
-          displayName: "Zoya: Context",
+          name: "jarvis-context",
+          displayName: "Jarvis: Context",
           description: "Read vault context.",
           actions: {
             vault_search: {
@@ -1138,4 +1138,3 @@ describe("composeFlow", () => {
     });
   });
 });
-

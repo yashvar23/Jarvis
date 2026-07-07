@@ -141,7 +141,7 @@ describe("manage_workflow tool", () => {
             name: "step_1",
             type: "PIECE",
             settings: {
-              pieceName: "zoya-ask",
+              pieceName: "jarvis-ask",
               actionName: "ask",
               input: { prompt: "hi" },
             },
@@ -176,7 +176,7 @@ describe("manage_workflow: compose", () => {
             name: "step_1",
             type: "PIECE",
             settings: {
-              pieceName: "zoya-ask",
+              pieceName: "jarvis-ask",
               actionName: "ask",
               input: { prompt: "hi" },
             },
@@ -267,4 +267,3 @@ describe("manage_workflow: compose", () => {
     expect(out.rawResponse).toContain("truncated");
   });
 });
-

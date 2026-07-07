@@ -1,9 +1,9 @@
-MODULE   := github.com/zoya/sidecar
+MODULE   := github.com/jarvis/sidecar
 # Single source of truth for the sidecar's own (brain-decoupled) version. The
 # VERSION file is read here and injected into the binary via -X; CI asserts the
 # `sidecar-v*` release tag matches it.
 VERSION  := $(shell cat VERSION 2>/dev/null || echo dev)
-BIN_NAME := zoya
+BIN_NAME := jarvis
 LDFLAGS  := -s -w -X main.sidecarVersion=$(VERSION)
 
 # macOS: build against the 11.0 deployment target (same as CI's
@@ -32,11 +32,11 @@ npm_dir = $(subst darwin/arm64,darwin-arm64,$(subst darwin/amd64,darwin-x64,$(su
 all: test build
 
 # Regenerate the embedded Windows application manifest resource from
-# zoya.manifest. Go auto-links rsrc_windows_amd64.syso into windows/amd64
+# jarvis.manifest. Go auto-links rsrc_windows_amd64.syso into windows/amd64
 # builds. The manifest declares OS compatibility so the Program Compatibility
 # Assistant doesn't flag the app as a (failed) installer. Requires mingw windres.
 manifest:
-	x86_64-w64-mingw32-windres --input zoya.rc --output rsrc_windows_amd64.syso --output-format=coff
+	x86_64-w64-mingw32-windres --input jarvis.rc --output rsrc_windows_amd64.syso --output-format=coff
 
 build:
 	go build -ldflags "$(LDFLAGS)" -o $(BIN_NAME) .
@@ -102,7 +102,7 @@ clean:
 	rm -f helpers/ocr-helper
 	rm -f npm/*/*.tgz
 	rm -rf npm/darwin-arm64/bin npm/darwin-x64/bin npm/linux-x64/bin npm/linux-arm64/bin npm/win32-x64/bin
-	rm -f npm/zoya-sidecar/*.tgz
+	rm -f npm/jarvis-sidecar/*.tgz
 
 # Cross-compile all platforms into dist/
 dist: test vet
@@ -140,7 +140,7 @@ npm-pack: dist
 	mkdir -p npm/win32-x64/bin
 	cp dist/windows-amd64/$(BIN_NAME).exe npm/win32-x64/bin/
 	@# Pack all platform packages + main package
-	@for dir in npm/darwin-arm64 npm/darwin-x64 npm/linux-x64 npm/linux-arm64 npm/win32-x64 npm/zoya-sidecar; do \
+	@for dir in npm/darwin-arm64 npm/darwin-x64 npm/linux-x64 npm/linux-arm64 npm/win32-x64 npm/jarvis-sidecar; do \
 		echo "Packing $$dir..."; \
 		cd $$dir && npm pack && cd ../..; \
 	done
@@ -153,7 +153,7 @@ npm-publish: npm-pack
 		cd $$dir && npm publish --access public && cd ../..; \
 	done
 	@echo "Publishing main package..."
-	cd npm/zoya-sidecar && npm publish --access public
+	cd npm/jarvis-sidecar && npm publish --access public
 
 # Update version across the VERSION file (source of truth) + all package.json
 set-version:
@@ -162,5 +162,5 @@ set-version:
 	@for f in npm/*/package.json; do \
 		sed -i 's/"version": ".*"/"version": "$(V)"/' $$f; \
 	done
-	@sed -i 's/"@zoya\/sidecar-\(.*\)": ".*"/"@zoya\/sidecar-\1": "$(V)"/g' npm/zoya-sidecar/package.json
+	@sed -i 's/"@jarvis\/sidecar-\(.*\)": ".*"/"@jarvis\/sidecar-\1": "$(V)"/g' npm/jarvis-sidecar/package.json
 	@echo "Version set to $(V)"

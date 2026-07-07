@@ -58,4 +58,3 @@ export const PopulatedTriggerSource = TriggerSource.extend({
     flow: Flow,
 })
 export type PopulatedTriggerSource = z.infer<typeof PopulatedTriggerSource>
-

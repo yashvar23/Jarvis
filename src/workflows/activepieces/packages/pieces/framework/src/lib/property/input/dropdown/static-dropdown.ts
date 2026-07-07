@@ -33,4 +33,3 @@ export type StaticMultiSelectDropdownProperty<
     PropertyType.STATIC_MULTI_SELECT_DROPDOWN,
     R
 >;
-

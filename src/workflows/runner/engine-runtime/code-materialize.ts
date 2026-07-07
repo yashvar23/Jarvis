@@ -44,4 +44,3 @@ export function materializeCodeActions(
   }
   return { written: paths.length, paths };
 }
-

@@ -19,7 +19,7 @@ export type RoomLayout =
   | { mode: "inline" }
   | { mode: "floating"; rect: LayoutRect };
 
-const STORAGE_KEY = "zoya:room-layout";
+const STORAGE_KEY = "jarvis:room-layout";
 
 export const DEFAULT_LAYOUT: RoomLayout = { mode: "inline" };
 
@@ -133,4 +133,3 @@ export function useRoomLayout() {
 
   return { getLayout, setLayout, resetAllLayouts, layouts };
 }
-

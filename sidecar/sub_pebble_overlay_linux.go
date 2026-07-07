@@ -187,9 +187,9 @@ static gboolean sub_destroy_idle(gpointer data) {
     return G_SOURCE_REMOVE;
 }
 
-// zoyaSubCreate allocates the handle synchronously (so Go gets it back) and
+// jarvisSubCreate allocates the handle synchronously (so Go gets it back) and
 // builds the GTK widgets on the main loop. seedX/seedY are the spawn cursor.
-static SubWin* zoyaSubCreate(int seedX, int seedY) {
+static SubWin* jarvisSubCreate(int seedX, int seedY) {
     SubWin* sw = (SubWin*)calloc(1, sizeof(SubWin));
     sw->seedX = seedX;
     sw->seedY = seedY;
@@ -198,7 +198,7 @@ static SubWin* zoyaSubCreate(int seedX, int seedY) {
     return sw;
 }
 
-static void zoyaSubPresent(SubWin* sw, int x, int y, int r, int g, int b, int state, unsigned long long tick) {
+static void jarvisSubPresent(SubWin* sw, int x, int y, int r, int g, int b, int state, unsigned long long tick) {
     SubPresent* p = (SubPresent*)malloc(sizeof(SubPresent));
     p->sw = sw; p->x = x; p->y = y;
     p->r = r/255.0; p->g = g/255.0; p->b = b/255.0;
@@ -206,7 +206,7 @@ static void zoyaSubPresent(SubWin* sw, int x, int y, int r, int g, int b, int st
     g_idle_add(sub_present_idle, p);
 }
 
-static void zoyaSubDestroy(SubWin* sw) {
+static void jarvisSubDestroy(SubWin* sw) {
     if (sw) g_idle_add(sub_destroy_idle, sw);
 }
 */
@@ -376,9 +376,9 @@ func (s *subPebbleServiceLinux) createOverlayWindow(entry *subPebbleEntry) error
 	if x, y, err := platformGetCursorPos(); err == nil {
 		cx, cy = x, y
 	}
-	sw := C.zoyaSubCreate(C.int(cx), C.int(cy))
+	sw := C.jarvisSubCreate(C.int(cx), C.int(cy))
 	if sw == nil {
-		return fmt.Errorf("zoyaSubCreate returned nil")
+		return fmt.Errorf("jarvisSubCreate returned nil")
 	}
 	entry.hwnd = uintptr(unsafe.Pointer(sw))
 	subPebbleByHandleLinux.Store(entry.hwnd, entry)
@@ -398,7 +398,7 @@ func (s *subPebbleServiceLinux) paint(entry *subPebbleEntry) error {
 	state, _ := entry.state.Load().(PebbleState)
 	color, _ := entry.color.Load().(SubPebbleColor)
 	r, g, b := subPebbleRGB(color)
-	C.zoyaSubPresent(
+	C.jarvisSubPresent(
 		sw,
 		C.int(entry.curX.Load()), C.int(entry.curY.Load()),
 		C.int(r), C.int(g), C.int(b),
@@ -424,7 +424,7 @@ func (s *subPebbleServiceLinux) destroyOverlay(entry *subPebbleEntry) {
 	}
 	subPebbleByHandleLinux.Delete(entry.hwnd)
 	if v, ok := subPebbleWinLinux.LoadAndDelete(entry.hwnd); ok {
-		C.zoyaSubDestroy(v.(*C.SubWin))
+		C.jarvisSubDestroy(v.(*C.SubWin))
 	}
 	entry.hwnd = 0
 }

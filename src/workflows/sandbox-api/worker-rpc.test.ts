@@ -243,4 +243,3 @@ describe("WorkerRpcServer (B4: socket.io engine <-> daemon)", () => {
     }
   });
 });
-

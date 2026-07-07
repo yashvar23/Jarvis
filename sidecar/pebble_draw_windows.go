@@ -340,7 +340,7 @@ func (s *pebbleServiceWindows) drawThinking(pixels []uint32) {
 }
 
 // drawWorking — wider amber-bordered pill with a sweeping progress
-// bar travelling left-to-right and back. T26 makes ZOYA-driven
+// bar travelling left-to-right and back. T26 makes JARVIS-driven
 // actions visually distinct from listening / thinking states; the
 // sweep reads as "I'm doing something autonomously" at a glance.
 func (s *pebbleServiceWindows) drawWorking(pixels []uint32) {
@@ -528,7 +528,7 @@ func roundedRectAA(x, y, x0, y0, x1, y1, r float64) float64 {
 // drawControllingHalo (W6-T4) — when the pebble is in "pointing" mode
 // (PointAt is active during desktop_click animations), paint a brief
 // vermilion outward halo around the disc so the user reads the motion
-// as "ZOYA reaching out to click" rather than ambient cursor follow.
+// as "JARVIS reaching out to click" rather than ambient cursor follow.
 // Pulses for the duration of the point.
 func (s *pebbleServiceWindows) drawControllingHalo(pixels []uint32) {
 	if !s.pointing.Load() {
@@ -552,7 +552,7 @@ func (s *pebbleServiceWindows) drawControllingHalo(pixels []uint32) {
 }
 
 // drawEyeGlyph (W6-T1/T2) — paints a small ambient indicator next to the
-// pebble disc that says whether ZOYA can currently see the screen.
+// pebble disc that says whether JARVIS can currently see the screen.
 //
 //   eyeActive && !blinded → pulsing accent (vermilion) eye → "I just saw"
 //   blinded               → muted ink-3 eye with a struck-through line

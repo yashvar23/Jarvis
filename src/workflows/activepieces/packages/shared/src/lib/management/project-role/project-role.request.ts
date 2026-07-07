@@ -22,4 +22,3 @@ export const ListProjectMembersForProjectRoleRequestQuery = z.object({
 })
 
 export type ListProjectMembersForProjectRoleRequestQuery = z.infer<typeof ListProjectMembersForProjectRoleRequestQuery>
-

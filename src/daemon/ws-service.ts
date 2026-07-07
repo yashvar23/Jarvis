@@ -187,10 +187,10 @@ export class WebSocketService implements Service {
   // dashboard clicks. See gateVoiceApprovalResolution + resolveLatestPendingByVoice.
   private auditTrail: AuditTrail | null = null;
 
-  constructor(port: number, agentService: AgentService, unixPath?: string) {
+  constructor(port: number, agentService: AgentService) {
     this.port = port;
     this.agentService = agentService;
-    this.wsServer = new WebSocketServer(port, unixPath);
+    this.wsServer = new WebSocketServer(port);
     this.streamRelay = new StreamRelay(this.wsServer);
 
     // Wire delegation callback: when PA delegates to a specialist,
@@ -304,8 +304,8 @@ export class WebSocketService implements Service {
     this.wsServer.setPublicDir(dir);
   }
 
-  setInsecureOpenAccess(enabled: boolean): void {
-    this.wsServer.setInsecureOpenAccess(enabled);
+  setAuthToken(token: string): void {
+    this.wsServer.setAuthToken(token);
   }
 
   async start(): Promise<void> {
@@ -873,7 +873,7 @@ export class WebSocketService implements Service {
         type: 'error',
         payload: {
           code: 'setup_required',
-          message: 'Finish first-run setup before chatting with Zoya.',
+          message: 'Finish first-run setup before chatting with Jarvis.',
         },
         id: msg.id,
         timestamp: Date.now(),
@@ -959,8 +959,8 @@ You are an LLM. You can only edit files by emitting a \`site_write_file\` tool_u
 
 ## How to pick which project the user means
 0. **NEW project request (do this FIRST).** If the user says "new project", "create a project", "make a new site/app/landing", "fresh project", "in a new repo", or otherwise indicates they want a NEW workspace (NOT to add a file to an existing one) — call \`site_create_project\` with a sensible name derived from the topic and continue with that new project's id. Do NOT reuse an existing project just because its name happens to match. Choose template by inferred stack ("react" → vite-react, "vue" → vite-vue, "static html" → vite-vanilla, "next.js" → next, otherwise vite-react default).
-1. **Explicit existing-project name.** If the user named an existing project (e.g. "in zoya-landing", "edit the SP500 calculator"), use that one.
-2. **Name keyword match.** If the user did NOT ask for a new project AND did NOT name one explicitly, but their request shares a meaningful keyword with an existing project's name (request mentions "landing page" + "zoya-landing" exists → use zoya-landing; request mentions "calculator" + "SP500 ROI Calculator" exists → use that), pick that project.
+1. **Explicit existing-project name.** If the user named an existing project (e.g. "in jarvis-landing", "edit the SP500 calculator"), use that one.
+2. **Name keyword match.** If the user did NOT ask for a new project AND did NOT name one explicitly, but their request shares a meaningful keyword with an existing project's name (request mentions "landing page" + "jarvis-landing" exists → use jarvis-landing; request mentions "calculator" + "SP500 ROI Calculator" exists → use that), pick that project.
 3. **Fallback.** If none of the above apply, use the FALLBACK PROJECT shown above.
 
 CRITICAL — when in genuine doubt between "make in a new project" vs "add to the existing one whose name overlaps", briefly ASK ONCE before acting. Better to ask once than to dump a file in the wrong project. But if the user has already said "no questions" / "just do it" / "you decide" earlier in the conversation, default to creating a new project rather than mutating an existing one (less destructive — they can always delete the new one).
@@ -994,7 +994,7 @@ CRITICAL — when in genuine doubt between "make in a new project" vs "add to th
       try {
         const taskLabel = text.length > 80 ? text.slice(0, 77) + '...' : text;
         taskCommitment = createCommitment(taskLabel, {
-          assigned_to: 'zoya',
+          assigned_to: 'jarvis',
           created_from: 'user',
         });
         updateCommitmentStatus(taskCommitment.id, 'active');
@@ -1049,7 +1049,7 @@ CRITICAL — when in genuine doubt between "make in a new project" vs "add to th
         }
 
         // Wake-phrase self-trigger guard: tell the UI whether this
-        // sentence contains "Zoya" so it can suppress the wake
+        // sentence contains "Jarvis" so it can suppress the wake
         // recognizer for the duration of the audio (otherwise TTS
         // playback echoes through the mic and self-triggers).
         const sentenceHasWake = containsWakePhrase(sentence);
@@ -1064,9 +1064,9 @@ CRITICAL — when in genuine doubt between "make in a new project" vs "add to th
             timestamp: Date.now(),
           });
         } else if (sentenceHasWake) {
-          // Subsequent sentence in the same turn that contains "Zoya" —
+          // Subsequent sentence in the same turn that contains "Jarvis" —
           // notify so the UI can flip suppression on mid-turn. (We never
-          // un-suppress mid-turn because earlier audio with "Zoya" may
+          // un-suppress mid-turn because earlier audio with "Jarvis" may
           // still be in the speaker buffer.)
           this.wsServer.sendToClient(ws, {
             type: 'tts_text',
@@ -1373,7 +1373,7 @@ CRITICAL — when in genuine doubt between "make in a new project" vs "add to th
   /** Lazily build the monthly spend tracker, persisted under the data dir. */
   private getRealtimeBudget(): RealtimeBudgetTracker {
     if (!this.realtimeBudget) {
-      const dataDir = this.agentService.getConfig().daemon?.data_dir || join(homedir(), '.zoya');
+      const dataDir = this.agentService.getConfig().daemon?.data_dir || join(homedir(), '.jarvis');
       this.realtimeBudget = RealtimeBudgetTracker.fromFile(join(dataDir, 'realtime-budget.json'));
     }
     return this.realtimeBudget;
@@ -1465,7 +1465,7 @@ CRITICAL — when in genuine doubt between "make in a new project" vs "add to th
     // text message. The UI must not guess: when it assumed TTS based on
     // its own (possibly stale) settings fetch and no `tts_start` ever
     // arrived — e.g. TTS disabled, or no provider loaded — it sat in
-    // "Zoya is thinking…" forever with the composer disabled.
+    // "Jarvis is thinking…" forever with the composer disabled.
     const willSpeak = Boolean(speakReply && this.ttsProvider && text);
 
     // Send the text reply for the UI to render in the chat-bubble
@@ -1497,7 +1497,7 @@ CRITICAL — when in genuine doubt between "make in a new project" vs "add to th
           type: 'tts_start',
           // containsWake=true conservatively suppresses the wake
           // recognizer for the entire interview reply — interviews
-          // are short and we don't need "Zoya" interrupts here.
+          // are short and we don't need "Jarvis" interrupts here.
           payload: { requestId, containsWake: true },
           id: requestId,
           timestamp: Date.now(),
@@ -2500,16 +2500,16 @@ function ackForRoomAction(ra: { room: string; action: string; args?: Record<stri
     case 'test_provider':
       return a.provider ? `Testing ${String(a.provider)}.` : `Testing provider.`;
     case 'enable_telegram':
-      return `Enabling Telegram. Restart Zoya to apply.`;
+      return `Enabling Telegram. Restart Jarvis to apply.`;
     case 'disable_telegram':
-      return `Disabling Telegram. Restart Zoya to apply.`;
+      return `Disabling Telegram. Restart Jarvis to apply.`;
     case 'enable_discord':
-      return `Enabling Discord. Restart Zoya to apply.`;
+      return `Enabling Discord. Restart Jarvis to apply.`;
     case 'disable_discord':
-      return `Disabling Discord. Restart Zoya to apply.`;
+      return `Disabling Discord. Restart Jarvis to apply.`;
     case 'set_stt_provider':
       return a.provider
-        ? `Setting STT to ${String(a.provider)}. Restart Zoya to apply.`
+        ? `Setting STT to ${String(a.provider)}. Restart Jarvis to apply.`
         : `Updating STT provider.`;
     case 'enable_tts':
       return `Turning on text to speech.`;
@@ -2524,7 +2524,7 @@ function ackForRoomAction(ra: { room: string; action: string; args?: Record<stri
     case 'set_heartbeat_aggressiveness':
       return a.level ? `Setting heartbeat to ${String(a.level)}.` : `Updating heartbeat.`;
     case 'restart_daemon':
-      return `Restarting Zoya. The dashboard will reconnect in a few seconds.`;
+      return `Restarting Jarvis. The dashboard will reconnect in a few seconds.`;
     case 'replay_onboarding': {
       const sc = a.scope ? String(a.scope) : 'all';
       const label =
@@ -2541,4 +2541,3 @@ function ackForRoomAction(ra: { room: string; action: string; args?: Record<stri
       return `Done.`;
   }
 }
-

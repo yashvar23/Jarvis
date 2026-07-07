@@ -48,7 +48,7 @@ export interface TriggerKindMeta {
  *   - schedule / webhook: built-in primitives the trigger manager
  *     understands as a pieceName (no triggerName -- there's only one
  *     mode per primitive).
- *   - event: the Zoya-side `@zoyapieces/piece-zoya-trigger`
+ *   - event: the Jarvis-side `@jarvispieces/piece-jarvis-trigger`
  *     piece's `on_event` trigger. Pulls events from the workflow event
  *     bus; the user picks which event type via a dedicated dropdown
  *     (powered by `WORKFLOW_EVENT_TYPES`).
@@ -78,8 +78,8 @@ export const TRIGGER_KINDS: ReadonlyArray<TriggerKindMeta> = [
   {
     kind: "event",
     label: "Event",
-    description: "Fire on a Zoya event (clipboard, email, awareness, ...)",
-    pieceName: "@zoyapieces/piece-zoya-trigger",
+    description: "Fire on a Jarvis event (clipboard, email, awareness, ...)",
+    pieceName: "@jarvispieces/piece-jarvis-trigger",
     triggerName: "on_event",
   },
 ];
@@ -117,7 +117,7 @@ export function detectTriggerKind(step: FlowStepNode): DetectedTriggerKind {
  * Contract: the key is the `TriggerKind` enum value, NOT the
  * `pieceName` or `triggerName`. The stash semantics survive any future
  * shuffle of the canonical (pieceName, triggerName) pair behind a kind
- * (e.g. if `zoya-trigger` grew a second trigger and we reshuffled
+ * (e.g. if `jarvis-trigger` grew a second trigger and we reshuffled
  * which one backs the `event` kind). Restore always looks up by kind,
  * so the stored settings can't accidentally be applied to a different
  * piece.
@@ -221,4 +221,3 @@ function hasMeaningfulSettings(settings: FlowStepNode["settings"] | undefined): 
 function deepClone<T>(v: T): T {
   return JSON.parse(JSON.stringify(v)) as T;
 }
-

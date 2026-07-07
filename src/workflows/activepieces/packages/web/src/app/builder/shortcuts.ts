@@ -202,4 +202,3 @@ export const CanvasShortcuts: CanvasShortcutsProps = {
     shortcutKey: 'e',
   },
 };
-

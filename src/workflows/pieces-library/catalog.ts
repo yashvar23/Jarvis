@@ -35,7 +35,7 @@ export type PieceTier = "verified" | "community";
 
 export interface CatalogEntry {
   /**
-   * Stable Zoya-side id. URL slug, manifest key. NEVER rename once shipped --
+   * Stable Jarvis-side id. URL slug, manifest key. NEVER rename once shipped --
    * existing installs reference pieces by this id and would orphan on rename.
    */
   id: string;
@@ -50,7 +50,7 @@ export interface CatalogEntry {
   description: string;
   iconUrl?: string;
   /**
-   * Exact version Zoya last tested end-to-end. For verified pieces this
+   * Exact version Jarvis last tested end-to-end. For verified pieces this
    * is set by the human reviewer; for community pieces it tracks the latest
    * version the sync script saw on npm.
    */
@@ -132,7 +132,7 @@ function mergeEntry(g: GeneratedCatalogEntry): CatalogEntry {
  */
 export const CATALOG: CatalogEntry[] = buildCatalog();
 
-/** Look up a catalog entry by Zoya-side id. Returns null when missing. */
+/** Look up a catalog entry by Jarvis-side id. Returns null when missing. */
 export function findCatalogEntry(id: string): CatalogEntry | null {
   return CATALOG.find((entry) => entry.id === id) ?? null;
 }
@@ -145,4 +145,3 @@ export function findCatalogEntry(id: string): CatalogEntry | null {
 export function catalogById(): Map<string, CatalogEntry> {
   return new Map(CATALOG.map((entry) => [entry.id, entry]));
 }
-

@@ -97,4 +97,3 @@ const authConnectionTypeToPropertyType: Record<AppConnectionType, PropertyType |
   [AppConnectionType.SECRET_TEXT]: PropertyType.SECRET_TEXT,
   [AppConnectionType.NO_AUTH]: undefined,
 }
-

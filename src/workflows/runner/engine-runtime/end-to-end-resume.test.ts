@@ -12,7 +12,7 @@
  *     template resolves correctly (regression: if the backup restoration
  *     is broken, step_1.output is undefined here).
  *
- * Gated on `ZOYA_TEST_ENGINE_BUILD=1` like the other engine-runtime tests.
+ * Gated on `JARVIS_TEST_ENGINE_BUILD=1` like the other engine-runtime tests.
  */
 
 import { test, expect, describe, beforeAll, afterAll } from "bun:test";
@@ -32,23 +32,23 @@ import { DEFAULT_IDS } from "../../db/schema";
 import { CredentialResolver } from "../../credentials/adapter";
 import { SandboxApi } from "../../sandbox-api/server";
 import { findCachedBundle, buildEngineBundle, ENGINE_BUILD_PATHS } from "./build";
-import { buildAllZoyaPieces } from "./build-pieces";
+import { buildAllJarvisPieces } from "./build-pieces";
 import { EngineRuntime } from "./engine-runtime";
 import { workflowLogsBase } from "../../sandbox-api/config";
 import { listWaitpointsByFlowRun } from "../../db/repos/waitpoint";
 
-const buildOptIn = process.env.ZOYA_TEST_ENGINE_BUILD === "1";
+const buildOptIn = process.env.JARVIS_TEST_ENGINE_BUILD === "1";
 const initialCached = findCachedBundle();
 const skipBundleTests = initialCached === null && !buildOptIn;
 const piecesAlreadyBuilt = existsSync(
   resolve(
     ENGINE_BUILD_PATHS.VENDOR_PACKAGES,
-    "pieces/zoya/test/dist/src/index.js",
+    "pieces/jarvis/test/dist/src/index.js",
   ),
 );
 const skipE2eTests = skipBundleTests || (!piecesAlreadyBuilt && !buildOptIn);
 
-const PIECE_TEST_NAME = "@zoyapieces/piece-zoya-test";
+const PIECE_TEST_NAME = "@jarvispieces/piece-jarvis-test";
 const PIECE_VERSION = "0.0.1";
 
 describe("Engine end-to-end: full RESUME via zstd backup", () => {
@@ -63,7 +63,7 @@ describe("Engine end-to-end: full RESUME via zstd backup", () => {
     let cached = initialCached;
     if (!cached && buildOptIn) cached = await buildEngineBundle();
     if (!cached) return;
-    if (buildOptIn) await buildAllZoyaPieces();
+    if (buildOptIn) await buildAllJarvisPieces();
     runtime = new EngineRuntime({ api, bundlePath: cached.bundlePath });
   });
 
@@ -521,4 +521,3 @@ describe("Engine end-to-end: full RESUME via zstd backup", () => {
     90_000,
   );
 });
-

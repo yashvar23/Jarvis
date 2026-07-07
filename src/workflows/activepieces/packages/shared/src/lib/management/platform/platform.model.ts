@@ -163,4 +163,3 @@ export const PlatformBillingInformation = z.object({
     cancelAt: Nullable(z.number()),
 })
 export type PlatformBillingInformation = z.infer<typeof PlatformBillingInformation>
-

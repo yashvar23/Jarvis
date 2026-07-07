@@ -134,11 +134,11 @@ func ensureWebView2Runtime() bool {
 		mbIconWarning = 0x00000030
 		idYes         = 6
 	)
-	msg := "ZOYA needs the Microsoft Edge WebView2 Runtime to show its windows " +
+	msg := "JARVIS needs the Microsoft Edge WebView2 Runtime to show its windows " +
 		"(the setup window and the dashboard panels).\r\n\r\n" +
-		"Download and install it now? ZOYA will start automatically when the " +
+		"Download and install it now? JARVIS will start automatically when the " +
 		"installation finishes."
-	if messageBox(msg, "ZOYA — WebView2 Runtime required", mbYesNo|mbIconWarning) != idYes {
+	if messageBox(msg, "JARVIS — WebView2 Runtime required", mbYesNo|mbIconWarning) != idYes {
 		return false
 	}
 

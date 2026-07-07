@@ -1,5 +1,5 @@
 /**
- * Example usage of ZOYA Communication Layer
+ * Example usage of J.A.R.V.I.S. Communication Layer
  *
  * This demonstrates how to:
  * 1. Start the WebSocket server
@@ -18,7 +18,7 @@ import {
 } from './index.ts';
 
 async function main() {
-  console.log('🤖 Starting ZOYA Communication Layer...\n');
+  console.log('🤖 Starting J.A.R.V.I.S. Communication Layer...\n');
 
   // 1. Initialize WebSocket server
   const wsServer = new WebSocketServer(3142);
@@ -103,9 +103,9 @@ async function main() {
     await new Promise(r => setTimeout(r, 100));
     yield { type: 'text' as const, text: 'from ' };
     await new Promise(r => setTimeout(r, 100));
-    yield { type: 'text' as const, text: 'ZOYA!' };
+    yield { type: 'text' as const, text: 'J.A.R.V.I.S.!' };
     await new Promise(r => setTimeout(r, 100));
-    yield { type: 'done' as const, response: { content: 'Hello from ZOYA!', tool_calls: [], usage: { input_tokens: 0, output_tokens: 10 }, model: 'demo', finish_reason: 'stop' as const } };
+    yield { type: 'done' as const, response: { content: 'Hello from J.A.R.V.I.S.!', tool_calls: [], usage: { input_tokens: 0, output_tokens: 10 }, model: 'demo', finish_reason: 'stop' as const } };
   })();
 
   const fullResponse = await streamRelay.relayStream(simulatedStream, 'demo-123');
@@ -127,4 +127,3 @@ async function main() {
 }
 
 main().catch(console.error);
-

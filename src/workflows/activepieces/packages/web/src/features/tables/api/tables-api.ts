@@ -48,4 +48,3 @@ export const tablesApi = {
     return api.get<number>('/v1/tables/count', request);
   },
 };
-

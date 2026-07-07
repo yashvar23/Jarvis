@@ -204,7 +204,7 @@ export class DailyRhythm {
 
   private buildMorningPrompt(): string {
     const tone = this.getToneInstructions();
-    return `You are ZOYA, an AI assistant running a morning planning session.${tone}
+    return `You are JARVIS, an AI assistant running a morning planning session.${tone}
 
 Analyze the user's active goals and generate today's plan.
 
@@ -219,7 +219,7 @@ Respond with ONLY valid JSON:
 
   private buildEveningPrompt(): string {
     const tone = this.getToneInstructions();
-    return `You are ZOYA, an AI assistant running an evening review session.${tone}
+    return `You are JARVIS, an AI assistant running an evening review session.${tone}
 
 Compare the morning plan against the day's reality. Score progress honestly.
 
@@ -273,4 +273,3 @@ Only include score_updates for goals where you have evidence of progress or regr
     };
   }
 }
-

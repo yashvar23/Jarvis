@@ -468,4 +468,3 @@ Give actionable insights as a JSON array of strings. Example: ["You spent 40% of
     }
   }
 }
-

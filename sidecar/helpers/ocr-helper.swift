@@ -1,4 +1,4 @@
-// ocr-helper: macOS Vision OCR companion for zoya-sidecar.
+// ocr-helper: macOS Vision OCR companion for jarvis-sidecar.
 //
 // Reads an image path from argv[1], runs VNRecognizeTextRequest, and writes
 // JSON {"text": "..."} to stdout. Errors go to stderr with a non-zero exit.

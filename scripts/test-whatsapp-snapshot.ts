@@ -11,7 +11,7 @@
 
 import { BrowserController } from '../src/actions/browser/session.ts';
 
-const browser = new BrowserController(9222, `${process.env.HOME}/.zoya/browser/profile`);
+const browser = new BrowserController(9222, `${process.env.HOME}/.jarvis/browser/profile`);
 const targetChat = process.argv[2] || ''; // optional: name of chat to open
 
 function printElements(elements: any[]) {
@@ -82,4 +82,3 @@ main().catch(err => {
   console.error('Error:', err);
   process.exit(1);
 });
-

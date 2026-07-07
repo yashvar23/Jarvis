@@ -24,14 +24,14 @@ func main() {
 	}
 
 	if *help {
-		fmt.Println(`zoya — Zoya sidecar client (Go)
+		fmt.Println(`jarvis — Jarvis sidecar client (Go)
 
 Usage:
-  zoya --token <jwt>    Enroll and start (saves token to config)
-  zoya                  Start using saved token
-  zoya --test <cmd>     Run a built-in platform test (test build only)
-  zoya --version        Print the sidecar version and exit
-  zoya --help           Show this help`)
+  jarvis --token <jwt>    Enroll and start (saves token to config)
+  jarvis                  Start using saved token
+  jarvis --test <cmd>     Run a built-in platform test (test build only)
+  jarvis --version        Print the sidecar version and exit
+  jarvis --help           Show this help`)
 		os.Exit(0)
 	}
 
@@ -39,14 +39,14 @@ Usage:
 		os.Exit(runTests(flag.Args()))
 	}
 
-	// Route logs to ~/.zoya/sidecar.log so the GUI-subsystem Windows build runs
+	// Route logs to ~/.jarvis/sidecar.log so the GUI-subsystem Windows build runs
 	// without a console window (and so there's a log to inspect anywhere).
 	setupLogging()
 
 	// When relaunched by an in-app restart (settings token change), wait briefly
 	// for the previous instance to exit and release the mic / hotkeys / tray icon
 	// before we grab them.
-	if os.Getenv("ZOYA_RELAUNCH") == "1" {
+	if os.Getenv("JARVIS_RELAUNCH") == "1" {
 		log.Println("[sidecar] relaunched — waiting for the previous instance to exit...")
 		time.Sleep(restartRelaunchWait)
 	}
@@ -79,17 +79,17 @@ Usage:
 	// is still absent (declined / timed out), in which case we can't render any
 	// window, so exit cleanly.
 	if !ensureWebView2Runtime() {
-		log.Println("[sidecar] WebView2 runtime not installed — ZOYA can't show its windows. Exiting.")
+		log.Println("[sidecar] WebView2 runtime not installed — JARVIS can't show its windows. Exiting.")
 		os.Exit(0)
 	}
 
 	if cfg.Token == "" {
 		// Unconfigured: pop up the first-run window asking for the enrollment
 		// token instead of erroring out. (--token still works headlessly.)
-		log.Println("[sidecar] No token configured - opening connect window...")
-		tok, err := runFirstRunWindow(cfg)
+		log.Println("[sidecar] No token configured - opening setup window...")
+		tok, err := runSetupWindow()
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error: %v\nAlternatively, run: zoya-sidecar --token <jwt>\n", err)
+			fmt.Fprintf(os.Stderr, "Error: %v\nAlternatively, run: jarvis-sidecar --token <jwt>\n", err)
 			os.Exit(1)
 		}
 		if tok == "" {

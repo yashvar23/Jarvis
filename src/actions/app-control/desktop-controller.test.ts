@@ -24,4 +24,3 @@ describe('DesktopController', () => {
     expect(ctrl.connected).toBe(false);
   });
 });
-

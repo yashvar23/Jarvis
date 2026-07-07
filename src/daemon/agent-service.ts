@@ -8,7 +8,7 @@
 
 import { join } from 'node:path';
 import type { Service, ServiceStatus } from './services.ts';
-import type { ZoyaConfig } from '../config/types.ts';
+import type { JarvisConfig } from '../config/types.ts';
 import type { LLMStreamEvent, LLMMessage } from '../llm/provider.ts';
 import type { RoleDefinition } from '../roles/types.ts';
 import type { PersonalityModel } from '../personality/model.ts';
@@ -28,7 +28,7 @@ import { researchQueueTool } from '../actions/tools/research.ts';
 import { documentTool } from '../actions/tools/documents.ts';
 import { AgentTaskManager } from '../agents/task-manager.ts';
 import { discoverSpecialists, formatSpecialistList } from '../agents/role-discovery.ts';
-import { buildSystemPromptParts, type PromptContext, type SystemPromptParts } from '../roles/prompt-builder.ts';
+import { buildSystemPrompt, type PromptContext } from '../roles/prompt-builder.ts';
 import type { ProgressCallback } from '../agents/sub-agent-runner.ts';
 import {
   getPersonality,
@@ -65,7 +65,7 @@ import { getRecentConversation, getMessages } from '../vault/conversations.ts';
 export class AgentService implements Service, IAgentService {
   name = 'agent';
   private _status: ServiceStatus = 'stopped';
-  private config: ZoyaConfig;
+  private config: JarvisConfig;
   private llmManager: LLMManager;
   private orchestrator: AgentOrchestrator;
   private role: RoleDefinition | null = null;
@@ -85,7 +85,7 @@ export class AgentService implements Service, IAgentService {
   private convTaskEventListener: ((event: ConvTaskEvent) => void) | null = null;
   private dialogueCompactor: DialogueCompactor | null = null;
 
-  constructor(config: ZoyaConfig) {
+  constructor(config: JarvisConfig) {
     this.config = config;
     this.llmManager = new LLMManager();
     this.orchestrator = new AgentOrchestrator();
@@ -133,7 +133,7 @@ export class AgentService implements Service, IAgentService {
    * without poking at private state. Returns the same reference the
    * daemon holds so config writes are visible immediately.
    */
-  getConfig(): ZoyaConfig {
+  getConfig(): JarvisConfig {
     return this.config;
   }
 
@@ -275,9 +275,9 @@ export class AgentService implements Service, IAgentService {
       return this.streamMessageConv(text, channel);
     }
 
-    const systemPrompt = this.buildFullSystemPromptParts(channel, text);
+    let systemPrompt = this.buildFullSystemPrompt(channel, text);
     if (siteContext) {
-      systemPrompt.dynamic += '\n\n' + siteContext;
+      systemPrompt += '\n\n' + siteContext;
     }
 
     const stream = this.orchestrator.streamMessage(systemPrompt, text);
@@ -396,8 +396,8 @@ export class AgentService implements Service, IAgentService {
     stream: AsyncIterable<LLMStreamEvent>;
     onComplete: (fullText: string) => Promise<void>;
   } {
-    const systemPrompt = this.buildFullSystemPromptParts(channel, text);
-    if (siteContext) systemPrompt.dynamic += '\n\n' + siteContext;
+    let systemPrompt = this.buildFullSystemPrompt(channel, text);
+    if (siteContext) systemPrompt += '\n\n' + siteContext;
 
     const content: import('../llm/provider.ts').ContentBlock[] = [
       { type: 'image', source: { type: 'base64', media_type: mediaType, data: imageBase64 } },
@@ -435,7 +435,7 @@ export class AgentService implements Service, IAgentService {
     if (this.convOrchestrator) {
       response = await this.handleMessageConv(text, channel);
     } else {
-      const systemPrompt = this.buildFullSystemPromptParts(channel, text);
+      const systemPrompt = this.buildFullSystemPrompt(channel, text);
       response = await this.orchestrator.processMessage(systemPrompt, text);
     }
 
@@ -555,9 +555,7 @@ export class AgentService implements Service, IAgentService {
 
   private registerProviders(): void {
     const { llm } = this.config;
-    const hasProvider = registerLLMProviders(this.llmManager, llm.providers ?? {}, {
-      promptCache: llm.prompt_cache !== false,
-    });
+    const hasProvider = registerLLMProviders(this.llmManager, llm.providers ?? {});
 
     if (!hasProvider) {
       console.warn('[AgentService] No LLM providers configured. Responses will be placeholders.');
@@ -579,7 +577,7 @@ export class AgentService implements Service, IAgentService {
       this.taskRegistry.hydrate();
       // Task runner: route delegations through the primary orchestrator so
       // task tiers run with the full tool registry, role prompt, authority
-      // gating, and Zoya-specific feature knowledge. Uses processTaskCall
+      // gating, and Jarvis-specific feature knowledge. Uses processTaskCall
       // (not processMessage) so the LLM has access to the
       // `ask_for_clarification` tool for pause/resume and the conversation
       // buffer is scoped to one task (not polluting the primary agent's
@@ -593,16 +591,12 @@ export class AgentService implements Service, IAgentService {
         signal,
         history,
       }) => {
-        const baseSystem = this.buildFullSystemPromptParts('conv', originalMessage);
+        const baseSystem = this.buildFullSystemPrompt('conv', originalMessage);
         const templateNote = TaskDispatcher.templatePromptFor(template);
         // Attach the conv LLM's routing intent as system context so the task
         // tier sees both the user's verbatim ask AND the conv's framing -
-        // but the user's words are the primary signal. Both are per-task
-        // volatile, so they ride on the dynamic half of the prompt.
-        const systemPrompt: SystemPromptParts = {
-          static: baseSystem.static,
-          dynamic: `${baseSystem.dynamic}\n\n${templateNote}\n\nConversation routing note: ${intent}`,
-        };
+        // but the user's words are the primary signal.
+        const systemPrompt = `${baseSystem}\n\n${templateNote}\n\nConversation routing note: ${intent}`;
         const result = await this.orchestrator.processTaskCall({
           systemPrompt,
           userMessage: originalMessage,
@@ -636,7 +630,7 @@ export class AgentService implements Service, IAgentService {
   private buildPersona(): string {
     const p = this.config.personality;
     const traits = (p?.core_traits ?? []).join(', ');
-    const name = p?.assistant_name ?? 'ZOYA';
+    const name = p?.assistant_name ?? 'JARVIS';
     return [
       `You are ${name}, the user's conversational assistant.`,
       traits ? `Core traits: ${traits}.` : '',
@@ -677,8 +671,8 @@ export class AgentService implements Service, IAgentService {
 
   /**
    * Build the full system prompt used by chat turns. Public so other code
-   * paths (workflow's `zoya-ask` piece, etc.) can give the LLM the same
-   * Zoya identity + role + personality + vault context that chat gets.
+   * paths (workflow's `jarvis-ask` piece, etc.) can give the LLM the same
+   * Jarvis identity + role + personality + vault context that chat gets.
    *
    * `channel` selects channel-specific personality overrides (telegram,
    * discord, etc.); unknown channel names fall back to the default
@@ -696,14 +690,14 @@ export class AgentService implements Service, IAgentService {
    * before EVERY spoken reply — the dominant per-turn latency (a simple "how
    * are you" took 1–2s). The realtime model is built for a concise,
    * conversational prompt, so here we give it just identity + tone + a
-   * live-voice framing (~100 tokens). Tools stay available, so ZOYA can still
+   * live-voice framing (~100 tokens). Tools stay available, so JARVIS can still
    * act; we only drop the heavyweight role/KPI/commitments/vault context that a
    * spoken chat doesn't need. This is removal of bloat, NOT a behavioral
    * directive (no "be brief / don't narrate" — those suppressed preambles and
    * made it deliberate).
    */
   buildRealtimeVoiceInstructions(): string {
-    const name = this.config.personality?.assistant_name?.trim() || this.role?.name || 'ZOYA';
+    const name = this.config.personality?.assistant_name?.trim() || this.role?.name || 'JARVIS';
     const userName = this.config.user?.name?.trim() || getUserProfile()?.answers.preferred_name?.trim();
     const traits = (this.config.personality?.core_traits ?? []).slice(0, 6).join(', ');
     return [
@@ -716,20 +710,7 @@ export class AgentService implements Service, IAgentService {
   }
 
   buildFullSystemPrompt(channel: string, userMessage?: string): string {
-    const parts = this.buildFullSystemPromptParts(channel, userMessage);
-    if (!parts.static && !parts.dynamic) return '';
-    return parts.dynamic ? `${parts.static}\n\n${parts.dynamic}` : parts.static;
-  }
-
-  /**
-   * System prompt split at the prompt-cache boundary: `static` is byte-stable
-   * turn-over-turn for a given channel (role prompt + channel personality),
-   * `dynamic` carries the per-turn context (time, observations, goals, ...).
-   * Callers hand the parts to the orchestrator, which marks the static half
-   * as a provider cache boundary.
-   */
-  buildFullSystemPromptParts(channel: string, userMessage?: string): SystemPromptParts {
-    if (!this.role) return { static: '', dynamic: '' };
+    if (!this.role) return '';
 
     // Build prompt context with live data + vault knowledge.
     // For latency-sensitive voice channels (pebble), build a slimmer
@@ -740,19 +721,15 @@ export class AgentService implements Service, IAgentService {
       ? this.buildPromptContext(userMessage, { slim: true })
       : this.buildPromptContext(userMessage);
 
-    // Build base system prompt from role + context, split at the boundary
-    const roleParts = buildSystemPromptParts(this.role, context);
+    // Build base system prompt from role + context
+    const rolePrompt = buildSystemPrompt(this.role, context);
 
-    // Build personality prompt for this channel. Config-derived and
-    // time-invariant, so it belongs to the static (cacheable) half.
+    // Build personality prompt for this channel
     const personality = this.personality ?? getPersonality();
     const channelPersonality = getChannelPersonality(personality, channel);
     const personalityPrompt = personalityToPrompt(channelPersonality);
 
-    return {
-      static: `${roleParts.static}\n\n${personalityPrompt}`,
-      dynamic: roleParts.dynamic,
-    };
+    return `${rolePrompt}\n\n${personalityPrompt}`;
   }
 
   private buildPromptContext(userMessage?: string, opts?: { slim?: boolean }): PromptContext {
@@ -916,4 +893,3 @@ export class AgentService implements Service, IAgentService {
     this.personality = personality;
   }
 }
-

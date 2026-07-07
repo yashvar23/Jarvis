@@ -36,7 +36,7 @@ type CreateActionParams<PieceAuth extends PieceAuthProperty | PieceAuthProperty[
   requireAuth?: boolean
   errorHandlingOptions?: ErrorHandlingOptionsParam
   /**
-   * Zoya-only extension to upstream Activepieces (not part of the public
+   * Jarvis-only extension to upstream Activepieces (not part of the public
    * AP framework API). Optional declaration of the action's output shape:
    * the same JSON the action would return on a successful run. The visual
    * editor's variable picker reads this so users can wire `{{step.field}}`
@@ -97,4 +97,3 @@ export const createAction = <
     params.outputSample,
   )
 }
-

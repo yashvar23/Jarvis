@@ -3,7 +3,7 @@
  *
  * Manages OAuth2 tokens for Google APIs (Gmail, Calendar).
  * Uses raw fetch() — no googleapis package needed.
- * Tokens stored at ~/.zoya/google-tokens.json
+ * Tokens stored at ~/.jarvis/google-tokens.json
  */
 
 import path from 'node:path';
@@ -35,7 +35,7 @@ export class GoogleAuth {
   ) {
     this.clientId = clientId;
     this.clientSecret = clientSecret;
-    this.tokensPath = opts?.tokensPath ?? path.join(os.homedir(), '.zoya', 'google-tokens.json');
+    this.tokensPath = opts?.tokensPath ?? path.join(os.homedir(), '.jarvis', 'google-tokens.json');
     this.redirectUri = opts?.redirectUri ?? 'http://localhost:3142/api/auth/google/callback';
     this.loadTokens();
   }
@@ -77,7 +77,7 @@ export class GoogleAuth {
   /**
    * Snapshot of the current token set, or `null` if not authenticated.
    * Returned by value (caller can't mutate the internal cache). Used by
-   * `ZoyaGoogleConnectionSource` to surface the full OAuth2-shaped value
+   * `JarvisGoogleConnectionSource` to surface the full OAuth2-shaped value
    * (access_token + refresh_token + expiry_date) to pieces.
    */
   getTokens(): GoogleTokens | null {
@@ -185,4 +185,3 @@ export class GoogleAuth {
     console.log('[GoogleAuth] Token refreshed successfully');
   }
 }
-

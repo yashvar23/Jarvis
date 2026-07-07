@@ -5,7 +5,7 @@
  *
  *   `LlmOnlyAgentDelegator` -- delegates by feeding the goal to the LLM with
  *      a system prompt instructing it to plan and answer. No tool loop. This
- *      is the baseline that works without M7 wired up: it gets `zoya-agent`
+ *      is the baseline that works without M7 wired up: it gets `jarvis-agent`
  *      flows running and returning final messages, even if the "agent" can't
  *      take actions yet. Tool trace is empty.
  *
@@ -23,7 +23,7 @@ import type {
   PieceAgentDelegateResult,
   PieceAgentDelegator,
   PieceLlmClient,
-} from "../zoya-pieces/types";
+} from "../jarvis-pieces/types";
 
 /**
  * Minimal-viable delegator: a single LLM round-trip with a "plan-and-answer"
@@ -33,7 +33,7 @@ export class LlmOnlyAgentDelegator implements PieceAgentDelegator {
   constructor(
     private readonly llm: PieceLlmClient,
     /** Optional override for the system prompt; default is goal-shaped. */
-    private readonly systemPrompt: string = "You are a Zoya sub-agent. Plan briefly, then answer the user's goal directly. If you would need a tool you don't have, say so explicitly.",
+    private readonly systemPrompt: string = "You are a Jarvis sub-agent. Plan briefly, then answer the user's goal directly. If you would need a tool you don't have, say so explicitly.",
   ) {}
 
   async delegate(input: PieceAgentDelegateInput): Promise<PieceAgentDelegateResult> {
@@ -48,4 +48,3 @@ export class LlmOnlyAgentDelegator implements PieceAgentDelegator {
     };
   }
 }
-

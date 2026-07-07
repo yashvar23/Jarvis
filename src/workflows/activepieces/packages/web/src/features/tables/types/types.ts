@@ -16,4 +16,3 @@ export const ROW_HEIGHT_MAP: Record<RowHeight, number> = {
   [RowHeight.DEFAULT]: 42,
   [RowHeight.EXPANDED]: 52,
 };
-

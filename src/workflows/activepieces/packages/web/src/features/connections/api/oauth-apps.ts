@@ -29,4 +29,3 @@ export const oauthAppsApi = {
     return api.post<OAuthApp>('/v1/oauth-apps', request);
   },
 };
-

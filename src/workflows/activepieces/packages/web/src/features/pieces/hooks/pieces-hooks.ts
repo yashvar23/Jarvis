@@ -479,4 +479,3 @@ const getExploreTabContent = (
 
   return [popularCategory, hightlightedPiecesCategory];
 };
-

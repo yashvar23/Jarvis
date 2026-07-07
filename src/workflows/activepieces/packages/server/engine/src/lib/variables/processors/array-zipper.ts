@@ -25,4 +25,3 @@ export const arrayZipperProcessor: ProcessorFn = (_property, value) => {
         (_, index) => constructResultForIndex(value, index),
     )
 }
-

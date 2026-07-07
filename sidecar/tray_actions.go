@@ -62,7 +62,7 @@ func (c *SidecarClient) openRoom(id PanelID, route, title string, w, h int) {
 }
 
 // OpenChat opens the main chat room (dashboard home).
-func (c *SidecarClient) OpenChat() { c.openRoom("tray:chat", "#/", "ZOYA", 1100, 760) }
+func (c *SidecarClient) OpenChat() { c.openRoom("tray:chat", "#/", "JARVIS", 1100, 760) }
 
 // OpenSettings now opens the local sidecar settings window (see
 // settings_window.go), not the remote dashboard settings room.

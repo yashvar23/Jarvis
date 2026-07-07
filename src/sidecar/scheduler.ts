@@ -134,4 +134,3 @@ function priorityWeight(p: EventPriority): number {
     case 'low': return 3;
   }
 }
-

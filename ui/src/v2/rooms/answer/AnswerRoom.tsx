@@ -72,7 +72,7 @@ export function AnswerRoom({ answerId }: { answerId: string }) {
     <div className="task-result">
       <header className="task-result__head">
         <div className="task-result__eyebrow">
-          <span className="task-result__agent">ZOYA</span>
+          <span className="task-result__agent">JARVIS</span>
           <span className="task-result__sep">·</span>
           <span className="task-result__elapsed">asked at {askedAt}</span>
         </div>

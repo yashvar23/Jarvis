@@ -167,7 +167,7 @@ export interface ExecuteTriggerHookOptions {
    * Public-facing webhook URL surfaced to the trigger via context.webhookUrl.
    * Used by webhook-strategy triggers that register external watches against
    * a publicly reachable URL (e.g. Gmail watch). Default: a placeholder so
-   * non-webhook triggers (most zoya triggers) still validate.
+   * non-webhook triggers (most jarvis triggers) still validate.
    */
   webhookUrl?: string;
   /** Whether to invoke the trigger's `test` path instead of `run`. */
@@ -213,4 +213,3 @@ function ensureApiSuffix(url: string): string {
   const slashed = ensureTrailingSlash(url);
   return slashed.endsWith("/api/") ? slashed : slashed + "api/";
 }
-

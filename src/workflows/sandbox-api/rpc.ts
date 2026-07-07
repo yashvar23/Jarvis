@@ -126,4 +126,3 @@ export function createNotifyClient<T extends Contract>(socket: RpcSocket): T {
     },
   });
 }
-

@@ -77,4 +77,3 @@ export function usePaletteSearch(query: string, opts: { enabled: boolean }) {
 
   return { results: ranked, loading };
 }
-

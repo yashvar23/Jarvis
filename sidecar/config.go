@@ -11,10 +11,10 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// The sidecar shares the ~/.zoya data folder with the brain (they rarely run
+// The sidecar shares the ~/.jarvis data folder with the brain (they rarely run
 // on the same host); its files are named distinctly so they can't collide with
-// brain files (zoya.pid, sidecar-keys/, the db, etc.). captures/ is shared.
-var configDir = filepath.Join(homeDir(), ".zoya")
+// brain files (jarvis.pid, sidecar-keys/, the db, etc.). captures/ is shared.
+var configDir = filepath.Join(homeDir(), ".jarvis")
 var configFile = filepath.Join(configDir, "sidecar.yaml")
 
 func homeDir() string {
@@ -48,7 +48,7 @@ func defaultConfig() SidecarConfig {
 			MinChangeThreshold: 0.02,
 			StuckThresholdMs:   120000,
 			OCREnabled:         true,
-			CaptureDir:         filepath.Join(homeDir(), ".zoya", "captures"),
+			CaptureDir:         filepath.Join(homeDir(), ".jarvis", "captures"),
 		},
 	}
 }
@@ -84,7 +84,7 @@ func LoadConfig() (*SidecarConfig, error) {
 		// Merge in any default capabilities that aren't already present in the
 		// saved config. This makes new capabilities (e.g. CapWindows added in
 		// Phase 2) auto-enable on existing installs without requiring users to
-		// hand-edit ~/.zoya-sidecar/config.yaml.
+		// hand-edit ~/.jarvis-sidecar/config.yaml.
 		have := make(map[SidecarCapability]bool, len(cfg.Capabilities))
 		for _, c := range cfg.Capabilities {
 			have[c] = true
@@ -110,7 +110,7 @@ func LoadConfig() (*SidecarConfig, error) {
 		cfg.Awareness.StuckThresholdMs = 120000
 	}
 	if cfg.Awareness.CaptureDir == "" {
-		cfg.Awareness.CaptureDir = filepath.Join(homeDir(), ".zoya", "captures")
+		cfg.Awareness.CaptureDir = filepath.Join(homeDir(), ".jarvis", "captures")
 	}
 
 	return &cfg, nil

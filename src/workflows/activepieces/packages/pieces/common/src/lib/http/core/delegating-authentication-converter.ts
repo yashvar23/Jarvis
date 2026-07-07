@@ -60,4 +60,3 @@ class BasicTokenAuthenticationConverter
 type AuthenticationConverter<T extends Authentication> = {
   convert: (authentication: T, headers: HttpHeaders) => HttpHeaders;
 };
-

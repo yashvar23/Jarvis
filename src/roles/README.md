@@ -1,6 +1,6 @@
 # Role Engine
 
-The Role Engine is a core component of Project ZOYA that defines, loads, and manages AI agent roles with their permissions, responsibilities, and behavior patterns.
+The Role Engine is a core component of Project J.A.R.V.I.S. that defines, loads, and manages AI agent roles with their permissions, responsibilities, and behavior patterns.
 
 ## Overview
 
@@ -225,7 +225,7 @@ bun run src/roles/test.ts
 bun run src/roles/test-multi.ts
 ```
 
-## Integration with ZOYA
+## Integration with J.A.R.V.I.S.
 
 The Role Engine integrates with:
 
@@ -250,4 +250,3 @@ The Role Engine integrates with:
 - Role-based routing and delegation
 - Automatic KPI tracking and reporting
 - Role versioning and migration
-

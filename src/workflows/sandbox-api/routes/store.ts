@@ -64,4 +64,3 @@ export const deleteStoreEntryRoute: RouteHandler = async (ctx: RouteContext) => 
     throw e;
   }
 };
-

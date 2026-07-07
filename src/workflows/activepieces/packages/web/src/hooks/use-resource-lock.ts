@@ -102,4 +102,3 @@ export { useResourceLock };
 type UseResourceLockParams = {
   resourceId: string;
 };
-

@@ -9,4 +9,3 @@ const ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz
 const ID_LENGTH = 21;
 
 export const apId: () => string = customAlphabet(ALPHABET, ID_LENGTH);
-

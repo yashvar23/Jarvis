@@ -35,4 +35,3 @@ export function setPaletteHandler(h: PaletteHandler | null): void {
 export function getPaletteHandler(): PaletteHandler | null {
   return handler;
 }
-

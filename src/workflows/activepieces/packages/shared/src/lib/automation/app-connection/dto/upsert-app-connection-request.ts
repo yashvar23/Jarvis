@@ -182,4 +182,3 @@ export const ListFlowsFromAppConnectionRequestQuery = z.object({
     projectId: z.string(),
 })
 export type ListFlowsFromAppConnectionRequestQuery = z.infer<typeof ListFlowsFromAppConnectionRequestQuery>
-

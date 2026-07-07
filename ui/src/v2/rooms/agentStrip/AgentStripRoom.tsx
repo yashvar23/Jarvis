@@ -181,7 +181,7 @@ export function AgentStripRoom(_: { mode?: RoomBodyMode }) {
             <span className="agent-strip__empty-dot" aria-hidden="true" />
             <div className="agent-strip__empty-eyebrow">standing by</div>
             <div className="agent-strip__empty-line">
-              Say "Zoya, in the background…" to launch one
+              Say "Jarvis, in the background…" to launch one
             </div>
           </div>
         )}

@@ -27,4 +27,3 @@ export const triggerEventsApi = {
     return api.post<TriggerEventWithPayload>(`/v1/trigger-events`, request);
   },
 };
-

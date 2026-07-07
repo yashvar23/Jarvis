@@ -368,8 +368,8 @@ const (
 // createWindow creates the layered overlay window and stores its handle on the
 // service. Implements pebblePlatform; called once by runPebbleLoop.
 func (s *pebbleServiceWindows) createWindow() error {
-	className, _ := syscall.UTF16PtrFromString("ZoyaPebbleOverlay")
-	windowName, _ := syscall.UTF16PtrFromString("ZOYA")
+	className, _ := syscall.UTF16PtrFromString("JarvisPebbleOverlay")
+	windowName, _ := syscall.UTF16PtrFromString("JARVIS")
 
 	hInstance, _, _ := procGetModuleHandleW.Call(0)
 
@@ -639,7 +639,7 @@ func (s *pebbleServiceWindows) present() error {
 	} else {
 		s.lastBubbleY1.Store(0)
 	}
-	// W6-T4 — outward halo around disc when ZOYA is remotely controlling
+	// W6-T4 — outward halo around disc when JARVIS is remotely controlling
 	// (PointAt active). Drawn before the eye glyph so the glyph sits on
 	// top of the halo, not under it.
 	s.drawControllingHalo(pixels)

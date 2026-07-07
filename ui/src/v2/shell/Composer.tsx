@@ -13,7 +13,7 @@ export interface ComposerProps {
 export function Composer({
   onSubmit,
   onSlash,
-  placeholder = "Ask Zoya, or press / to summon a tool…",
+  placeholder = "Ask Jarvis, or press / to summon a tool…",
   disabled,
 }: ComposerProps) {
   const [value, setValue] = useState("");
@@ -99,7 +99,7 @@ export function Composer({
             }
           }}
           disabled={disabled}
-          aria-label="Message Zoya"
+          aria-label="Message Jarvis"
         />
         <button
           type="button"

@@ -143,4 +143,3 @@ function validateSubRoleTemplate(template: unknown): template is SubRoleTemplate
     typeof t.max_budget_per_task === 'number'
   );
 }
-

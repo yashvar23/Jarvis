@@ -636,7 +636,7 @@ export function useSettingsData() {
         await refresh();
         return {
           ok: true,
-          message: "Telegram saved. Restart Zoya to apply.",
+          message: "Telegram saved. Restart Jarvis to apply.",
           restartRequired: true,
         };
       } catch (err) {
@@ -659,7 +659,7 @@ export function useSettingsData() {
         await refresh();
         return {
           ok: true,
-          message: "Discord saved. Restart Zoya to apply.",
+          message: "Discord saved. Restart Jarvis to apply.",
           restartRequired: true,
         };
       } catch (err) {
@@ -693,7 +693,7 @@ export function useSettingsData() {
         await refresh();
         return {
           ok: true,
-          message: `STT set to ${provider}. Restart Zoya to apply.`,
+          message: `STT set to ${provider}. Restart Jarvis to apply.`,
           restartRequired: true,
         };
       } catch (err) {
@@ -863,7 +863,7 @@ export function useSettingsData() {
       await refresh();
       return {
         ok: true,
-        message: "Disconnected. Restart Zoya to deactivate observers.",
+        message: "Disconnected. Restart Jarvis to deactivate observers.",
         restartRequired: true,
       };
     } catch (err) {
@@ -966,4 +966,3 @@ export function useSettingsData() {
 }
 
 export type SettingsHook = ReturnType<typeof useSettingsData>;
-

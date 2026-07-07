@@ -11,7 +11,7 @@ import {
 } from './index.ts';
 
 async function testActionLayer() {
-  console.log('Testing ZOYA Action Layer\n');
+  console.log('Testing J.A.R.V.I.S. Action Layer\n');
 
   console.log('1. App Controller');
   console.log(`   Platform: ${process.platform}`);
@@ -26,7 +26,7 @@ async function testActionLayer() {
   const executor = new TerminalExecutor();
   console.log(`   Detected shell: ${executor.getShell()}`);
   try {
-    const result = await executor.execute('echo "Hello from ZOYA"');
+    const result = await executor.execute('echo "Hello from JARVIS"');
     console.log(`   ✓ Command executed: ${result.stdout.trim()}`);
     console.log(`   Duration: ${result.duration}ms`);
   } catch (error) {
@@ -81,7 +81,7 @@ async function testActionLayer() {
   console.log(`   Categories: ${registry.getCategories().join(', ')}`);
 
   try {
-    const result = await registry.execute('echo', { message: 'Hello ZOYA!' });
+    const result = await registry.execute('echo', { message: 'Hello JARVIS!' });
     console.log(`   ✓ Tool execution: ${result}`);
   } catch (error) {
     console.log(`   ✗ Error: ${error instanceof Error ? error.message : String(error)}`);
@@ -91,4 +91,3 @@ async function testActionLayer() {
 }
 
 testActionLayer().catch(console.error);
-

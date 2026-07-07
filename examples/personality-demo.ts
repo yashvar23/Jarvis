@@ -22,7 +22,7 @@ import {
 } from '../src/personality/index.ts';
 
 // Initialize database
-initDatabase('./data/zoya.db');
+initDatabase('./data/jarvis.db');
 
 console.log('=== Personality Engine Demo ===\n');
 
@@ -115,4 +115,3 @@ console.log(`   Core traits: ${updated.core_traits.join(', ')}`);
 console.log(`   Shared references: ${updated.relationship.shared_references.join(', ')}\n`);
 
 console.log('=== Demo Complete ===');
-

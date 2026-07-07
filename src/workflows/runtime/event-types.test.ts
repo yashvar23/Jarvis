@@ -59,4 +59,3 @@ describe("workflow event types", () => {
     expect(getWorkflowEventTypeMeta("ghost")).toBeNull();
   });
 });
-

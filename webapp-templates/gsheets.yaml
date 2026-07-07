@@ -173,7 +173,7 @@ instructions: |
 
   ### HOW TO IDENTIFY ELEMENTS IN THE SNAPSHOT
 
-  Since the snapshot uses ZOYA's format (not the chrome-devtools format), elements appear as `[id] tag "text" attrs...`. To find the Name Box and formula bar:
+  Since the snapshot uses JARVIS's format (not the chrome-devtools format), elements appear as `[id] tag "text" attrs...`. To find the Name Box and formula bar:
   - **Name Box**: Look for an INPUT whose displayed text is a cell reference pattern (e.g., "A1", "B2", "AA100"). It's usually in the "Key Elements" section.
   - **Formula Bar**: Look for an INPUT with `(contenteditable)` that contains the cell's actual content (text, number, or formula starting with "=").
   - **Inline Editor**: When a cell is being edited, a focused contenteditable element appears. Its `[id]` is what you use for `browser_type`.

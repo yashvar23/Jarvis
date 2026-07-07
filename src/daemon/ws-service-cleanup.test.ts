@@ -155,4 +155,3 @@ describe('sweepExpiredVoiceConfirmations', () => {
     expect(pending.size).toBe(1);
   });
 });
-

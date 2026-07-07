@@ -149,4 +149,3 @@ type OAuth2PopupResponse = {
   code: string;
   codeVerifier: string | undefined;
 };
-

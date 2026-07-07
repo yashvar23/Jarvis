@@ -1,12 +1,12 @@
 # Piece verification guide
 
-How to verify a piece is wired correctly end-to-end -- from source on disk all the way to a workflow run inside the engine subprocess. Applies to Zoya-authored pieces (under `src/workflows/activepieces/packages/pieces/zoya/`) and to community pieces installed at runtime via the pieces library.
+How to verify a piece is wired correctly end-to-end -- from source on disk all the way to a workflow run inside the engine subprocess. Applies to Jarvis-authored pieces (under `src/workflows/activepieces/packages/pieces/jarvis/`) and to community pieces installed at runtime via the pieces library.
 
 If a piece works through every stage below, it is fully integrated. If it stops working at stage N, the section "What fails at each stage" at the bottom tells you where to look.
 
 ## TL;DR -- happy path
 
-1. Write piece source under `packages/pieces/zoya/<name>/src/`.
+1. Write piece source under `packages/pieces/jarvis/<name>/src/`.
 2. Restart the daemon. No manual build command needed.
 3. Watch the daemon log for `catalog built with N piece(s)` and no extraction failures for your piece.
 4. Open the workflows editor. Add the piece via the library picker. Configure it. Run.
@@ -19,24 +19,24 @@ That's it for the well-trodden path. The sections below cover what to check when
 A piece is one `createPiece` call plus one `createAction` (or `createTrigger`) per surfaced operation. The minimum viable shape:
 
 ```ts
-// packages/pieces/zoya/my-piece/src/index.ts
+// packages/pieces/jarvis/my-piece/src/index.ts
 import { createPiece, PieceAuth } from "@activepieces/pieces-framework";
 import { greetAction } from "./lib/actions/greet";
 
 export const myPiece = createPiece({
-  displayName: "Zoya: My Piece",
+  displayName: "Jarvis: My Piece",
   description: "One-line, user-facing description.",
   auth: PieceAuth.None(),
   minimumSupportedRelease: "0.0.0",
   logoUrl: "",
-  authors: ["zoya"],
+  authors: ["jarvis"],
   actions: [greetAction],
   triggers: [],
 });
 ```
 
 ```ts
-// packages/pieces/zoya/my-piece/src/lib/actions/greet.ts
+// packages/pieces/jarvis/my-piece/src/lib/actions/greet.ts
 import { createAction, Property } from "@activepieces/pieces-framework";
 
 export const greetAction = createAction({
@@ -61,7 +61,7 @@ export const greetAction = createAction({
 
 Verify each of:
 
-- [ ] `package.json` is present at the piece root with `name: "@zoyapieces/piece-zoya-<short>"`, a `version`, and `"main": "./dist/src/index.js"`.
+- [ ] `package.json` is present at the piece root with `name: "@jarvispieces/piece-jarvis-<short>"`, a `version`, and `"main": "./dist/src/index.js"`.
 - [ ] Every action declares `outputSample` matching the exact shape its `run()` returns. Without this, the variable picker is blind and downstream steps cannot reference the action's outputs.
 - [ ] Every trigger declares `sampleData` (upstream-native -- the same role as `outputSample` but for triggers).
 - [ ] `auth` is set explicitly. Use `PieceAuth.None()` if the piece doesn't need credentials. Setting it to `undefined` looks the same in the editor as `None` but disables the connection picker.
@@ -69,22 +69,22 @@ Verify each of:
 
 ## Stage 2 -- build
 
-The daemon's bootstrap runs `buildAllZoyaPieces()` on every start with content-hash caching. New piece directories are auto-discovered. You do not need to run `bun run build:workflows` manually unless you want to verify the build offline before restarting.
+The daemon's bootstrap runs `buildAllJarvisPieces()` on every start with content-hash caching. New piece directories are auto-discovered. You do not need to run `bun run build:workflows` manually unless you want to verify the build offline before restarting.
 
 To verify the build path explicitly:
 
 ```bash
 bun run build:workflows
 # expected output:
-#   built @zoyapieces/piece-zoya-<short>@0.0.1
-#     bundle: /home/<you>/.zoya/cache/pieces/<hash>/<short>/dist/src/index.js
+#   built @jarvispieces/piece-jarvis-<short>@0.0.1
+#     bundle: /home/<you>/.jarvis/cache/pieces/<hash>/<short>/dist/src/index.js
 ```
 
-After build, the piece's `dist/` lives under `~/.zoya/cache/pieces/<piece-hash>/<short>/`. The hash mixes the engine bundle hash, so framework changes invalidate every piece automatically.
+After build, the piece's `dist/` lives under `~/.jarvis/cache/pieces/<piece-hash>/<short>/`. The hash mixes the engine bundle hash, so framework changes invalidate every piece automatically.
 
 Verify:
 
-- [ ] `~/.zoya/cache/pieces/<hash>/<short>/dist/src/index.js` exists.
+- [ ] `~/.jarvis/cache/pieces/<hash>/<short>/dist/src/index.js` exists.
 - [ ] Running `bun run build:workflows` a second time prints `cached` rather than `built` for your piece.
 
 ## Stage 3 -- daemon bootstrap
@@ -96,11 +96,11 @@ Restart the daemon. Watch the log for the engine bootstrap line:
 [Daemon] catalog built with <N> piece(s)
 ```
 
-If you see `catalog built with K piece(s), <M> extraction failure(s)`, one or more pieces failed to extract metadata. Failures persist in `~/.zoya/cache/piece-metadata.json` as part of the cache write (since the partial-cache fix), and the daemon prints the failing package name and error.
+If you see `catalog built with K piece(s), <M> extraction failure(s)`, one or more pieces failed to extract metadata. Failures persist in `~/.jarvis/cache/piece-metadata.json` as part of the cache write (since the partial-cache fix), and the daemon prints the failing package name and error.
 
 Verify:
 
-- [ ] The piece's package name appears in `~/.zoya/cache/piece-metadata.json` under `entries[].name`.
+- [ ] The piece's package name appears in `~/.jarvis/cache/piece-metadata.json` under `entries[].name`.
 - [ ] If the piece declares auth, its catalog entry has `auth: { type: "SECRET_TEXT" | "OAUTH2" | "BASIC_AUTH" | "CUSTOM_AUTH", ... }`, not `auth: null`.
 - [ ] Every action listed under `entries[].actions` has a non-empty `outputSample`.
 
@@ -112,7 +112,7 @@ bun run scripts/audit-piece-outputs.ts
 # Use --json for machine-readable output.
 ```
 
-If the daemon was already running with stale cache before your changes, the cache key may not have changed enough to invalidate. Bump `CATALOG_SCHEMA_VERSION` in `src/workflows/runtime/piece-catalog.ts`, or just delete `~/.zoya/cache/piece-metadata.json` and restart.
+If the daemon was already running with stale cache before your changes, the cache key may not have changed enough to invalidate. Bump `CATALOG_SCHEMA_VERSION` in `src/workflows/runtime/piece-catalog.ts`, or just delete `~/.jarvis/cache/piece-metadata.json` and restart.
 
 ## Stage 4 -- catalog API
 
@@ -120,7 +120,7 @@ The daemon exposes the projected catalog over HTTP. Hit it directly to confirm t
 
 ```bash
 curl -s http://localhost:3142/api/workflows/pieces \
-  | jq '.[] | select(.name == "@zoyapieces/piece-zoya-<short>")'
+  | jq '.[] | select(.name == "@jarvispieces/piece-jarvis-<short>")'
 ```
 
 Verify:
@@ -139,12 +139,12 @@ If the catalog API returns the piece but its shape looks wrong, the issue is in 
 DEBUG=1 bun start
 
 # Or run the engine-extract test against a real piece (e.g. gmail when installed):
-ZOYA_GATED_REAL_PIECE_TESTS=1 bun test src/workflows/runner/engine-runtime/extract-piece-metadata.test.ts
+JARVIS_GATED_REAL_PIECE_TESTS=1 bun test src/workflows/runner/engine-runtime/extract-piece-metadata.test.ts
 ```
 
 The two most common extraction failures:
 
-- `PieceNotFoundError: Piece not found for package: @zoyapieces/piece-zoya-<short>-<version>`. The engine couldn't find your piece in its dev-pieces list. This is now auto-discovered via `discoverZoyaDevPieces()` in `engine-runtime.ts` -- if you see this, confirm `packages/pieces/zoya/<short>/package.json` exists and has a valid `name`.
+- `PieceNotFoundError: Piece not found for package: @jarvispieces/piece-jarvis-<short>-<version>`. The engine couldn't find your piece in its dev-pieces list. This is now auto-discovered via `discoverJarvisDevPieces()` in `engine-runtime.ts` -- if you see this, confirm `packages/pieces/jarvis/<short>/package.json` exists and has a valid `name`.
 - `Cannot read property 'parse' of undefined` (or similar). The bundle didn't include something the framework expects. Re-run `bun run build:workflows --force` and check the esbuild output.
 
 ## Stage 6 -- visual editor
@@ -186,14 +186,14 @@ Three test layers, run from cheapest to most expensive:
 
 2. **Catalog drift detection.** `src/workflows/runtime/test-fixtures-drift.test.ts` rebuilds the catalog from your dev tree and compares against the committed test fixture. If your piece's catalog shape changed intentionally, regenerate the fixture; if not, the test surfaces the drift.
 
-3. **Engine-extract smoke (gated).** For pieces with auth, the engine-extract test exercises `EXTRACT_PIECE_METADATA` against a real installed piece. Gate it with `ZOYA_GATED_REAL_PIECE_TESTS=1` so CI doesn't require Gmail credentials.
+3. **Engine-extract smoke (gated).** For pieces with auth, the engine-extract test exercises `EXTRACT_PIECE_METADATA` against a real installed piece. Gate it with `JARVIS_GATED_REAL_PIECE_TESTS=1` so CI doesn't require Gmail credentials.
 
 ## What fails at each stage
 
 | Symptom | Stage | Where to look |
 |---|---|---|
-| Piece doesn't appear in `bun run build:workflows` output | 2 | `package.json` missing or malformed under `packages/pieces/zoya/<short>/` |
-| `PieceNotFoundError` in daemon log | 3 | `discoverZoyaDevPieces()` in `engine-runtime.ts` -- check the piece dir has a `package.json` with a `name` field |
+| Piece doesn't appear in `bun run build:workflows` output | 2 | `package.json` missing or malformed under `packages/pieces/jarvis/<short>/` |
+| `PieceNotFoundError` in daemon log | 3 | `discoverJarvisDevPieces()` in `engine-runtime.ts` -- check the piece dir has a `package.json` with a `name` field |
 | Catalog says `auth: null` but piece declared auth | 4 | `metadataToCatalogEntry` projection in `piece-catalog.ts`; bump `CATALOG_SCHEMA_VERSION` |
 | Catalog has the piece but actions have no `outputSample` | 4 | The action source -- `outputSample` is required on every `createAction` |
 | Piece appears in library but action props are empty | 5 | The piece bundle didn't include the action files. Re-run with `--force` |
@@ -204,10 +204,10 @@ Three test layers, run from cheapest to most expensive:
 
 ## When introducing a brand-new piece
 
-Just drop a new directory under `packages/pieces/zoya/<name>/`. Restart the daemon. Everything else is automatic:
+Just drop a new directory under `packages/pieces/jarvis/<name>/`. Restart the daemon. Everything else is automatic:
 
-- `buildAllZoyaPieces()` walks the directory and builds it (content-hash cached).
-- `discoverZoyaDevPieces()` walks the same directory and adds it to the engine's dev-pieces list.
+- `buildAllJarvisPieces()` walks the directory and builds it (content-hash cached).
+- `discoverJarvisDevPieces()` walks the same directory and adds it to the engine's dev-pieces list.
 - The catalog re-extracts because the piece-hash mix changed.
 - The library API surfaces it on next refresh.
 
@@ -215,12 +215,11 @@ If you ever find yourself editing a hardcoded piece list to register a new piece
 
 ## When upgrading a community piece (pieces library)
 
-Community pieces ship pre-built from npm and live under `~/.zoya/pieces/node_modules/@activepieces/`. Verification flow:
+Community pieces ship pre-built from npm and live under `~/.jarvis/pieces/node_modules/@activepieces/`. Verification flow:
 
 1. Open the pieces library, click **Install** (or **Update** if already installed).
 2. Wait for the install footprint indicator to show the package landed.
 3. Catalog refreshes hot -- no daemon restart needed.
 4. Walk Stages 4 / 6 / 7 above. Stages 1-3 don't apply (you didn't write the source).
 
-If the catalog refresh doesn't see the new piece, the bundle cache may be holding a stale entry. The install path invalidates the bundle cache automatically; if it didn't, delete `~/.zoya/cache/piece-metadata.json` and restart.
-
+If the catalog refresh doesn't see the new piece, the bundle cache may be holding a stale entry. The install path invalidates the bundle cache automatically; if it didn't, delete `~/.jarvis/cache/piece-metadata.json` and restart.

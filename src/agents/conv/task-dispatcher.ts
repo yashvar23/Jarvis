@@ -2,12 +2,12 @@
  * TaskDispatcher - executes a TaskRequest by routing it through a runner
  * callback supplied by the AgentService. The runner is the primary
  * orchestrator path so the task gets the FULL tool registry, role prompt,
- * authority gating, and Zoya-specific feature knowledge - just on the
+ * authority gating, and Jarvis-specific feature knowledge - just on the
  * requested tier instead of the default medium.
  *
  * Why a callback instead of calling chatTier directly: the original Phase 4
  * dispatcher did a single tool-less LLM call, which left task tiers with no
- * Zoya context (couldn't manage workflows, no tools, no role). Routing
+ * Jarvis context (couldn't manage workflows, no tools, no role). Routing
  * through the orchestrator fixes that without duplicating the orchestrator's
  * loop + tool-registry plumbing here.
  */
@@ -27,7 +27,7 @@ const TOOL_USE_INSTRUCTION = `IMPORTANT: You have access to real tools listed in
 const TEMPLATE_PROMPTS: Record<TaskTemplate, string> = {
   research: `[TASK TEMPLATE: RESEARCH] Gather information using your tools (web search, vault, docs). Stay on the user's intent. Cite sources where it matters. End with a clear conclusion the conversation agent can quote.\n\n${TOOL_USE_INSTRUCTION}`,
   code: `[TASK TEMPLATE: CODE] Read existing code via file-ops first when needed. Write clean, minimal changes. Run tests or builds if available. End with a brief plain-English summary (file paths, key changes).\n\n${TOOL_USE_INSTRUCTION}`,
-  plan: `[TASK TEMPLATE: PLAN] Decompose the intent into concrete steps with clear ownership and rough effort. If the plan involves Zoya features (workflows, commitments, goals, browser, sidecar) call the corresponding tools to inspect what already exists before drafting. Output a structured plan.\n\n${TOOL_USE_INSTRUCTION}`,
+  plan: `[TASK TEMPLATE: PLAN] Decompose the intent into concrete steps with clear ownership and rough effort. If the plan involves Jarvis features (workflows, commitments, goals, browser, sidecar) call the corresponding tools to inspect what already exists before drafting. Output a structured plan.\n\n${TOOL_USE_INSTRUCTION}`,
   write: `[TASK TEMPLATE: WRITE] Draft prose matching the requested format and audience. Prefer clarity over flourish. Return only the drafted content plus a one-line note about choices made.`,
   general: `[TASK TEMPLATE: GENERAL] Use your tools to accomplish the user's intent. Stay on scope. End with a brief summary.\n\n${TOOL_USE_INSTRUCTION}`,
 };
@@ -45,7 +45,7 @@ export type TaskRunResult =
  * Runner signature: given a (tier, subsystem, template-prefixed prompt,
  * abort signal), execute the work. The AgentService implements this by
  * invoking the primary orchestrator's `processTaskCall` with the requested
- * tier - which gives the task tier full access to the role's tools, Zoya
+ * tier - which gives the task tier full access to the role's tools, Jarvis
  * knowledge, AND the `ask_for_clarification` tool for pause/resume.
  *
  * On resume, the runner is invoked again with `history` set to the saved
@@ -250,4 +250,3 @@ export class TaskDispatcher {
     return envelope;
   }
 }
-

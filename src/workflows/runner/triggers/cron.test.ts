@@ -73,4 +73,3 @@ describe("CronScheduler with @every syntax", () => {
     expect(a?.nextRun).toBeGreaterThan(Date.now());
   });
 });
-

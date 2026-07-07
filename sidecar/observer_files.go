@@ -79,8 +79,8 @@ func (o *FileObserver) excluded(path string) bool {
 			continue
 		}
 		// Match the excluded dir itself or anything under it, but NOT a sibling
-		// that merely shares the prefix (exclude ".../.zoya" must not also
-		// swallow ".../.zoya-backup").
+		// that merely shares the prefix (exclude ".../.jarvis" must not also
+		// swallow ".../.jarvis-backup").
 		if path == p || strings.HasPrefix(path, p+string(os.PathSeparator)) {
 			return true
 		}

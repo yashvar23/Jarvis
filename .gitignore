@@ -6,8 +6,8 @@ out
 dist
 *.tgz
 
-# Built Zoya piece artifacts (created by scripts/build-pieces.ts)
-src/workflows/activepieces/packages/pieces/zoya/*/dist/
+# Built Jarvis piece artifacts (created by scripts/build-pieces.ts)
+src/workflows/activepieces/packages/pieces/jarvis/*/dist/
 
 # code coverage
 coverage

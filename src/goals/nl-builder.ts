@@ -254,4 +254,3 @@ When the user wants to change goals, include a JSON proposal in a \`\`\`json cod
     return depths[level];
   }
 }
-

@@ -28,12 +28,12 @@ export type UserProfileQuestion = {
  * One structured fact captured by the conversational onboarding
  * interviewer (Phase B). Themes match the 9 topics the interviewer
  * agent is told to cover (identity / work / projects / goals /
- * ambitions / communication / rhythm / tools / what-zoya-does).
+ * ambitions / communication / rhythm / tools / what-jarvis-does).
  *
  * Stored separately from the wizard `answers` map so the two surfaces
  * coexist cleanly: the wizard is the structured-edit surface, the
  * interview is the conversational capture path. Both feed the same
- * "About the user" markdown block injected into Zoya's system prompt.
+ * "About the user" markdown block injected into Jarvis's system prompt.
  */
 export type UserProfileFact = {
   theme: string;
@@ -60,7 +60,7 @@ export const USER_PROFILE_QUESTIONS: UserProfileQuestion[] = [
     step: 1,
     step_title: 'Identity',
     label: 'Preferred Name',
-    prompt: 'What should ZOYA call you?',
+    prompt: 'What should JARVIS call you?',
     description: 'Use the name you actually want the assistant to use in conversation.',
     placeholder: 'e.g. Alex',
   },
@@ -69,7 +69,7 @@ export const USER_PROFILE_QUESTIONS: UserProfileQuestion[] = [
     step: 1,
     step_title: 'Identity',
     label: 'Pronouns',
-    prompt: 'What pronouns do you want ZOYA to use, if any?',
+    prompt: 'What pronouns do you want JARVIS to use, if any?',
     description: 'Optional, but useful for natural and respectful replies.',
     placeholder: 'e.g. she/her, he/him, they/them',
   },
@@ -78,7 +78,7 @@ export const USER_PROFILE_QUESTIONS: UserProfileQuestion[] = [
     step: 1,
     step_title: 'Identity',
     label: 'Location / Timezone',
-    prompt: 'What location or timezone should ZOYA keep in mind?',
+    prompt: 'What location or timezone should JARVIS keep in mind?',
     description: 'This helps with scheduling, recommendations, and time references.',
     placeholder: 'e.g. Miami, FL / America/New_York',
   },
@@ -118,8 +118,8 @@ export const USER_PROFILE_QUESTIONS: UserProfileQuestion[] = [
     step_title: 'Interests',
     label: 'Goals',
     prompt: 'What do you want to accomplish over the next 30 to 90 days?',
-    description: 'Short-term outcomes that ZOYA should optimize around.',
-    placeholder: 'What should ZOYA help push forward?',
+    description: 'Short-term outcomes that JARVIS should optimize around.',
+    placeholder: 'What should JARVIS help push forward?',
     multiline: true,
   },
   {
@@ -127,7 +127,7 @@ export const USER_PROFILE_QUESTIONS: UserProfileQuestion[] = [
     step: 3,
     step_title: 'Working Style',
     label: 'Communication Preferences',
-    prompt: 'How do you want ZOYA to communicate with you?',
+    prompt: 'How do you want JARVIS to communicate with you?',
     description: 'Tone, directness, detail level, structure, reminders, and how much pushback you want.',
     placeholder: 'e.g. blunt, concise, actionable, no fluff',
     multiline: true,
@@ -139,7 +139,7 @@ export const USER_PROFILE_QUESTIONS: UserProfileQuestion[] = [
     label: 'Pet Peeves',
     prompt: 'What annoys you or wastes your time?',
     description: 'Patterns to avoid in planning, writing, or collaboration.',
-    placeholder: 'What should ZOYA not do?',
+    placeholder: 'What should JARVIS not do?',
     multiline: true,
   },
   {
@@ -147,7 +147,7 @@ export const USER_PROFILE_QUESTIONS: UserProfileQuestion[] = [
     step: 3,
     step_title: 'Working Style',
     label: 'Routines & Constraints',
-    prompt: 'What routines, limits, or constraints should ZOYA know?',
+    prompt: 'What routines, limits, or constraints should JARVIS know?',
     description: 'Schedule constraints, health habits, budget limits, availability, or boundaries.',
     placeholder: 'Anything that should shape reminders or recommendations',
     multiline: true,
@@ -158,7 +158,7 @@ export const USER_PROFILE_QUESTIONS: UserProfileQuestion[] = [
     step_title: 'Context',
     label: 'Tools & Stack',
     prompt: 'What tools, apps, or technical stack do you use most?',
-    description: 'Software, devices, languages, frameworks, and workflows ZOYA should assume.',
+    description: 'Software, devices, languages, frameworks, and workflows JARVIS should assume.',
     placeholder: 'e.g. GitHub, Bun, React, Notion, Telegram, Windows',
     multiline: true,
   },
@@ -169,7 +169,7 @@ export const USER_PROFILE_QUESTIONS: UserProfileQuestion[] = [
     label: 'Important People',
     prompt: 'Who are the important people, teams, or audiences around you?',
     description: 'Managers, cofounders, clients, family, friends, or communities that matter in your context.',
-    placeholder: 'Who should ZOYA keep in mind?',
+    placeholder: 'Who should JARVIS keep in mind?',
     multiline: true,
   },
   {
@@ -177,7 +177,7 @@ export const USER_PROFILE_QUESTIONS: UserProfileQuestion[] = [
     step: 4,
     step_title: 'Context',
     label: 'Anything Else',
-    prompt: 'What else should ZOYA know to be useful from day one?',
+    prompt: 'What else should JARVIS know to be useful from day one?',
     description: 'Any extra context that does not fit the earlier prompts.',
     placeholder: 'Anything important you want carried forward',
     multiline: true,
@@ -231,7 +231,7 @@ export function hasUserProfile(profile: UserProfileRecord | null): boolean {
  * source has any data so the caller can omit the block entirely.
  *
  * Called by the chat agent's `buildPromptContext` AND by the voice
- * intent classifier — both paths get the same context so Zoya is
+ * intent classifier — both paths get the same context so Jarvis is
  * consistent across modalities.
  */
 export function formatUserProfileForPrompt(profile: UserProfileRecord | null): string | undefined {
@@ -285,4 +285,3 @@ function indentPromptValue(value: string): string {
     .map((line) => `    ${line}`)
     .join('\n');
 }
-

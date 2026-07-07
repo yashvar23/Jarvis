@@ -3,8 +3,8 @@ import { closeWorkflowDb, DEFAULT_IDS, initWorkflowDb } from "../db/index";
 import { upsertConnection } from "../db/repos/app-connection";
 import {
   CredentialResolver,
-  ZOYA_PREFIX,
-  type ZoyaConnectionSource,
+  JARVIS_PREFIX,
+  type JarvisConnectionSource,
   type ResolvedConnection,
 } from "./adapter";
 
@@ -16,11 +16,11 @@ afterEach(() => {
   closeWorkflowDb();
 });
 
-// Lightweight test stubs. The live sources (`ZoyaGoogleConnectionSource`,
-// `ZoyaTelegramConnectionSource`) have their own dedicated test files that
+// Lightweight test stubs. The live sources (`JarvisGoogleConnectionSource`,
+// `JarvisTelegramConnectionSource`) have their own dedicated test files that
 // exercise the per-source contracts. These tests only care that the resolver
 // dispatches correctly to whatever Source it's handed.
-function stubSource(id: string, externalId: string, value: ResolvedConnection | null): ZoyaConnectionSource {
+function stubSource(id: string, externalId: string, value: ResolvedConnection | null): JarvisConnectionSource {
   return {
     id,
     canResolve: (eid) => eid === externalId,
@@ -29,10 +29,10 @@ function stubSource(id: string, externalId: string, value: ResolvedConnection | 
 }
 
 describe("CredentialResolver", () => {
-  test("dispatches zoya:* externalIds to a registered Zoya source", async () => {
+  test("dispatches jarvis:* externalIds to a registered Jarvis source", async () => {
     const r = new CredentialResolver();
     r.register(
-      stubSource("telegram", `${ZOYA_PREFIX}telegram`, {
+      stubSource("telegram", `${JARVIS_PREFIX}telegram`, {
         type: "SECRET_TEXT",
         value: { secret_text: "live-bot-token" },
       }),
@@ -40,33 +40,33 @@ describe("CredentialResolver", () => {
     const got = await r.resolve({
       projectId: DEFAULT_IDS.project,
       pieceName: "telegram-bot",
-      externalId: `${ZOYA_PREFIX}telegram`,
+      externalId: `${JARVIS_PREFIX}telegram`,
     });
     expect(got).toEqual({ type: "SECRET_TEXT", value: { secret_text: "live-bot-token" } });
   });
 
-  test("returns null when a Zoya source cannot resolve (not yet authenticated)", async () => {
+  test("returns null when a Jarvis source cannot resolve (not yet authenticated)", async () => {
     const r = new CredentialResolver();
-    r.register(stubSource("google", `${ZOYA_PREFIX}gmail`, null));
+    r.register(stubSource("google", `${JARVIS_PREFIX}gmail`, null));
     const got = await r.resolve({
       projectId: DEFAULT_IDS.project,
       pieceName: "gmail",
-      externalId: `${ZOYA_PREFIX}gmail`,
+      externalId: `${JARVIS_PREFIX}gmail`,
     });
     expect(got).toBeNull();
   });
 
-  test("returns null when no Zoya source claims the externalId", async () => {
+  test("returns null when no Jarvis source claims the externalId", async () => {
     const r = new CredentialResolver();
     const got = await r.resolve({
       projectId: DEFAULT_IDS.project,
       pieceName: "anything",
-      externalId: `${ZOYA_PREFIX}unknown`,
+      externalId: `${JARVIS_PREFIX}unknown`,
     });
     expect(got).toBeNull();
   });
 
-  test("falls back to the app_connection repo for non-zoya externalIds", async () => {
+  test("falls back to the app_connection repo for non-jarvis externalIds", async () => {
     upsertConnection({
       externalId: "user-supplied",
       displayName: "Notion",
@@ -85,12 +85,12 @@ describe("CredentialResolver", () => {
     expect(got?.value).toMatchObject({ access_token: "abc" });
   });
 
-  test("does not consult the DB for zoya:* externalIds (isolation)", async () => {
-    // Even if a row exists with externalId "zoya:gmail", the resolver should
-    // route through the Zoya source path and not return DB values. This
-    // guarantees the DB cannot shadow live-managed Zoya credentials.
+  test("does not consult the DB for jarvis:* externalIds (isolation)", async () => {
+    // Even if a row exists with externalId "jarvis:gmail", the resolver should
+    // route through the Jarvis source path and not return DB values. This
+    // guarantees the DB cannot shadow live-managed Jarvis credentials.
     upsertConnection({
-      externalId: `${ZOYA_PREFIX}gmail`,
+      externalId: `${JARVIS_PREFIX}gmail`,
       displayName: "ghost",
       type: "OAUTH2",
       pieceName: "gmail",
@@ -99,7 +99,7 @@ describe("CredentialResolver", () => {
     });
     const r = new CredentialResolver();
     r.register(
-      stubSource("google", `${ZOYA_PREFIX}gmail`, {
+      stubSource("google", `${JARVIS_PREFIX}gmail`, {
         type: "OAUTH2",
         value: { access_token: "live-token" },
       }),
@@ -107,7 +107,7 @@ describe("CredentialResolver", () => {
     const got = await r.resolve({
       projectId: DEFAULT_IDS.project,
       pieceName: "gmail",
-      externalId: `${ZOYA_PREFIX}gmail`,
+      externalId: `${JARVIS_PREFIX}gmail`,
     });
     expect(got?.value.access_token).toBe("live-token");
   });
@@ -115,9 +115,9 @@ describe("CredentialResolver", () => {
   test("multiple sources: first matching wins", async () => {
     const r = new CredentialResolver();
     let calls = 0;
-    const dummy: ZoyaConnectionSource = {
+    const dummy: JarvisConnectionSource = {
       id: "dummy",
-      canResolve: (id) => id === `${ZOYA_PREFIX}custom`,
+      canResolve: (id) => id === `${JARVIS_PREFIX}custom`,
       resolve: async () => {
         calls++;
         return { type: "NO_AUTH", value: {} };
@@ -125,7 +125,7 @@ describe("CredentialResolver", () => {
     };
     r.register(dummy);
     r.register(
-      stubSource("telegram", `${ZOYA_PREFIX}telegram`, {
+      stubSource("telegram", `${JARVIS_PREFIX}telegram`, {
         type: "SECRET_TEXT",
         value: { secret_text: "tg" },
       }),
@@ -133,12 +133,12 @@ describe("CredentialResolver", () => {
     const a = await r.resolve({
       projectId: DEFAULT_IDS.project,
       pieceName: "x",
-      externalId: `${ZOYA_PREFIX}custom`,
+      externalId: `${JARVIS_PREFIX}custom`,
     });
     const b = await r.resolve({
       projectId: DEFAULT_IDS.project,
       pieceName: "telegram-bot",
-      externalId: `${ZOYA_PREFIX}telegram`,
+      externalId: `${JARVIS_PREFIX}telegram`,
     });
     expect(a?.type).toBe("NO_AUTH");
     expect(b?.value.secret_text).toBe("tg");
@@ -147,7 +147,7 @@ describe("CredentialResolver", () => {
 
   test("unregister removes a source by id", async () => {
     const r = new CredentialResolver();
-    const source = stubSource("discord", `${ZOYA_PREFIX}discord`, {
+    const source = stubSource("discord", `${JARVIS_PREFIX}discord`, {
       type: "SECRET_TEXT",
       value: { secret_text: "dc" },
     });
@@ -156,9 +156,8 @@ describe("CredentialResolver", () => {
     const got = await r.resolve({
       projectId: DEFAULT_IDS.project,
       pieceName: "discord",
-      externalId: `${ZOYA_PREFIX}discord`,
+      externalId: `${JARVIS_PREFIX}discord`,
     });
     expect(got).toBeNull();
   });
 });
-

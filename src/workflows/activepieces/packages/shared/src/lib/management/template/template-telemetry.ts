@@ -44,4 +44,3 @@ export const TemplateTelemetryEvent = z.discriminatedUnion('eventType', [
     ExploreViewEvent,
 ])
 export type TemplateTelemetryEvent = z.infer<typeof TemplateTelemetryEvent>
-

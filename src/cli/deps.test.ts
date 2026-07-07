@@ -60,4 +60,3 @@ describe('CLI dependency helpers', () => {
     });
   });
 });
-

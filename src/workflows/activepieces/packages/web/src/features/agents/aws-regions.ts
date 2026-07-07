@@ -26,4 +26,3 @@ export const AWS_BEDROCK_REGIONS: ReadonlyArray<{
   { label: 'Europe (Zurich) [eu-central-2]', value: 'eu-central-2' },
   { label: 'South America (São Paulo) [sa-east-1]', value: 'sa-east-1' },
 ];
-

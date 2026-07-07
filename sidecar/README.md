@@ -1,18 +1,18 @@
 # Sidecar
 
-A Go client that connects to the ZOYA brain over WebSocket and exposes local machine capabilities (terminal, filesystem, clipboard, screenshots, etc.) as RPC handlers.
+A Go client that connects to the JARVIS brain over WebSocket and exposes local machine capabilities (terminal, filesystem, clipboard, screenshots, etc.) as RPC handlers.
 
 ## Building
 
 ```bash
-go build -o zoya-sidecar .
+go build -o jarvis-sidecar .
 ```
 
 Cross-compile for other platforms:
 
 ```bash
-GOOS=darwin  go build -o zoya-sidecar-macos .
-GOOS=windows go build -o zoya-sidecar.exe .
+GOOS=darwin  go build -o jarvis-sidecar-macos .
+GOOS=windows go build -o jarvis-sidecar.exe .
 ```
 
 ### Panel service prerequisites (Phase 2 ambient UX)
@@ -47,10 +47,10 @@ Cross-compilation with cgo: the panel service uses cgo, so cross-compiling needs
 
 ```bash
 # First run — enroll with a token from the brain
-./zoya-sidecar --token <jwt>
+./jarvis-sidecar --token <jwt>
 
 # Subsequent runs — uses saved token
-./zoya-sidecar
+./jarvis-sidecar
 ```
 
 ## File Structure
@@ -60,7 +60,7 @@ Cross-compilation with cgo: the panel service uses cgo, so cross-compiling needs
 | File | Purpose |
 |---|---|
 | `main.go` | Entry point, flag parsing, signal handling |
-| `config.go` | YAML config loading/saving (`~/.zoya/sidecar.yaml`) |
+| `config.go` | YAML config loading/saving (`~/.jarvis/sidecar.yaml`) |
 | `types.go` | Shared types: capabilities, RPC messages, config structs |
 | `client.go` | WebSocket client, reconnect loop, preflight integration |
 | `handlers.go` | RPC handler registry (terminal, filesystem, clipboard, screenshot, config, system info) |
@@ -98,4 +98,3 @@ Unavailable capabilities are reported to the brain in the `register` and `capabi
 ```bash
 go test ./...
 ```
-

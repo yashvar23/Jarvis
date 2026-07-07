@@ -366,4 +366,3 @@ describe('Vault Extractor', () => {
     });
   });
 });
-

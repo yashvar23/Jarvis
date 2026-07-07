@@ -71,7 +71,7 @@ jobs:
         run: |
           set -euo pipefail
           export CGO_CFLAGS="-I$(pwd)/include" CGO_CXXFLAGS="-I$(pwd)/include"
-          go build -o /tmp/zoya-sidecar.exe .
+          go build -o /tmp/jarvis-sidecar.exe .
 
   # NOTE: the sidecar VERSION-bump PR gate is intentionally OFF during the
   # current development phase — the sidecar is frozen at sidecar/VERSION = 0.1.0

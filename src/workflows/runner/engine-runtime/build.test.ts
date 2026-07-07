@@ -3,7 +3,7 @@
  *
  * These cover the pure helpers (deterministic hash, package.json synthesis).
  * The actual esbuild + bun install path is exercised by `scripts/build-engine.ts`
- * and gated here on `ZOYA_TEST_ENGINE_BUILD=1` because it pulls ~30MB of
+ * and gated here on `JARVIS_TEST_ENGINE_BUILD=1` because it pulls ~30MB of
  * deps and takes a few seconds. CI opts in.
  */
 
@@ -25,7 +25,7 @@ describe("engine bundle build", () => {
     expect(existsSync(main)).toBe(true);
   });
 
-  test.skipIf(process.env.ZOYA_TEST_ENGINE_BUILD !== "1")(
+  test.skipIf(process.env.JARVIS_TEST_ENGINE_BUILD !== "1")(
     "produces a runnable bundle that exits cleanly without SANDBOX_ID",
     async () => {
       const { bundlePath } = await buildEngineBundle();
@@ -62,4 +62,3 @@ describe("engine bundle build", () => {
     20_000,
   );
 });
-

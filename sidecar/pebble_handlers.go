@@ -65,7 +65,7 @@ func makePebbleSetStateHandler(svc PebbleService) RPCHandler {
 
 // pebble.play_audio — plays a TTS clip through the system's default output
 // device. Used by the daemon's voice cycle once an LLM response has been
-// synthesized; lets ZOYA speak even when the dashboard isn't running.
+// synthesized; lets JARVIS speak even when the dashboard isn't running.
 //
 // Params: {
 //   "data":      base64-encoded audio bytes (MP3 or WAV — sniffed at decode),

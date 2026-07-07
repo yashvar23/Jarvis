@@ -11,7 +11,7 @@
  * Response shape upstream expects: `StepFileUpsertResponse = { url: string, uploadUrl?: string }`.
  *
  * Storage:
- *   ~/.zoya/workflow-files/<flowId>/<stepName>/<fileId>__<basename>
+ *   ~/.jarvis/workflow-files/<flowId>/<stepName>/<fileId>__<basename>
  *
  * The `url` in the response is `/v1/step-files/<fileId>`. Files retained
  * indefinitely today; pruning is a follow-up (tie to flow_run retention).
@@ -102,4 +102,3 @@ export const _filesUtil = {
   readFileSync,
   statSync,
 };
-

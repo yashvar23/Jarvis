@@ -2,7 +2,7 @@
  * Adapter: PieceWorkflowRunner over the workflow DB.
  *
  * `flowId` is the only resolver supported. The route header at
- * `src/workflows/sandbox-api/routes/zoya-workflows.ts` explains why
+ * `src/workflows/sandbox-api/routes/jarvis-workflows.ts` explains why
  * name-based resolution was dropped; this file is just the
  * implementation.
  *
@@ -20,7 +20,7 @@ import type {
   PieceWorkflowRunner,
   PieceWorkflowStartInput,
   PieceWorkflowStartResult,
-} from "../zoya-pieces/types";
+} from "../jarvis-pieces/types";
 import { getFlow } from "../db/repos/flow";
 import { getFlowVersion, getLatestDraft } from "../db/repos/flow-version";
 import { createFlowRun, getFlowRun } from "../db/repos/flow-run";
@@ -50,7 +50,7 @@ export class WorkflowRunnerError extends Error {
   }
 }
 
-export class ZoyaWorkflowRunnerAdapter implements PieceWorkflowRunner {
+export class JarvisWorkflowRunnerAdapter implements PieceWorkflowRunner {
   /**
    * Start a workflow. When `callerRunId` is supplied, the adapter
    * walks the parent-run chain and refuses to start the target if
@@ -132,4 +132,3 @@ export class ZoyaWorkflowRunnerAdapter implements PieceWorkflowRunner {
     return { runId: run.id };
   }
 }
-

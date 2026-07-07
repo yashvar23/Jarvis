@@ -36,7 +36,7 @@ describe("TriggerManager: lifecycle", () => {
       name: "trigger",
       type: "PIECE_TRIGGER",
       settings: {
-        pieceName: "zoya-trigger",
+        pieceName: "jarvis-trigger",
         triggerName: "on_event",
         input: { eventType: "test.evt" },
       },
@@ -88,13 +88,13 @@ describe("TriggerManager: lifecycle", () => {
   });
 });
 
-describe("TriggerManager: zoya-trigger on_event", () => {
+describe("TriggerManager: jarvis-trigger on_event", () => {
   test("publishing the configured event fires a flow run", async () => {
     const { flowId } = publishFlowWithTrigger("on app", {
       name: "trigger",
       type: "PIECE_TRIGGER",
       settings: {
-        pieceName: "zoya-trigger",
+        pieceName: "jarvis-trigger",
         triggerName: "on_event",
         input: { eventType: "awareness.app_changed" },
       },
@@ -117,7 +117,7 @@ describe("TriggerManager: zoya-trigger on_event", () => {
       name: "trigger",
       type: "PIECE_TRIGGER",
       settings: {
-        pieceName: "zoya-trigger",
+        pieceName: "jarvis-trigger",
         triggerName: "on_event",
         input: { eventType: "awareness.app_changed", filter: { app: "VS Code" } },
       },
@@ -140,7 +140,7 @@ describe("TriggerManager: zoya-trigger on_event", () => {
     publishFlowWithTrigger("bad event", {
       name: "trigger",
       type: "PIECE_TRIGGER",
-      settings: { pieceName: "zoya-trigger", triggerName: "on_event", input: {} },
+      settings: { pieceName: "jarvis-trigger", triggerName: "on_event", input: {} },
     });
     const tm = new TriggerManager({
       eventBus: new WorkflowEventBus(),
@@ -154,7 +154,7 @@ describe("TriggerManager: zoya-trigger on_event", () => {
     publishFlowWithTrigger("wrong name", {
       name: "trigger",
       type: "PIECE_TRIGGER",
-      settings: { pieceName: "zoya-trigger", triggerName: "polling", input: {} },
+      settings: { pieceName: "jarvis-trigger", triggerName: "polling", input: {} },
     });
     const tm = new TriggerManager({
       eventBus: new WorkflowEventBus(),
@@ -225,7 +225,7 @@ describe("TriggerManager: integration with canonical event taxonomy", () => {
       name: "trigger",
       type: "PIECE_TRIGGER",
       settings: {
-        pieceName: "zoya-trigger",
+        pieceName: "jarvis-trigger",
         triggerName: "on_event",
         input: { eventType: "observer.clipboard_changed" },
       },
@@ -247,7 +247,7 @@ describe("TriggerManager: integration with canonical event taxonomy", () => {
       name: "trigger",
       type: "PIECE_TRIGGER",
       settings: {
-        pieceName: "zoya-trigger",
+        pieceName: "jarvis-trigger",
         triggerName: "on_event",
         input: { eventType: "awareness.context_changed" },
       },
@@ -258,7 +258,7 @@ describe("TriggerManager: integration with canonical event taxonomy", () => {
       log: silent,
     });
     await tm.start();
-    bus.publish("awareness.context_changed", { app: "VS Code", project: "zoya" });
+    bus.publish("awareness.context_changed", { app: "VS Code", project: "jarvis" });
     await new Promise((r) => setImmediate(r));
     await new Promise((r) => setImmediate(r));
     expect(queueStats().queued).toBe(1);
@@ -269,7 +269,7 @@ describe("TriggerManager: integration with canonical event taxonomy", () => {
       name: "trigger",
       type: "PIECE_TRIGGER",
       settings: {
-        pieceName: "zoya-trigger",
+        pieceName: "jarvis-trigger",
         triggerName: "on_event",
         input: {
           eventType: "commitment.overdue",
@@ -421,7 +421,7 @@ describe("TriggerManager: engine-managed triggers (Phase J)", () => {
       name: "trigger",
       type: "PIECE_TRIGGER",
       settings: {
-        pieceName: "zoya-trigger",
+        pieceName: "jarvis-trigger",
         triggerName: "on_event",
         input: { eventType: "awareness.context_changed" },
       },
@@ -487,7 +487,7 @@ describe("TriggerManager: engine-managed triggers (Phase J)", () => {
       name: "trigger",
       type: "PIECE_TRIGGER",
       settings: {
-        pieceName: "zoya-trigger",
+        pieceName: "jarvis-trigger",
         triggerName: "on_event",
         input: { eventType: "x" },
       },
@@ -602,7 +602,7 @@ describe("TriggerManager: engine-managed triggers (Phase J)", () => {
       name: "trigger",
       type: "PIECE_TRIGGER",
       settings: {
-        pieceName: "zoya-trigger",
+        pieceName: "jarvis-trigger",
         triggerName: "on_event",
         input: { eventType: "x" },
       },
@@ -646,7 +646,7 @@ describe("TriggerManager: engine-managed triggers (Phase J)", () => {
       name: "trigger",
       type: "PIECE_TRIGGER",
       settings: {
-        pieceName: "zoya-trigger",
+        pieceName: "jarvis-trigger",
         triggerName: "on_event",
         input: { eventType: "x" },
       },
@@ -699,7 +699,7 @@ describe("TriggerManager: engine-managed triggers (Phase J)", () => {
       name: "trigger",
       type: "PIECE_TRIGGER",
       settings: {
-        pieceName: "zoya-trigger",
+        pieceName: "jarvis-trigger",
         triggerName: "on_event",
         input: { eventType: "x" },
       },
@@ -761,7 +761,7 @@ describe("TriggerManager: engine-managed triggers (Phase J)", () => {
       name: "trigger",
       type: "PIECE_TRIGGER",
       settings: {
-        pieceName: "zoya-trigger",
+        pieceName: "jarvis-trigger",
         triggerName: "on_event",
         input: { eventType: "x" },
       },
@@ -790,4 +790,3 @@ describe("TriggerManager: engine-managed triggers (Phase J)", () => {
     expect(logs.some((l) => l.includes("engine ON_ENABLE failed"))).toBe(true);
   });
 });
-

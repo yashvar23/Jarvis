@@ -5,7 +5,7 @@ import type { SpotlightAnchor } from "./TutorialSteps";
 
 /**
  * Phase C — anchored chat-bubble card that points at the spotlight
- * cut-out. Reads as one of Zoya's thread bubbles visually
+ * cut-out. Reads as one of Jarvis's thread bubbles visually
  * (paper-2 background, soft ring) so it feels like he's talking to
  * you, not at you.
  *
@@ -82,7 +82,7 @@ export function SpotlightBubble({
           }
           aria-hidden="true"
         />
-        <span className="v2-spotlight-bubble__brand">ZOYA · onboarding</span>
+        <span className="v2-spotlight-bubble__brand">JARVIS · onboarding</span>
         <span className="v2-spotlight-bubble__progress">
           {stepIndex + 1} of {totalSteps}
         </span>

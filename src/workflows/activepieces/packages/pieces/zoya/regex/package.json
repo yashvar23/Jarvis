@@ -1,6 +1,0 @@
-{
-  "name": "@zoyapieces/piece-zoya-regex",
-  "version": "0.0.1",
-  "main": "./dist/src/index.js"
-}
-

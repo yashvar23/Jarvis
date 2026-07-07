@@ -99,7 +99,7 @@ export function createRequestApprovalTool(deps: RequestApprovalDeps): ToolDefini
         );
       }
 
-      const agent = deps.getCurrentAgent() ?? { id: 'primary', name: 'Zoya' };
+      const agent = deps.getCurrentAgent() ?? { id: 'primary', name: 'Jarvis' };
       const urgency: 'urgent' | 'normal' =
         category === 'make_payment' || category === 'delete_data' || category === 'terminate_agent'
           ? 'urgent'
@@ -160,4 +160,3 @@ export function createRequestApprovalTool(deps: RequestApprovalDeps): ToolDefini
     },
   };
 }
-

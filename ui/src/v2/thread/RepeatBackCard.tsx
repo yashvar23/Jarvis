@@ -37,7 +37,7 @@ export function RepeatBackCard({
     >
       <div className="v2-repeatback__attribution">
         <span className="v2-repeatback__attribution-dot" aria-hidden="true" />
-        Zoya
+        Jarvis
         <span className="v2-repeatback__attribution-tag">· didn&rsquo;t catch that</span>
         <span className="v2-repeatback__conf">{Math.round(confidence * 100)}% match</span>
       </div>

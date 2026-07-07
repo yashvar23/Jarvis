@@ -19,4 +19,3 @@ export const DeleteStoreEntryRequest = z.object({
 })
 
 export type DeleteStoreEntryRequest = z.infer<typeof DeleteStoreEntryRequest>
-

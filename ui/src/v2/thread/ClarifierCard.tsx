@@ -44,7 +44,7 @@ export function ClarifierCard({
     >
       <div className="v2-clarifier__attribution">
         <span className="v2-clarifier__attribution-dot" aria-hidden="true" />
-        Zoya
+        Jarvis
         <span className="v2-clarifier__attribution-tag">· not quite sure</span>
         <Chip tone="warn" dot={false}>{`${Math.round(confidence * 100)}%`}</Chip>
       </div>

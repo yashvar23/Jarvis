@@ -1,16 +1,17 @@
 <div align="center">
 
-# ZOYA
+# JARVIS
 
-**An always-on autonomous AI daemon**
+**Just A Rather Very Intelligent System**
 
-[![CI](https://github.com/yashvar23/zoya/actions/workflows/test.yml/badge.svg)](https://github.com/yashvar23/zoya/actions/workflows/test.yml)
+[![CI](https://github.com/yashvar23/jarvis/actions/workflows/test.yml/badge.svg)](https://github.com/yashvar23/jarvis/actions/workflows/test.yml)
+[![bun](https://img.shields.io/npm/v/@yashvar23/brain?label=bun&logo=bun&color=%23f9f1e1)](https://bun.sh/packages/@yashvar23/brain)
 [![License](https://img.shields.io/badge/license-RSALv2-blue)](LICENSE)
 [![Runtime](https://img.shields.io/badge/runtime-Bun-%23f9f1e1)](https://bun.sh)
 
 *An always-on autonomous AI daemon with desktop awareness, multi-agent hierarchy, visual workflows, and goal pursuit.*
 
-ZOYA is not a chatbot with tools. It is a persistent daemon that sees your screen, understands what you're doing, and acts — within the authority limits you define. Run it on a server for 24/7 availability, then connect sidecars on your laptop, desktop, or any other machine to give it eyes and hands everywhere.
+JARVIS is not a chatbot with tools. It is a persistent daemon that sees your screen, understands what you're doing, and acts — within the authority limits you define. Run it on a server for 24/7 availability, then connect sidecars on your laptop, desktop, or any other machine to give it eyes and hands everywhere.
 
 </div>
 
@@ -20,11 +21,12 @@ ZOYA is not a chatbot with tools. It is a persistent daemon that sees your scree
 
 ## Table of Contents
 
-- [ZOYA](#zoya)
+- [JARVIS](#jarvis)
   - [Table of Contents](#table-of-contents)
-  - [🔍 What Makes ZOYA Different](#-what-makes-zoya-different)
+  - [🔍 What Makes JARVIS Different](#-what-makes-jarvis-different)
   - [⚡ Quick Start](#-quick-start)
   - [🪨 Ambient mode (recommended)](#-ambient-mode-recommended)
+  - [☁️ Managed Hosting](#️-managed-hosting)
   - [💡 Use Cases](#-use-cases)
   - [📋 Requirements](#-requirements)
   - [📦 Installation](#-installation)
@@ -34,7 +36,7 @@ ZOYA is not a chatbot with tools. It is a persistent daemon that sees your scree
     - [Manual](#manual)
   - [🚀 Usage](#-usage)
     - [Updating](#updating)
-    - [Removing ZOYA](#removing-zoya)
+    - [Removing JARVIS](#removing-jarvis)
   - [🖥️ Sidecar Setup](#️-sidecar-setup)
     - [1. Install the sidecar](#1-install-the-sidecar)
     - [2. Enroll in the dashboard](#2-enroll-in-the-dashboard)
@@ -52,9 +54,9 @@ ZOYA is not a chatbot with tools. It is a persistent daemon that sees your scree
 
 ---
 
-## 🔍 What Makes ZOYA Different
+## 🔍 What Makes JARVIS Different
 
-| Feature | Typical AI Assistant | ZOYA |
+| Feature | Typical AI Assistant | JARVIS |
 |---|---|---|
 | Always-on | No — request/response only | Yes — persistent daemon, runs 24/7 on a server or locally |
 | Reach across machines | No — single machine only | Yes — one daemon, unlimited sidecars on any machine |
@@ -72,8 +74,8 @@ ZOYA is not a chatbot with tools. It is a persistent daemon that sees your scree
 ## ⚡ Quick Start
 
 ```bash
-bun install -g zoya   # Install the daemon
-zoya start -d                   # Start as background daemon
+bun install -g @yashvar23/brain   # Install the daemon
+jarvis start -d                   # Start as background daemon
 ```
 
 Open `http://localhost:3142` — the dashboard walks you through LLM provider, voice, and a quick conversational profile interview the first time you visit.
@@ -82,7 +84,7 @@ Open `http://localhost:3142` — the dashboard walks you through LLM provider, v
 
 ## 🪨 Ambient mode
 
-ZOYA ships a "dashboard-less" experience built around a small cursor-following pebble — **on by default** after onboarding. Just run:
+JARVIS ships a "dashboard-less" experience built around a small cursor-following pebble — **on by default** after onboarding. Just run:
 
 ```bash
 bun run start
@@ -90,28 +92,28 @@ bun run start
 
 What you get:
 
-- **Pebble** — a small paper-toned disc that follows your cursor. Wake-word ("Hey Zoya"), `Ctrl+Space`, or click summons it. Long-press the disc to blind awareness instantly (privacy toggle); the eye glyph next to it shows when ZOYA is actively reading your screen.
+- **Pebble** — a small paper-toned disc that follows your cursor. Wake-word ("Hey Jarvis"), `Ctrl+Space`, or click summons it. Long-press the disc to blind awareness instantly (privacy toggle); the eye glyph next to it shows when JARVIS is actively reading your screen.
 - **Native windows** — every dashboard room (workflows, memory, settings, …) opens as a real Windows window via voice ("open settings", "show me workflows") or `Ctrl+K`. No browser tab.
 - **Sub-pebble rail** — say "in the background, research X" and a colored sub-pebble flies to the right edge of your screen. Click it to see what the agent is doing; "open full ↗" pops a dedicated result panel.
 - **Voice-first** — "what's on my screen?", "close all background agents", "open the workflows window", "in the background, summarize today's meeting notes" — all routed inline, no LLM round-trip for the common verbs.
 
 Currently **Windows-only** (cross-platform ports planned). The `localhost:3142` dashboard still works as a fallback / debug surface.
 
-> **Opt out:** set `ZOYA_AMBIENT_UI=0` to disable the pebble + sidecar voice loop (useful for headless servers, CI, or users who only want the web dashboard).
+> **Opt out:** set `JARVIS_AMBIENT_UI=0` to disable the pebble + sidecar voice loop (useful for headless servers, CI, or users who only want the web dashboard).
 
 ---
 
 ## 💡 Use Cases
 
-**Research while you work** — Ask ZOYA to deep-dive a topic. It runs browser searches, reads pages, and compiles a summary in the background while you focus on other things.
+**Research while you work** — Ask JARVIS to deep-dive a topic. It runs browser searches, reads pages, and compiles a summary in the background while you focus on other things.
 
-**Automate across machines** — Run the daemon on your home server. Connect sidecars on your work laptop and your desktop. ZOYA can move files between them, run scripts on your server, and open apps on your laptop — all from one conversation.
+**Automate across machines** — Run the daemon on your home server. Connect sidecars on your work laptop and your desktop. JARVIS can move files between them, run scripts on your server, and open apps on your laptop — all from one conversation.
 
 **Inbox triage** — Set up a workflow that monitors your Gmail, categorizes incoming messages, drafts replies for your review, and schedules follow-ups on your calendar.
 
-**Desktop co-pilot** — ZOYA watches your screen via the sidecar. If it sees you struggling with an error message or a complex form, it proactively offers help or fills in fields for you.
+**Desktop co-pilot** — JARVIS watches your screen via the sidecar. If it sees you struggling with an error message or a complex form, it proactively offers help or fills in fields for you.
 
-**Goal accountability** — Define OKRs in the Goals dashboard. ZOYA plans your day each morning, checks in during the evening, and escalates if you're falling behind — like a personal drill sergeant.
+**Goal accountability** — Define OKRs in the Goals dashboard. JARVIS plans your day each morning, checks in during the evening, and escalates if you're falling behind — like a personal drill sergeant.
 
 **Multi-step workflows** — Build visual automations with 50+ node types: "when a file appears in this folder, OCR it, extract key data, update the spreadsheet, and notify me on Telegram."
 
@@ -131,56 +133,56 @@ Currently **Windows-only** (cross-platform ports planned). The `localhost:3142` 
 ### bun (recommended)
 
 ```bash
-bun install -g zoya
-zoya start
+bun install -g @yashvar23/brain
+jarvis start
 ```
 
-The first time you run `zoya start`, the daemon boots in setup mode and the dashboard at `http://localhost:3142` guides you through LLM provider, voice (TTS) choice, a conversational profile interview, and a 10-minute spotlight tour.
+The first time you run `jarvis start`, the daemon boots in setup mode and the dashboard at `http://localhost:3142` guides you through LLM provider, voice (TTS) choice, a conversational profile interview, and a 10-minute spotlight tour.
 
-> **Restart after first-time setup:** The daemon constructs background services (heartbeat, commitments, awareness) at boot, gated on setup having already been completed. Once you finish setup in the dashboard, those services don't activate until the next start — the dashboard shows a banner reminding you. Run `zoya restart` (or stop/start) to bring them online. This will go away in a follow-up that constructs the services in-process at setup completion.
+> **Restart after first-time setup:** The daemon constructs background services (heartbeat, commitments, awareness) at boot, gated on setup having already been completed. Once you finish setup in the dashboard, those services don't activate until the next start — the dashboard shows a banner reminding you. Run `jarvis restart` (or stop/start) to bring them online. This will go away in a follow-up that constructs the services in-process at setup completion.
 
-> **Note:** Native Windows is not a supported platform for the ZOYA daemon. ZOYA is built for Unix-like systems (macOS, Linux, and WSL); supporting native Windows would mean porting to a fundamentally different OS, which is out of scope. On Windows, use WSL2 for the Bun install above, or use the Docker install instead.
+> **Note:** Native Windows is not a supported platform for the JARVIS daemon. JARVIS is built for Unix-like systems (macOS, Linux, and WSL); supporting native Windows would mean porting to a fundamentally different OS, which is out of scope. On Windows, use WSL2 for the Bun install above, or use the Docker install instead.
 
 ### Docker
 
-Run ZOYA on any OS with a single command — no Bun or dependencies required. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Windows, macOS, Linux) if you don't have Docker yet.
+Run JARVIS on any OS with a single command — no Bun or dependencies required. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Windows, macOS, Linux) if you don't have Docker yet.
 
 ```bash
-docker run -d --name zoya \
+docker run -d --name jarvis \
   -p 3142:3142 \
-  -v zoya-data:/data \
-  ghcr.io/yashvar23/zoya:latest
+  -v jarvis-data:/data \
+  ghcr.io/yashvar23/jarvis:latest
 ```
 
-The image is available on [GHCR](https://ghcr.io/yashvar23/zoya). Non-LLM configuration can be provided via environment variables or by mounting a `config.yaml` into the `/data` volume. LLM providers, API keys, and model routing are configured from the settings dashboard (open http://localhost:3142 after first boot) and stored in the database + encrypted keychain - they are not set via env vars or `config.yaml`.
+The image is available on [GHCR](https://ghcr.io/yashvar23/jarvis). Non-LLM configuration can be provided via environment variables or by mounting a `config.yaml` into the `/data` volume. LLM providers, API keys, and model routing are configured from the settings dashboard (open http://localhost:3142 after first boot) and stored in the database + encrypted keychain - they are not set via env vars or `config.yaml`.
 
-> **Note:** Docker runs in an isolated container, so the daemon inside it cannot access your host desktop, browser, or clipboard directly. You must still install the [sidecar](#️-sidecar-setup) on each machine where you want ZOYA to have desktop awareness and automation capabilities.
+> **Note:** Docker runs in an isolated container, so the daemon inside it cannot access your host desktop, browser, or clipboard directly. You must still install the [sidecar](#️-sidecar-setup) on each machine where you want JARVIS to have desktop awareness and automation capabilities.
 
 ### One-liner
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/yashvar23/zoya/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/yashvar23/jarvis/main/install.sh | bash
 ```
 
 After opening a new terminal, run:
 
 ```bash
-zoya start
+jarvis start
 ```
 
-The install script sets up Bun, clones the repo, and links the `zoya` CLI. Then finish setup in your browser at `http://localhost:3142`.
+The install script sets up Bun, clones the repo, and links the `jarvis` CLI. Then finish setup in your browser at `http://localhost:3142`.
 
 > **Note:** The one-liner only supports macOS, Linux, and WSL. Native Windows shells such as PowerShell, Git Bash, and CMD should use WSL2 or the Docker install instead.
 
 ### Manual
 
 ```bash
-git clone https://github.com/yashvar23/zoya.git ~/.zoya/daemon
-cd ~/.zoya/daemon
+git clone https://github.com/yashvar23/jarvis.git ~/.jarvis/daemon
+cd ~/.jarvis/daemon
 bun install
 bun run build:ui
 bun link
-zoya start
+jarvis start
 ```
 
 Then open `http://localhost:3142` to finish setup in the dashboard.
@@ -190,64 +192,64 @@ Then open `http://localhost:3142` to finish setup in the dashboard.
 ## 🚀 Usage
 
 ```bash
-zoya start            # Start in foreground
-zoya start -d         # Start as background daemon
-zoya start --port 3142 # Start on a specific port
-zoya stop             # Stop the daemon
-zoya status           # Check if running
-zoya doctor           # Verify environment & connectivity
-zoya logs -f          # Follow live logs
+jarvis start            # Start in foreground
+jarvis start -d         # Start as background daemon
+jarvis start --port 3142 # Start on a specific port
+jarvis stop             # Stop the daemon
+jarvis status           # Check if running
+jarvis doctor           # Verify environment & connectivity
+jarvis logs -f          # Follow live logs
 ```
 
 The dashboard is available at `http://localhost:3142` once the daemon is running.
 
 ### Updating
 
-`zoya update` detects how you installed ZOYA and runs the right update command. Equivalent manual commands per install method:
+`jarvis update` detects how you installed JARVIS and runs the right update command. Equivalent manual commands per install method:
 
-| Install method | `zoya update` dispatches to |
+| Install method | `jarvis update` dispatches to |
 | --- | --- |
-| Bun global (`bun install -g zoya`) | `bun update -g zoya` |
-| `install.sh` (git clone under `~/.zoya/daemon`) | `git pull --ff-only` + `bun install` |
-| Docker | Refused — run `docker pull <image> && docker rm -f zoya && docker run ...` on the host |
+| Bun global (`bun install -g @yashvar23/brain`) | `bun update -g @yashvar23/brain` |
+| `install.sh` (git clone under `~/.jarvis/daemon`) | `git pull --ff-only` + `bun install` |
+| Docker | Refused — run `docker pull <image> && docker rm -f jarvis && docker run ...` on the host |
 | Developer checkout | Refused — run `git pull` yourself |
 
-Run `zoya doctor` to see what was detected and the exact commands for your install.
+Run `jarvis doctor` to see what was detected and the exact commands for your install.
 
-### Removing ZOYA
+### Removing JARVIS
 
-`zoya uninstall` stops the daemon, removes autostart hooks, deletes `~/.zoya`, and — where applicable — runs the correct package-manager uninstall. It does **not** touch sidecars.
+`jarvis uninstall` stops the daemon, removes autostart hooks, deletes `~/.jarvis`, and — where applicable — runs the correct package-manager uninstall. It does **not** touch sidecars.
 
-| Install method | `zoya uninstall` dispatches to |
+| Install method | `jarvis uninstall` dispatches to |
 | --- | --- |
-| Bun global | `bun uninstall -g zoya` + side-effect cleanup |
-| `install.sh` | `rm -rf ~/.zoya/daemon` + CLI wrapper + side-effect cleanup |
-| Docker | Refused — run `docker rm -f zoya` (and optionally `docker volume rm zoya-data`) on the host |
+| Bun global | `bun uninstall -g @yashvar23/brain` + side-effect cleanup |
+| `install.sh` | `rm -rf ~/.jarvis/daemon` + CLI wrapper + side-effect cleanup |
+| Docker | Refused — run `docker rm -f jarvis` (and optionally `docker volume rm jarvis-data`) on the host |
 | Developer checkout | Side-effect cleanup only — your checkout is left in place |
 
-> **Tip:** If you already ran `bun uninstall -g zoya` without going through `zoya uninstall`, your daemon may still be running and `~/.zoya` is still on disk. Run `zoya doctor` before uninstalling to see what will be cleaned up, or stop the daemon and remove `~/.zoya` manually.
+> **Tip:** If you already ran `bun uninstall -g @yashvar23/brain` without going through `jarvis uninstall`, your daemon may still be running and `~/.jarvis` is still on disk. Run `jarvis doctor` before uninstalling to see what will be cleaned up, or stop the daemon and remove `~/.jarvis` manually.
 
 ---
 
 ## 🖥️ Sidecar Setup
 
-The sidecar is what gives ZOYA physical reach beyond the machine it runs on. It is a lightweight agent that you install on any machine — your laptop, a dev server, a home PC — and it connects back to the central daemon over an authenticated WebSocket. Each sidecar gives ZOYA access to that machine's desktop, browser, terminal, filesystem, clipboard, and screenshots.
+The sidecar is what gives JARVIS physical reach beyond the machine it runs on. It is a lightweight agent that you install on any machine — your laptop, a dev server, a home PC — and it connects back to the central daemon over an authenticated WebSocket. Each sidecar gives JARVIS access to that machine's desktop, browser, terminal, filesystem, clipboard, and screenshots.
 
-This means you can run the daemon on an always-on server and still interact with your desktop machines as if ZOYA were running locally. Enroll as many sidecars as you want.
+This means you can run the daemon on an always-on server and still interact with your desktop machines as if JARVIS were running locally. Enroll as many sidecars as you want.
 
 ### 1. Install the sidecar
 
 **Via bun:**
 
 ```bash
-bun install -g @zoya/sidecar
+bun install -g @yashvar23/sidecar
 ```
 
-**Or download the binary** from [GitHub Releases](https://github.com/yashvar23/zoya/releases) for your platform (macOS, Linux, Windows).
+**Or download the binary** from [GitHub Releases](https://github.com/yashvar23/jarvis/releases) for your platform (macOS, Linux, Windows).
 
 ### 2. Enroll in the dashboard
 
-1. Open the ZOYA dashboard at `http://localhost:3142`
+1. Open the JARVIS dashboard at `http://localhost:3142`
 2. Go to **Settings** → **Sidecar**
 3. Enter a friendly name for this machine (e.g. "work laptop") and click **Enroll**
 4. Click **Copy** to copy the token command
@@ -257,27 +259,27 @@ bun install -g @zoya/sidecar
 Just start it:
 
 ```bash
-zoya
+jarvis
 ```
 
 The first time it runs unconfigured, a small **setup window** pops up asking for
 the enrollment token — paste the token you copied and click **Connect**. The
-sidecar saves it locally (`~/.zoya/sidecar.yaml`) and connects.
+sidecar saves it locally (`~/.jarvis/sidecar.yaml`) and connects.
 
 Prefer the terminal / a headless box? Pass the token on the CLI instead (no
 window):
 
 ```bash
-zoya --token <your-token>
+jarvis --token <your-token>
 ```
 
-Either way, subsequent runs are just `zoya` (the saved token is reused).
+Either way, subsequent runs are just `jarvis` (the saved token is reused).
 
 Once connected, the sidecar appears as online in the Settings page where you can configure its capabilities (terminal, filesystem, desktop, browser, clipboard, screenshot, awareness, file watch, processes, notifications). The host-sensing observers (clipboard, file watch, process monitor, desktop notifications) run inside the sidecar on your machine and stream to the brain - the brain no longer observes its own host.
 
 ### Versioning & updates
 
-The sidecar is versioned **independently of the brain** (`bun update -g @zoya/sidecar`, or grab a newer binary from [GitHub Releases](https://github.com/yashvar23/zoya/releases) -- the `sidecar-vX.Y.Z` releases). Run `zoya --version` to see what you have.
+The sidecar is versioned **independently of the brain** (`bun update -g @yashvar23/sidecar`, or grab a newer binary from [GitHub Releases](https://github.com/yashvar23/jarvis/releases) -- the `sidecar-vX.Y.Z` releases). Run `jarvis --version` to see what you have.
 
 On connect, the brain checks the sidecar's version against its compatibility floors and surfaces the result in **Settings -> Sidecar**:
 
@@ -295,7 +297,7 @@ Local development builds report `dev` and are never blocked.
 
 **Tool Execution** — 14+ builtin tools with up to 200 iterations per turn. The agent loop runs until the task is complete, not until the response looks done.
 
-**Memory & Knowledge** — Vault knowledge graph (entities, facts, relationships) stored in SQLite. Extracted automatically after each response. Injected into the system prompt so ZOYA always remembers what matters.
+**Memory & Knowledge** — Vault knowledge graph (entities, facts, relationships) stored in SQLite. Extracted automatically after each response. Injected into the system prompt so JARVIS always remembers what matters.
 
 **Browser Control** — Auto-launches Chromium via CDP. 7 browser tools handle navigation, interaction, extraction, and form filling.
 
@@ -317,15 +319,13 @@ Local development builds report `dev` and are never blocked.
 
 ## ⚙️ Configuration
 
-ZOYA stores its system configuration at `~/.zoya/config.yaml`; user-level settings live in its database and are managed from the dashboard. Access is **JWT-only by default**: run `zoya enroll "<device-name>"` and paste the printed token into the sidecar (desktop app), which connects and gives you the dashboard. Setting up without a sidecar? Temporarily add `auth:\n  insecure_open_access: true` to config.yaml, open `http://localhost:3142` after `zoya start` for the guided setup, then **remove the flag** once your device is enrolled. The Settings room lets you tweak channels, personality, and authority later.
-
-Running the brain on another machine — a home server, a LAN box, or a VPS with a domain? Read [docs/SELF_HOSTING.md](docs/SELF_HOSTING.md) for the reverse-proxy setup, `brain_domain`, device enrollment across machines, and what plain-HTTP access does and doesn't support.
+JARVIS stores its configuration at `~/.jarvis/config.yaml`. Open the dashboard at `http://localhost:3142` after `jarvis start` for guided setup — it walks through LLM provider, voice, and a profile interview the first time. The Settings room lets you tweak channels, personality, and authority later.
 
 ```yaml
 daemon:
   port: 3142
-  data_dir: "~/.zoya"
-  db_path: "~/.zoya/zoya.db"
+  data_dir: "~/.jarvis"
+  db_path: "~/.jarvis/jarvis.db"
 
 llm:
   primary: "anthropic"
@@ -336,7 +336,7 @@ llm:
 
 personality:
   core_traits: ["loyal", "efficient", "proactive"]
-  assistant_name: "Zoya"
+  assistant_name: "Jarvis"
 
 authority:
   default_level: 3
@@ -352,7 +352,7 @@ See [config.example.yaml](config.example.yaml) for the full reference including 
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                     ZOYA Daemon                           │
+│                     JARVIS Daemon                           │
 │                  (server or local machine)                  │
 │                                                             │
 │  ┌──────────┐  ┌──────────┐  ┌───────────┐  ┌───────────┐   │
@@ -384,7 +384,7 @@ The **daemon** is the brain — it holds the LLM connections, memory vault, agen
 
 **Sidecars** are the hands. Each sidecar is a lightweight Go binary that connects to the daemon and exposes its host machine's capabilities. The daemon can orchestrate actions across all connected sidecars simultaneously. Sidecars authenticate via JWT and communicate over a binary WebSocket protocol.
 
-This separation means ZOYA stays reachable 24/7 on a server while still being able to see your screen, type in your apps, and manage files on any machine where a sidecar is running.
+This separation means JARVIS stays reachable 24/7 on a server while still being able to see your screen, type in your apps, and manage files on any machine where a sidecar is running.
 
 ---
 
@@ -406,7 +406,7 @@ bun run db:init         # Initialize or reset the database
 - **LLM**: Anthropic Claude, OpenAI GPT, Google Gemini, Ollama
 - **Desktop sidecar**: Go (JWT auth, WebSocket RPC, platform-specific automation)
 - **Voice**: openwakeword (ONNX), Edge TTS / ElevenLabs
-- **Package**: `zoya` (published to npm registry, installable via bun)
+- **Package**: `@yashvar23/brain` (published to npm registry, installable via bun)
 
 ---
 
@@ -415,7 +415,6 @@ bun run db:init         # Initialize or reset the database
 General:
 
 - [config.example.yaml](config.example.yaml) — Full configuration reference
-- [docs/SELF_HOSTING.md](docs/SELF_HOSTING.md) — Deploying the brain: single machine, LAN, or VPS behind a reverse proxy
 - [docs/LLM_PROVIDERS.md](docs/LLM_PROVIDERS.md) — LLM provider configuration and routing
 - [docs/VAULT_EXTRACTOR.md](docs/VAULT_EXTRACTOR.md) — Memory and knowledge vault
 - [docs/PERSONALITY_ENGINE.md](docs/PERSONALITY_ENGINE.md) — Personality and role system
@@ -432,15 +431,13 @@ Workflows (contributor reading order):
 
 ## 💬 Community
 
-- [Discord](https://discord.gg/ytG2PHQ6rW) — Chat with other users, ask questions, share workflows
-- [Website](https://zoya.dev) — Project homepage and documentation
-- [GitHub Issues](https://github.com/yashvar23/zoya/issues) — Bug reports and feature requests
+- [GitHub Issues](https://github.com/yashvar23/jarvis/issues) — Bug reports and feature requests
 
 ---
 
 ## 📊 Telemetry
 
-ZOYA sends **anonymous** usage metrics so the project can measure its unique
+JARVIS sends **anonymous** usage metrics so the project can measure its unique
 user base and retention. Each ping contains only a hashed machine id (derived
 from hostname + username, never reversible to either), the app version, the
 install method, and the OS/arch. No personal data, config, content, or feature
@@ -449,13 +446,13 @@ usage is ever sent. Pings go out at startup and every hour.
 It is on by default (opt-out). Disable it with any of:
 
 ```yaml
-# ~/.zoya/config.yaml
+# ~/.jarvis/config.yaml
 telemetry:
   enabled: false
 ```
 
 ```bash
-ZOYA_TELEMETRY=0   # or the cross-tool standard: DO_NOT_TRACK=1
+JARVIS_TELEMETRY=0   # or the cross-tool standard: DO_NOT_TRACK=1
 ```
 
 Full details: [docs/TELEMETRY.md](docs/TELEMETRY.md).
@@ -464,7 +461,7 @@ Full details: [docs/TELEMETRY.md](docs/TELEMETRY.md).
 
 ## 🔒 Security
 
-ZOYA includes a built-in authority engine that gates every action at runtime. All tool executions are logged in an audit trail, and sensitive operations require explicit approval via the dashboard, Telegram, or Discord. Emergency pause and kill controls are always available.
+JARVIS includes a built-in authority engine that gates every action at runtime. All tool executions are logged in an audit trail, and sensitive operations require explicit approval via the dashboard, Telegram, or Discord. Emergency pause and kill controls are always available.
 
 If you discover a security vulnerability, please report it privately by emailing the maintainer rather than opening a public issue.
 
@@ -472,7 +469,6 @@ If you discover a security vulnerability, please report it privately by emailing
 
 ## 📄 License
 
-Zoya is distributed under the [Zoya Source Available License 2.0](LICENSE) (based on RSALv2).
+Jarvis is distributed under the [Jarvis Source Available License 2.0](LICENSE) (based on RSALv2).
 
-The Zoya codebase incorporates third-party components under their own licenses. Those components retain their original licenses for any party who extracts them as a standalone work; the combined Zoya distribution is governed by the Zoya Source Available License. See [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) for the full list and per-component license text.
-
+The Jarvis codebase incorporates third-party components under their own licenses. Those components retain their original licenses for any party who extracts them as a standalone work; the combined Jarvis distribution is governed by the Jarvis Source Available License. See [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) for the full list and per-component license text.

@@ -3340,7 +3340,7 @@ function PropertiesPanel(props: PropertiesPanelProps): React.ReactElement {
           `auth`. The chosen connection is stored in
           `settings.input.auth` as a `{{connections.<externalId>}}`
           template -- the engine resolves it to the actual secret at
-          run time. Skipped for connectionless pieces (zoya-ask,
+          run time. Skipped for connectionless pieces (jarvis-ask,
           schedule, code, webhook). */}
       {!isLoop && !isRouter && piece?.auth ? (
         <ConnectionPicker
@@ -4067,7 +4067,7 @@ function TypedField({ field, value, onChange }: TypedFieldProps): React.ReactEle
 
   if (field.type === "enum") {
     // Group options by their `group` attribute (when any option carries
-    // one) so wide dropdowns -- zoya-trigger:on_event eventType is
+    // one) so wide dropdowns -- jarvis-trigger:on_event eventType is
     // the canonical case -- render as <optgroup> sections rather than
     // a flat 15+ item list. Order: groups appear in first-seen order,
     // ungrouped options first. Falls back to a flat list when no

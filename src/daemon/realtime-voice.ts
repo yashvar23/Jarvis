@@ -2,7 +2,7 @@
  * Realtime voice session wiring (Phase 2).
  *
  * Glues a `RealtimeSession` (the OpenAI WS client) to an `AudioTransport`
- * (browser today; Pebble once phase2 lands) and to ZOYA's tool executor.
+ * (browser today; Pebble once phase2 lands) and to JARVIS's tool executor.
  * Kept separate from ws-service so the wiring is unit-testable with an injected
  * session factory. See docs/GPT_REALTIME_2_INTEGRATION.md §4 Phase 2.
  */
@@ -108,4 +108,3 @@ export class RealtimeVoiceSession {
     this.session.close();
   }
 }
-

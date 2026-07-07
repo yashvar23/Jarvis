@@ -30,4 +30,3 @@ describe('computeAnonId', () => {
     expect(computeAnonId()).toMatch(/^[0-9a-f]{32}$/);
   });
 });
-

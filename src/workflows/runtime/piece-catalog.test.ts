@@ -3,8 +3,8 @@
  *   - Unit-level: discovery, conflict reporting, metadata->entry conversion,
  *     prop-type mapping, on-disk cache round-trip with key invalidation,
  *     timeout + per-piece failure isolation, content-hash cache key.
- *   - Engine-level (gated on ZOYA_TEST_ENGINE_BUILD=1): spawn the real
- *     engine, run EXTRACT_PIECE_METADATA against the seven vendored Zoya
+ *   - Engine-level (gated on JARVIS_TEST_ENGINE_BUILD=1): spawn the real
+ *     engine, run EXTRACT_PIECE_METADATA against the seven vendored Jarvis
  *     pieces, assert every piece + every action/trigger is captured.
  */
 
@@ -23,7 +23,7 @@ import {
   type CacheFileShape,
   type PieceLookup,
 } from "./piece-catalog";
-import { ZoyaPieceRegistry } from "../zoya-pieces/types";
+import { JarvisPieceRegistry } from "../jarvis-pieces/types";
 import { CredentialResolver } from "../credentials/adapter";
 import { SandboxApi } from "../sandbox-api/server";
 import {
@@ -31,7 +31,7 @@ import {
   ENGINE_BUILD_PATHS,
   findCachedBundle,
 } from "../runner/engine-runtime/build";
-import { buildAllZoyaPieces } from "../runner/engine-runtime/build-pieces";
+import { buildAllJarvisPieces } from "../runner/engine-runtime/build-pieces";
 import { EngineRuntime, type EngineHandle } from "../runner/engine-runtime/engine-runtime";
 
 /** Returns a fresh tmp dir under os.tmpdir() and a cleanup callback. */
@@ -45,20 +45,20 @@ describe("PieceCatalog (unit)", () => {
   test("PieceCatalog.list/get round-trips initial entries", () => {
     const catalog = new PieceCatalog([
       {
-        name: "@zoyapieces/piece-zoya-test",
-        displayName: "Zoya: Test",
+        name: "@jarvispieces/piece-jarvis-test",
+        displayName: "Jarvis: Test",
         description: "test",
         actions: { echo: { name: "echo", displayName: "Echo", description: "" } },
       },
     ]);
     expect(catalog.list().length).toBe(1);
-    expect(catalog.get("@zoyapieces/piece-zoya-test")?.displayName).toBe("Zoya: Test");
+    expect(catalog.get("@jarvispieces/piece-jarvis-test")?.displayName).toBe("Jarvis: Test");
     expect(catalog.get("missing")).toBeNull();
   });
 
   test("metadataToCatalogEntry maps actions + triggers verbatim", () => {
     const entry = metadataToCatalogEntry({
-      name: "@zoyapieces/piece-x",
+      name: "@jarvispieces/piece-x",
       displayName: "X",
       description: "x desc",
       actions: {
@@ -80,7 +80,7 @@ describe("PieceCatalog (unit)", () => {
         },
       },
     });
-    expect(entry.name).toBe("@zoyapieces/piece-x");
+    expect(entry.name).toBe("@jarvispieces/piece-x");
     const goal = entry.actions["do_thing"]?.inputSchema?.fields[0];
     expect(goal?.name).toBe("goal");
     expect(goal?.required).toBe(true);
@@ -88,15 +88,15 @@ describe("PieceCatalog (unit)", () => {
     expect(entry.triggers?.["on_event"]?.displayName).toBe("On");
   });
 
-  test("metadataToCatalogEntry attaches dynamicSampleData to zoya-trigger:on_event", () => {
-    // zoya-trigger's on_event surfaces an envelope whose payload shape
+  test("metadataToCatalogEntry attaches dynamicSampleData to jarvis-trigger:on_event", () => {
+    // jarvis-trigger's on_event surfaces an envelope whose payload shape
     // varies with the configured eventType. The projection injects a
     // synthesized `dynamicSampleData` map sourced from the canonical
     // `WORKFLOW_EVENT_TYPES` registry so the picker + composer don't
     // each have to import the registry directly.
     const entry = metadataToCatalogEntry({
-      name: "@zoyapieces/piece-zoya-trigger",
-      displayName: "Zoya: Trigger",
+      name: "@jarvispieces/piece-jarvis-trigger",
+      displayName: "Jarvis: Trigger",
       description: "",
       actions: {},
       triggers: {
@@ -127,8 +127,8 @@ describe("PieceCatalog (unit)", () => {
     // each option's `description` is the per-event prose used as the
     // <option title> hover.
     const entry = metadataToCatalogEntry({
-      name: "@zoyapieces/piece-zoya-trigger",
-      displayName: "Zoya: Trigger",
+      name: "@jarvispieces/piece-jarvis-trigger",
+      displayName: "Jarvis: Trigger",
       description: "",
       actions: {},
       triggers: {
@@ -176,8 +176,8 @@ describe("PieceCatalog (unit)", () => {
     // framework has no flow-ref concept. The projection upgrades it so
     // the editor renders a searchable workflow picker.
     const entry = metadataToCatalogEntry({
-      name: "@zoyapieces/piece-zoya-trigger",
-      displayName: "Zoya: Trigger",
+      name: "@jarvispieces/piece-jarvis-trigger",
+      displayName: "Jarvis: Trigger",
       description: "",
       actions: {
         run_workflow: {
@@ -581,12 +581,12 @@ describe("PieceCatalog (unit)", () => {
     }
   });
 
-  test("ZoyaPieceRegistry structurally satisfies the PieceLookup interface", () => {
-    // Compile-time + runtime check: assigning a ZoyaPieceRegistry instance
+  test("JarvisPieceRegistry structurally satisfies the PieceLookup interface", () => {
+    // Compile-time + runtime check: assigning a JarvisPieceRegistry instance
     // to a PieceLookup variable must succeed, and calling list/get on it must
     // return shape-compatible values. Catches a regression if PieceLookup
     // tightens later (e.g., a required field is added).
-    const reg = new ZoyaPieceRegistry();
+    const reg = new JarvisPieceRegistry();
     reg.register({
       name: "p",
       displayName: "P",
@@ -611,14 +611,14 @@ describe("PieceCatalog (unit)", () => {
   });
 });
 
-const buildOptIn = process.env.ZOYA_TEST_ENGINE_BUILD === "1";
+const buildOptIn = process.env.JARVIS_TEST_ENGINE_BUILD === "1";
 const initialCached = findCachedBundle();
 const skipEngineTests =
   initialCached === null && !buildOptIn;
 const piecesAlreadyBuilt = existsSync(
   resolve(
     ENGINE_BUILD_PATHS.VENDOR_PACKAGES,
-    "pieces/zoya/test/dist/src/index.js",
+    "pieces/jarvis/test/dist/src/index.js",
   ),
 );
 const skipE2eTests = skipEngineTests || (!piecesAlreadyBuilt && !buildOptIn);
@@ -636,7 +636,7 @@ describe("PieceCatalog (engine end-to-end)", () => {
     let cached = initialCached;
     if (!cached && buildOptIn) cached = await buildEngineBundle();
     if (!cached) return;
-    if (!piecesAlreadyBuilt && buildOptIn) await buildAllZoyaPieces();
+    if (!piecesAlreadyBuilt && buildOptIn) await buildAllJarvisPieces();
     runtime = new EngineRuntime({ api, bundlePath: cached.bundlePath });
   });
 
@@ -645,9 +645,9 @@ describe("PieceCatalog (engine end-to-end)", () => {
   });
 
   test.skipIf(skipE2eTests)(
-    "extracts metadata for every Zoya-native piece via the real engine",
+    "extracts metadata for every Jarvis-native piece via the real engine",
     async () => {
-      const root = resolve(ENGINE_BUILD_PATHS.VENDOR_PACKAGES, "pieces/zoya");
+      const root = resolve(ENGINE_BUILD_PATHS.VENDOR_PACKAGES, "pieces/jarvis");
       const { path: cacheDir, cleanup } = tmp("piece-catalog-e2e");
       const cacheFile = resolve(cacheDir, "cache.json");
       try {
@@ -660,18 +660,18 @@ describe("PieceCatalog (engine end-to-end)", () => {
         });
         expect(failures).toEqual([]);
         const names = catalog.list().map((e) => e.name).sort();
-        expect(names).toContain("@zoyapieces/piece-zoya-ask");
-        expect(names).toContain("@zoyapieces/piece-zoya-tool");
-        expect(names).toContain("@zoyapieces/piece-zoya-notify");
-        expect(names).toContain("@zoyapieces/piece-zoya-context");
-        expect(names).toContain("@zoyapieces/piece-zoya-agent");
-        expect(names).toContain("@zoyapieces/piece-zoya-trigger");
-        expect(names).toContain("@zoyapieces/piece-zoya-test");
+        expect(names).toContain("@jarvispieces/piece-jarvis-ask");
+        expect(names).toContain("@jarvispieces/piece-jarvis-tool");
+        expect(names).toContain("@jarvispieces/piece-jarvis-notify");
+        expect(names).toContain("@jarvispieces/piece-jarvis-context");
+        expect(names).toContain("@jarvispieces/piece-jarvis-agent");
+        expect(names).toContain("@jarvispieces/piece-jarvis-trigger");
+        expect(names).toContain("@jarvispieces/piece-jarvis-test");
         // ask: single action `ask` with at least the `prompt` field.
-        const ask = catalog.get("@zoyapieces/piece-zoya-ask");
+        const ask = catalog.get("@jarvispieces/piece-jarvis-ask");
         expect(ask?.actions["ask"]?.inputSchema?.fields.find((f) => f.name === "prompt")?.required).toBe(true);
         // trigger: piece has both an action and a trigger.
-        const trigger = catalog.get("@zoyapieces/piece-zoya-trigger");
+        const trigger = catalog.get("@jarvispieces/piece-jarvis-trigger");
         expect(Object.keys(trigger?.triggers ?? {})).toContain("on_event");
         expect(Object.keys(trigger?.actions ?? {})).toContain("run_workflow");
         // Cache file written + readable on second build (no engine spawn).
@@ -690,4 +690,3 @@ describe("PieceCatalog (engine end-to-end)", () => {
     60_000,
   );
 });
-

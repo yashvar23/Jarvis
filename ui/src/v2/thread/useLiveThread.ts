@@ -14,7 +14,7 @@ import type { Impact, ObjectType, ThreadItem, ThreadRoomKey } from "./types";
  * Wraps `useWebSocket` and merges its streams into the v2 `ThreadItem[]`:
  *
  *   - user-voice / user-text  ← role="user" messages
- *   - zoya-speech           ← role="assistant" (status from isStreaming)
+ *   - jarvis-speech           ← role="assistant" (status from isStreaming)
  *   - result                  ← role="system"
  *   - approval                ← notification.source="approval_request"
  *                               (3B-2: includes daemon-computed impact + intent)
@@ -343,7 +343,7 @@ function messageToThreadItem(msg: ChatMessage): (ThreadItem & { __ts: number }) 
   if (msg.role === "assistant") {
     return {
       __ts: msg.timestamp,
-      kind: "zoya-speech",
+      kind: "jarvis-speech",
       id: msg.id,
       text: msg.content,
       t,
@@ -374,4 +374,3 @@ function formatTime(ts: number): string {
 
 // Re-export for callers that want to build their own ThreadItem view.
 export type { PendingApproval };
-

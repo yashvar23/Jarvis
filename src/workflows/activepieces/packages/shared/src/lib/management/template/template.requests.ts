@@ -43,4 +43,3 @@ export type ListFlowTemplatesRequestQuery = z.infer<typeof ListFlowTemplatesRequ
 
 export const ListTemplatesRequestQuery = ListFlowTemplatesRequestQuery
 export type ListTemplatesRequestQuery = z.infer<typeof ListTemplatesRequestQuery>
-

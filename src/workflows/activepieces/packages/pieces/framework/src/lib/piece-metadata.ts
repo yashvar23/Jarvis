@@ -51,7 +51,7 @@ export const ActionBase = z.object({
   description: z.string(),
   props: PiecePropertyMap,
   requireAuth: z.boolean(),
-  // Zoya-only extension to upstream Activepieces. Mirrors the
+  // Jarvis-only extension to upstream Activepieces. Mirrors the
   // long-standing `sampleData` on TriggerBase: an optional declaration of
   // the action's output shape so the visual editor's variable picker
   // can offer `{{step.field}}` references before the action has been
@@ -145,4 +145,3 @@ export const PiecePackageInformation = z.object({
   version: z.string(),
 })
 export type PiecePackageInformation = z.infer<typeof PiecePackageInformation>
-

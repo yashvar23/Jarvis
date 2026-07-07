@@ -19,4 +19,3 @@ export type BasicAuthentication =
     username: string;
     password: string;
   };
-

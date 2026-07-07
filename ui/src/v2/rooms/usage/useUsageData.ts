@@ -11,8 +11,6 @@ export type UsageQueryRow = {
   calls: number;
   input_tokens: number;
   output_tokens: number;
-  cache_read_input_tokens: number;
-  cache_creation_input_tokens: number;
   total_latency_ms: number;
   errors: number;
 };
@@ -21,8 +19,6 @@ export type UsageQueryTotals = {
   calls: number;
   input_tokens: number;
   output_tokens: number;
-  cache_read_input_tokens: number;
-  cache_creation_input_tokens: number;
   total_latency_ms: number;
   errors: number;
 };
@@ -36,8 +32,6 @@ export type UsageRawRow = {
   model: string;
   input_tokens: number;
   output_tokens: number;
-  cache_read_input_tokens: number;
-  cache_creation_input_tokens: number;
   latency_ms: number;
   error_code: string | null;
 };
@@ -217,4 +211,3 @@ export function useUsageData() {
     period,
   };
 }
-

@@ -2,7 +2,7 @@
  * RealtimeSession — native WebSocket client for OpenAI's GA Realtime API
  * (`gpt-realtime-2`), driving premium speech-to-speech voice.
  *
- * No SDK — raw `fetch`/`WebSocket`, consistent with src/llm/*. ZOYA sits in
+ * No SDK — raw `fetch`/`WebSocket`, consistent with src/llm/*. JARVIS sits in
  * the middle as an audio relay (via an `AudioTransport`) AND as the tool
  * executor: OpenAI requests a function, the caller gates + runs it, then calls
  * `sendFunctionResult`.
@@ -385,4 +385,3 @@ export class RealtimeSession {
     }
   }
 }
-

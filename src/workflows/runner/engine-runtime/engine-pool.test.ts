@@ -4,7 +4,7 @@
  * connection instead of cold-spawning a fresh one. Same sandboxId across
  * runs; the registry is rebound to each new (runId, projectId).
  *
- * Gated on `ZOYA_TEST_ENGINE_BUILD=1` like the other engine-runtime tests.
+ * Gated on `JARVIS_TEST_ENGINE_BUILD=1` like the other engine-runtime tests.
  */
 
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
@@ -18,16 +18,16 @@ import {
   buildEngineBundle,
   findCachedBundle,
 } from "./build";
-import { buildAllZoyaPieces } from "./build-pieces";
+import { buildAllJarvisPieces } from "./build-pieces";
 import { EngineRuntime } from "./engine-runtime";
 
-const buildOptIn = process.env.ZOYA_TEST_ENGINE_BUILD === "1";
+const buildOptIn = process.env.JARVIS_TEST_ENGINE_BUILD === "1";
 const initialCached = findCachedBundle();
 const skipBundleTests = initialCached === null && !buildOptIn;
 const piecesAlreadyBuilt = existsSync(
   resolve(
     ENGINE_BUILD_PATHS.VENDOR_PACKAGES,
-    "pieces/zoya/test/dist/src/index.js",
+    "pieces/jarvis/test/dist/src/index.js",
   ),
 );
 const skipE2eTests = skipBundleTests || (!piecesAlreadyBuilt && !buildOptIn);
@@ -45,7 +45,7 @@ describe("EngineRuntime pool", () => {
     let cached = initialCached;
     if (!cached && buildOptIn) cached = await buildEngineBundle();
     if (!cached) return;
-    if (buildOptIn) await buildAllZoyaPieces();
+    if (buildOptIn) await buildAllJarvisPieces();
     runtime = new EngineRuntime({
       api,
       bundlePath: cached.bundlePath,
@@ -173,4 +173,3 @@ describe("EngineRuntime pool", () => {
     60_000,
   );
 });
-

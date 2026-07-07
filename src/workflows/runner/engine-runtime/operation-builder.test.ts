@@ -18,7 +18,7 @@ import {
 } from "./operation-builder";
 import type { FlowVersion } from "../../db/repos/flow-version";
 
-function makeZoyaVersion(overrides: Partial<FlowVersion> = {}): FlowVersion {
+function makeJarvisVersion(overrides: Partial<FlowVersion> = {}): FlowVersion {
   return {
     id: "v_1",
     flowId: "f_1",
@@ -48,20 +48,20 @@ function makeZoyaVersion(overrides: Partial<FlowVersion> = {}): FlowVersion {
 
 describe("toUpstreamFlowVersion", () => {
   test("converts epoch ms to ISO timestamps and fills lastUpdatedDate", () => {
-    const out = toUpstreamFlowVersion(makeZoyaVersion());
+    const out = toUpstreamFlowVersion(makeJarvisVersion());
     expect(out.created).toBe("1970-01-01T00:00:01.000Z");
     expect(out.updated).toBe("1970-01-01T00:00:02.000Z");
     expect(out.trigger.lastUpdatedDate).toBe(out.updated);
   });
 
   test("preserves EMPTY trigger settings as a plain object", () => {
-    const out = toUpstreamFlowVersion(makeZoyaVersion());
+    const out = toUpstreamFlowVersion(makeJarvisVersion());
     expect(out.trigger.type).toBe("EMPTY");
     expect(out.trigger.settings).toEqual({});
   });
 
   test("adapts PIECE_TRIGGER + nested CODE action chain", () => {
-    const version = makeZoyaVersion({
+    const version = makeJarvisVersion({
       trigger: {
         name: "trigger",
         type: "PIECE_TRIGGER",
@@ -93,7 +93,7 @@ describe("toUpstreamFlowVersion", () => {
   });
 
   test("rejects unknown trigger types", () => {
-    const v = makeZoyaVersion({
+    const v = makeJarvisVersion({
       trigger: { name: "t", type: "MYSTERY", settings: {} },
     });
     expect(() => toUpstreamFlowVersion(v)).toThrow();
@@ -101,7 +101,7 @@ describe("toUpstreamFlowVersion", () => {
 
   test("recurses through LOOP_ON_ITEMS firstLoopAction", () => {
     const out = toUpstreamFlowVersion(
-      makeZoyaVersion({
+      makeJarvisVersion({
         trigger: {
           name: "trigger",
           type: "EMPTY",
@@ -129,7 +129,7 @@ describe("toUpstreamFlowVersion", () => {
 describe("collectCodeActions", () => {
   test("walks the whole tree including LOOP and ROUTER children", () => {
     const out = toUpstreamFlowVersion(
-      makeZoyaVersion({
+      makeJarvisVersion({
         trigger: {
           name: "trigger",
           type: "EMPTY",
@@ -166,10 +166,10 @@ describe("collectCodeActions", () => {
 
 describe("materializeCodeActions", () => {
   test("writes one index.js per CODE action under <baseCodeDir>/<versionId>/<stepName>/", () => {
-    const baseCodeDir = mkdtempSync(resolve(tmpdir(), "zoya-mat-"));
+    const baseCodeDir = mkdtempSync(resolve(tmpdir(), "jarvis-mat-"));
     try {
       const version = toUpstreamFlowVersion(
-        makeZoyaVersion({
+        makeJarvisVersion({
           id: "v_1",
           trigger: {
             name: "trigger",
@@ -203,7 +203,7 @@ describe("materializeCodeActions", () => {
 
 describe("buildExecuteFlowOperation", () => {
   test("produces an EXECUTE_FLOW envelope with required fields", () => {
-    const v = toUpstreamFlowVersion(makeZoyaVersion());
+    const v = toUpstreamFlowVersion(makeJarvisVersion());
     const env = buildExecuteFlowOperation({
       flowVersion: v,
       flowRunId: "run_1",
@@ -235,4 +235,3 @@ describe("buildExtractPieceMetadataOperation", () => {
     expect(env.operation["pieceName"]).toBe("@activepieces/piece-claude");
   });
 });
-

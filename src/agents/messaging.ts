@@ -123,4 +123,3 @@ export function getMessages(
 export function getPendingMessages(agentId: string): AgentMessage[] {
   return getMessages(agentId);
 }
-

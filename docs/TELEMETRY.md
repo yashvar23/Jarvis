@@ -1,6 +1,6 @@
 # Telemetry & Privacy
 
-ZOYA collects **anonymous** usage metrics so the project can answer two
+JARVIS collects **anonymous** usage metrics so the project can answer two
 questions: how many people have run it at least once (the unique user base),
 and whether they keep using it over time (retention). That is the whole goal -
 there is no per-user analytics, no feature tracking, and no content of any
@@ -25,7 +25,7 @@ everything stored.
 
 ### The anonymous id
 
-`anon_id` is `sha256("zoya-telemetry-v1:" + hostname + ":" + username)`,
+`anon_id` is `sha256("jarvis-telemetry-v1:" + hostname + ":" + username)`,
 truncated to 128 bits of hex. It is:
 
 - **Stable** - the same machine produces the same id across restarts,
@@ -50,7 +50,7 @@ feature-usage data.
 - Once at daemon startup.
 - Then once every hour while the process runs.
 
-The hourly heartbeat exists because ZOYA is a long-running server daemon:
+The hourly heartbeat exists because JARVIS is a long-running server daemon:
 without it, a machine that starts once and stays up for weeks would look like a
 single brief session. Every send is fire-and-forget with a 5-second timeout; a
 failed or blocked request never affects the daemon.
@@ -59,16 +59,16 @@ failed or blocked request never affects the daemon.
 
 Any one of these disables telemetry completely:
 
-- **Config flag** - set in `~/.zoya/config.yaml`:
+- **Config flag** - set in `~/.jarvis/config.yaml`:
   ```yaml
   telemetry:
     enabled: false
   ```
-- **Env var** - `ZOYA_TELEMETRY=0` (also accepts `false`/`no`/`off`).
+- **Env var** - `JARVIS_TELEMETRY=0` (also accepts `false`/`no`/`off`).
 - **`DO_NOT_TRACK=1`** - the cross-tool community standard
   (<https://consoledonottrack.com>) is honored.
 
-Precedence: `DO_NOT_TRACK` > `ZOYA_TELEMETRY` > config flag > default (on).
+Precedence: `DO_NOT_TRACK` > `JARVIS_TELEMETRY` > config flag > default (on).
 
 On the first run a one-time notice is printed explaining all of the above; on
 later runs a single concise line reminds you telemetry is on and how to turn it
@@ -78,10 +78,10 @@ off.
 
 Pings are fire-and-forget and failures are silent by design, so a broken
 collector would otherwise look identical to "no users." To make sends
-observable, set `ZOYA_TELEMETRY_DEBUG=1`:
+observable, set `JARVIS_TELEMETRY_DEBUG=1`:
 
 ```bash
-ZOYA_TELEMETRY_DEBUG=1 zoya start
+JARVIS_TELEMETRY_DEBUG=1 jarvis start
 ```
 
 Every ping then logs its outcome, e.g. `ping ok (HTTP 201)` or
@@ -100,11 +100,11 @@ simply does nothing.
 
 ## Sidecar telemetry
 
-The desktop sidecar (the Go agent that gives ZOYA eyes and hands on your
+The desktop sidecar (the Go agent that gives JARVIS eyes and hands on your
 machines) sends its own anonymous ping to a separate `sidecar_pings` table. It
 is **independent of the brain**: it has its own hashed id
-(`zoya-sidecar-telemetry-v1` namespace), its own opt-out, and it does **not**
-honor the brain's `ZOYA_TELEMETRY` / `DO_NOT_TRACK` env vars.
+(`jarvis-sidecar-telemetry-v1` namespace), its own opt-out, and it does **not**
+honor the brain's `JARVIS_TELEMETRY` / `DO_NOT_TRACK` env vars.
 
 What it sends: the sidecar's hashed machine id, its version, platform + arch,
 coarse OS version, UTC offset, whether it is currently connected to a brain,
@@ -119,8 +119,7 @@ Cadence is the same: one ping at startup, then hourly.
 
 - Untick **Settings -> Privacy -> "Send anonymous usage metrics"** in the
   sidecar window (on by default).
-- Set `telemetry.enabled: false` in `~/.zoya/sidecar.yaml`.
-- Run with `ZOYA_SIDECAR_TELEMETRY=0`.
+- Set `telemetry.enabled: false` in `~/.jarvis/sidecar.yaml`.
+- Run with `JARVIS_SIDECAR_TELEMETRY=0`.
 
-Set `ZOYA_SIDECAR_TELEMETRY_DEBUG=1` to log each ping's outcome.
-
+Set `JARVIS_SIDECAR_TELEMETRY_DEBUG=1` to log each ping's outcome.

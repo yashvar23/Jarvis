@@ -155,7 +155,7 @@ export function SiteGitHubModal({ projectId, projectName, onClose, onConnected }
               Enter a GitHub Personal Access Token with <strong>repo</strong> scope to create and push to repositories.
             </p>
             <a
-              href="https://github.com/settings/tokens/new?scopes=repo&description=ZOYA+Site+Builder"
+              href="https://github.com/settings/tokens/new?scopes=repo&description=JARVIS+Site+Builder"
               target="_blank"
               rel="noopener noreferrer"
               style={linkStyle}

@@ -1,5 +1,5 @@
 /**
- * Bundle each Zoya-authored piece (under `packages/pieces/zoya/*`) into
+ * Bundle each Jarvis-authored piece (under `packages/pieces/jarvis/*`) into
  * the on-disk layout the engine's piece-loader expects:
  *
  *   .../piece-dir/dist/package.json     (with the canonical `name` + `version`)
@@ -127,7 +127,7 @@ async function ensureStagingInstalled(): Promise<void> {
   // staging package.json + runs `bun install` if needed; it's a no-op
   // when the staging tree is already fresh. Wiring through this avoids
   // the previous race: bootstrap kicks off `buildEngineBundle()` and
-  // `buildAllZoyaPieces()` in parallel, and if pieces won the race
+  // `buildAllJarvisPieces()` in parallel, and if pieces won the race
   // they used to throw on missing esbuild. Now both paths share the
   // same install promise (bun install dedupes naturally; consecutive
   // calls return without re-running once the tree is in place).
@@ -251,15 +251,15 @@ export async function buildPiece(
 }
 
 /**
- * Build every piece directly under `packages/pieces/zoya/`. Returns the
+ * Build every piece directly under `packages/pieces/jarvis/`. Returns the
  * artifacts in the order discovered (alphabetical by piece dir name).
  * Each piece skips work when its content-hash marker is fresh; pass
  * `force: true` to rebuild every piece unconditionally.
  */
-export async function buildAllZoyaPieces(
+export async function buildAllJarvisPieces(
   opts: BuildPieceOptions = {},
 ): Promise<BuildPieceResult[]> {
-  const root = resolve(ENGINE_BUILD_PATHS.VENDOR_PACKAGES, "pieces/zoya");
+  const root = resolve(ENGINE_BUILD_PATHS.VENDOR_PACKAGES, "pieces/jarvis");
   if (!existsSync(root)) return [];
   const out: BuildPieceResult[] = [];
   for (const name of readdirSync(root).sort()) {
@@ -272,8 +272,7 @@ export async function buildAllZoyaPieces(
 }
 
 export const PIECE_BUILD_PATHS = {
-  zoyaPiecesRoot: resolve(ENGINE_BUILD_PATHS.VENDOR_PACKAGES, "pieces/zoya"),
+  jarvisPiecesRoot: resolve(ENGINE_BUILD_PATHS.VENDOR_PACKAGES, "pieces/jarvis"),
 } as const;
 
 void basename; // keep import shape stable across edits
-

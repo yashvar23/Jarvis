@@ -20,4 +20,3 @@ export const ListUsersRequestBody = z.object({
 })
 
 export type ListUsersRequestBody = z.infer<typeof ListUsersRequestBody>
-

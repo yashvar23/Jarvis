@@ -1,6 +1,6 @@
 /**
  * Test fixtures: pre-built PieceCatalog instances mimicking the legacy
- * Zoya-native pieces' shape. Used by composer / manage-workflow / API
+ * Jarvis-native pieces' shape. Used by composer / manage-workflow / API
  * route tests so they don't have to spawn the engine to extract real
  * metadata.
  *
@@ -13,14 +13,14 @@ import { PieceCatalog, type PieceCatalogEntry } from "./piece-catalog";
 export function sampleCatalog(): PieceCatalog {
   const entries: PieceCatalogEntry[] = [
     {
-      name: "zoya-ask",
-      displayName: "Zoya: Ask",
+      name: "jarvis-ask",
+      displayName: "Jarvis: Ask",
       description: "Send a prompt to the LLM and receive the reply.",
       actions: {
         ask: {
           name: "ask",
           displayName: "Ask",
-          description: "Send a prompt to Zoya's LLM and receive the reply.",
+          description: "Send a prompt to Jarvis's LLM and receive the reply.",
           inputSchema: {
             fields: [
               {
@@ -49,14 +49,14 @@ export function sampleCatalog(): PieceCatalog {
       },
     },
     {
-      name: "zoya-notify",
-      displayName: "Zoya: Notify",
+      name: "jarvis-notify",
+      displayName: "Jarvis: Notify",
       description: "Deliver a message through the configured channels.",
       actions: {
         notify: {
           name: "notify",
-          displayName: "Send a Zoya notification",
-          description: "Deliver a message through Zoya's configured channels.",
+          displayName: "Send a Jarvis notification",
+          description: "Deliver a message through Jarvis's configured channels.",
           inputSchema: {
             fields: [
               { name: "message", label: "Message", type: "long_text", required: true },
@@ -93,9 +93,9 @@ export function sampleCatalog(): PieceCatalog {
       },
     },
     {
-      name: "zoya-trigger",
-      displayName: "Zoya: Trigger",
-      description: "Bridge Zoya events into workflows.",
+      name: "jarvis-trigger",
+      displayName: "Jarvis: Trigger",
+      description: "Bridge Jarvis events into workflows.",
       actions: {
         run_workflow: {
           name: "run_workflow",
@@ -112,8 +112,8 @@ export function sampleCatalog(): PieceCatalog {
       triggers: {
         on_event: {
           name: "on_event",
-          displayName: "On Zoya event",
-          description: "Fire the workflow when a Zoya event of the given type is published.",
+          displayName: "On Jarvis event",
+          description: "Fire the workflow when a Jarvis event of the given type is published.",
           inputSchema: {
             fields: [
               { name: "eventType", label: "Event type", type: "string", required: true },
@@ -126,4 +126,3 @@ export function sampleCatalog(): PieceCatalog {
   ];
   return new PieceCatalog(entries);
 }
-

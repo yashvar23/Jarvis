@@ -139,7 +139,7 @@ export function LLMTab({
       <section className="v2-set__section">
         <div className="v2-set__section-head">
           <div>
-            <h3 className="v2-set__section-title">How should Zoya think?</h3>
+            <h3 className="v2-set__section-title">How should Jarvis think?</h3>
             <div className="v2-set__section-sub">
               Pick the architecture that drives chat and background work.
               You can switch any time.

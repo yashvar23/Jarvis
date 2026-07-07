@@ -47,7 +47,7 @@ instructions: |
   - **Compose open**: you see `<input> role="combobox"` (To field) and `<input> name="subjectbox"` (Subject). -> Compose is ready.
 
   ### Element Reference (from REAL browser_snapshot output)
-  These are the EXACT elements as they appear in ZOYA's browser_snapshot. Match PRIMARILY by tag, role, name, and structural attributes. These are stable across languages.
+  These are the EXACT elements as they appear in JARVIS's browser_snapshot. Match PRIMARILY by tag, role, name, and structural attributes. These are stable across languages.
 
   **Top bar:**
   - Search box: `<input> name="q" type="text">` — the search input. Always has name="q".

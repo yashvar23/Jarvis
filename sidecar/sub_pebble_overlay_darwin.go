@@ -30,24 +30,24 @@ extern void goSubPebbleClick(unsigned long long handle, int x, int y);
 #define SUB_CX 22.0
 #define SUB_CY 22.0
 
-@class ZoyaSubView;
+@class JarvisSubView;
 
 typedef struct {
     NSWindow*          window;
-    ZoyaSubView*     view;
+    JarvisSubView*     view;
     double             r, g, b;   // accent (0..1)
     int                state;
     unsigned long long tick;
     unsigned long long handle;    // == (uintptr)self
 } SubWin;
 
-@interface ZoyaSubView : NSView {
+@interface JarvisSubView : NSView {
 @public
     SubWin* sw;
 }
 @end
 
-@implementation ZoyaSubView
+@implementation JarvisSubView
 
 - (BOOL)isFlipped { return YES; } // top-left origin, matches the disc math
 
@@ -106,7 +106,7 @@ static void sub_create_impl(SubWin* sw) {
         NSWindowCollectionBehaviorIgnoresCycle |
         NSWindowCollectionBehaviorFullScreenAuxiliary];
 
-    ZoyaSubView* view = [[ZoyaSubView alloc] initWithFrame:frame];
+    JarvisSubView* view = [[JarvisSubView alloc] initWithFrame:frame];
     view->sw = sw;
     [win setContentView:view];
     sw->window = win;
@@ -114,7 +114,7 @@ static void sub_create_impl(SubWin* sw) {
     [win makeKeyAndOrderFront:nil];
 }
 
-static SubWin* zoyaSubCreate(int seedX, int seedY) {
+static SubWin* jarvisSubCreate(int seedX, int seedY) {
     (void)seedX; (void)seedY;
     SubWin* sw = (SubWin*)calloc(1, sizeof(SubWin));
     sw->handle = (unsigned long long)(uintptr_t)sw;
@@ -122,7 +122,7 @@ static SubWin* zoyaSubCreate(int seedX, int seedY) {
     return sw;
 }
 
-static void zoyaSubPresent(SubWin* sw, int x, int y, int r, int g, int b, int state, unsigned long long tick) {
+static void jarvisSubPresent(SubWin* sw, int x, int y, int r, int g, int b, int state, unsigned long long tick) {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (!sw || !sw->window) return;
         sw->r = r/255.0; sw->g = g/255.0; sw->b = b/255.0;
@@ -135,15 +135,15 @@ static void zoyaSubPresent(SubWin* sw, int x, int y, int r, int g, int b, int st
     });
 }
 
-// zoyaSubMonitorRight returns the main screen's right edge (single-display
+// jarvisSubMonitorRight returns the main screen's right edge (single-display
 // assumption — multi-monitor anchor-at-cursor is a follow-up).
-static int zoyaSubMonitorRight(void) {
+static int jarvisSubMonitorRight(void) {
     NSScreen* main = [[NSScreen screens] firstObject];
     if (!main) return 0;
     return (int)(main.frame.origin.x + main.frame.size.width);
 }
 
-static void zoyaSubDestroy(SubWin* sw) {
+static void jarvisSubDestroy(SubWin* sw) {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (sw->window) { [sw->window orderOut:nil]; sw->window = nil; }
         sw->view = nil;
@@ -201,7 +201,7 @@ func (s *subPebbleServiceDarwin) Spawn(spec SubPebbleSpec) error {
 	entry.label.Store(spec.Label)
 	entry.task.Store("")
 	entry.result.Store("")
-	entry.monitorRight.Store(int32(C.zoyaSubMonitorRight()))
+	entry.monitorRight.Store(int32(C.jarvisSubMonitorRight()))
 	if cx, cy, err := platformGetCursorPos(); err == nil {
 		entry.curX.Store(int32(cx - subPebbleDarwinAnchor))
 		entry.curY.Store(int32(cy - subPebbleDarwinAnchor))
@@ -298,9 +298,9 @@ func (s *subPebbleServiceDarwin) createOverlayWindow(entry *subPebbleEntry) erro
 	if x, y, err := platformGetCursorPos(); err == nil {
 		cx, cy = x, y
 	}
-	sw := C.zoyaSubCreate(C.int(cx), C.int(cy))
+	sw := C.jarvisSubCreate(C.int(cx), C.int(cy))
 	if sw == nil {
-		return fmt.Errorf("zoyaSubCreate returned nil")
+		return fmt.Errorf("jarvisSubCreate returned nil")
 	}
 	entry.hwnd = uintptr(unsafe.Pointer(sw))
 	subPebbleByHandleDarwin.Store(entry.hwnd, entry)
@@ -320,7 +320,7 @@ func (s *subPebbleServiceDarwin) paint(entry *subPebbleEntry) error {
 	state, _ := entry.state.Load().(PebbleState)
 	color, _ := entry.color.Load().(SubPebbleColor)
 	r, g, b := subPebbleRGB(color)
-	C.zoyaSubPresent(
+	C.jarvisSubPresent(
 		sw,
 		C.int(entry.curX.Load()), C.int(entry.curY.Load()),
 		C.int(r), C.int(g), C.int(b),
@@ -346,7 +346,7 @@ func (s *subPebbleServiceDarwin) destroyOverlay(entry *subPebbleEntry) {
 	}
 	subPebbleByHandleDarwin.Delete(entry.hwnd)
 	if v, ok := subPebbleWinDarwin.LoadAndDelete(entry.hwnd); ok {
-		C.zoyaSubDestroy(v.(*C.SubWin))
+		C.jarvisSubDestroy(v.(*C.SubWin))
 	}
 	entry.hwnd = 0
 }

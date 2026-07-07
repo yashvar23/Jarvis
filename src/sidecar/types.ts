@@ -45,8 +45,6 @@ export interface SidecarRecord {
   capabilities: string | null;
   /** Sidecar's own semver, reported on register ("dev" for local builds) */
   version: string | null;
-  /** IANA timezone reported on register (null = unknown/old sidecar) */
-  timezone: string | null;
 }
 
 /** JWT claims for a sidecar enrollment token */
@@ -106,8 +104,6 @@ export interface ConnectedSidecar {
   updateStatus: SidecarUpdateStatus;
   capabilities: SidecarCapability[];
   unavailableCapabilities: UnavailableCapability[];
-  /** IANA timezone reported on register ("" = unknown) */
-  timezone?: string;
   connectedAt: Date;
 }
 
@@ -138,4 +134,3 @@ export interface SidecarInfo {
   /** Compatibility verdict (only while connected): 'ok' | 'suggested' | 'dev' */
   update_status?: SidecarUpdateStatus;
 }
-

@@ -89,4 +89,3 @@ function trimRecentObjects(): void {
     [MAX_ROWS],
   );
 }
-

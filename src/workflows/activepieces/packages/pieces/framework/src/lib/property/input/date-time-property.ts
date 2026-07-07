@@ -9,4 +9,3 @@ export const DateTimeProperty = z.object({
 
 export type DateTimeProperty<R extends boolean> = BasePropertySchema &
   TPropertyValue<string, PropertyType.DATE_TIME, R>;
-

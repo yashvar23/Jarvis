@@ -6,7 +6,7 @@ import type { ThreadItem } from "./types";
  */
 export const MOCK_THREAD: ThreadItem[] = [
   {
-    kind: "zoya-speech",
+    kind: "jarvis-speech",
     id: "s-001",
     text:
       "Good morning, Martin. Quiet overnight — no critical alerts. Your 10am with Anya is confirmed, and I've held two hours of deep work this afternoon.",
@@ -20,13 +20,13 @@ export const MOCK_THREAD: ThreadItem[] = [
     t: "07:34",
   },
   {
-    kind: "zoya-thought",
+    kind: "jarvis-thought",
     id: "th-001",
     text: "Pulling the researcher's run log and the authority-patterns brief.",
     t: "07:34",
   },
   {
-    kind: "zoya-speech",
+    kind: "jarvis-speech",
     id: "s-002",
     text:
       "The Researcher finished the authority-patterns brief — 4 pages, 23 sources. Headline: soft-gate approval with auto-learn is now the dominant production pattern; hard RBAC is out.",
@@ -51,7 +51,7 @@ export const MOCK_THREAD: ThreadItem[] = [
     t: "07:36",
   },
   {
-    kind: "zoya-thought",
+    kind: "jarvis-thought",
     id: "th-002",
     text: "Checking Anya's availability and our authority scope for calendar writes.",
     t: "07:36",
@@ -66,7 +66,7 @@ export const MOCK_THREAD: ThreadItem[] = [
     t: "07:36",
   },
   {
-    kind: "zoya-speech",
+    kind: "jarvis-speech",
     id: "s-003",
     text: "Thursday at 2pm looks clear for both of you. Shall I send the invite?",
     t: "07:36",
@@ -103,11 +103,10 @@ export const MOCK_THREAD: ThreadItem[] = [
     t: "07:40",
   },
   {
-    kind: "zoya-speech",
+    kind: "jarvis-speech",
     id: "s-004",
     text: "Drafting the Thursday invite now — you'll see an approval card when it's ready to send.",
     t: "07:41",
     status: "speaking",
   },
 ];
-

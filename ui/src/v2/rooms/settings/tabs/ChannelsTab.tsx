@@ -391,7 +391,7 @@ export function ChannelsTab({
           <div>
             <h3 className="v2-set__section-title">Text-to-Speech (TTS)</h3>
             <div className="v2-set__section-sub">
-              Voice responses from Zoya via the dashboard. Hot-reloaded.
+              Voice responses from Jarvis via the dashboard. Hot-reloaded.
             </div>
           </div>
         </div>

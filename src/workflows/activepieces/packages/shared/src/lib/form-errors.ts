@@ -5,4 +5,3 @@ export const formErrors = {
     invalidGitRepoRemoteUrl: 'invalidGitRepoRemoteUrl',
     invalidExternalId: 'invalidExternalId',
 } as const
-

@@ -10,4 +10,3 @@ export const PropertySettings = z.object({
     schema: z.any().optional(),
 })
 export type PropertySettings = z.infer<typeof PropertySettings>
-

@@ -1,5 +1,5 @@
 /**
- * Autostart Setup for ZOYA
+ * Autostart Setup for J.A.R.V.I.S.
  *
  * Installs/uninstalls keepalive daemon autostart:
  * - Linux: systemd user service
@@ -50,9 +50,9 @@ function getBunPath(): string {
   }
 }
 
-function getZoyaPath(): string {
+function getJarvisPath(): string {
   // When installed globally, import.meta.dir points to the package
-  return join(import.meta.dir, '../../bin/zoya.ts');
+  return join(import.meta.dir, '../../bin/jarvis.ts');
 }
 
 export type SpawnResultLike = {
@@ -106,19 +106,19 @@ export function canUseSystemdUserService(spawnSync: SpawnSyncFn = defaultSpawnSy
 // ── systemd (Linux) ──────────────────────────────────────────────────
 
 const SYSTEMD_DIR = join(homedir(), '.config', 'systemd', 'user');
-const SYSTEMD_SERVICE = join(SYSTEMD_DIR, 'zoya.service');
+const SYSTEMD_SERVICE = join(SYSTEMD_DIR, 'jarvis.service');
 
 function generateSystemdUnit(): string {
   const bunPath = getBunPath();
-  const zoyaPath = getZoyaPath();
+  const jarvisPath = getJarvisPath();
 
   return `[Unit]
-Description=ZOYA Daemon
+Description=J.A.R.V.I.S. Daemon
 After=network.target
 
 [Service]
 Type=simple
-ExecStart=${bunPath} ${zoyaPath} start --foreground
+ExecStart=${bunPath} ${jarvisPath} start --foreground
 Restart=on-failure
 RestartSec=5
 Environment=HOME=${homedir()}
@@ -143,9 +143,9 @@ async function installSystemd(): Promise<boolean> {
       return false;
     }
 
-    const enable = Bun.spawnSync(['systemctl', '--user', 'enable', 'zoya.service']);
+    const enable = Bun.spawnSync(['systemctl', '--user', 'enable', 'jarvis.service']);
     if (enable.exitCode !== 0) {
-      printErr('Failed to enable service. You may need to run: systemctl --user enable zoya.service');
+      printErr('Failed to enable service. You may need to run: systemctl --user enable jarvis.service');
       return false;
     }
 
@@ -166,13 +166,13 @@ async function installSystemd(): Promise<boolean> {
 
 async function startSystemdService(): Promise<boolean> {
   try {
-    const start = Bun.spawnSync(['systemctl', '--user', 'start', 'zoya.service']);
+    const start = Bun.spawnSync(['systemctl', '--user', 'start', 'jarvis.service']);
     if (start.exitCode !== 0) {
-      printErr('Failed to start systemd service. You may need to run: systemctl --user start zoya.service');
+      printErr('Failed to start systemd service. You may need to run: systemctl --user start jarvis.service');
       return false;
     }
 
-    printOk('ZOYA keepalive service is running.');
+    printOk('JARVIS keepalive service is running.');
     return true;
   } catch (err) {
     printErr(`Failed to start systemd service: ${err}`);
@@ -184,7 +184,7 @@ export function scheduleSystemdRestart(spawnSync: SpawnSyncFn = defaultSpawnSync
   // --no-block returns immediately; systemd queues the restart through its own
   // lifecycle, so the calling HTTP handler can return before the unit cycles.
   try {
-    const res = spawnSync(['systemctl', '--user', '--no-block', 'restart', 'zoya.service']);
+    const res = spawnSync(['systemctl', '--user', '--no-block', 'restart', 'jarvis.service']);
     return res.exitCode === 0;
   } catch {
     return false;
@@ -193,8 +193,8 @@ export function scheduleSystemdRestart(spawnSync: SpawnSyncFn = defaultSpawnSync
 
 async function uninstallSystemd(): Promise<boolean> {
   try {
-    Bun.spawnSync(['systemctl', '--user', 'stop', 'zoya.service']);
-    Bun.spawnSync(['systemctl', '--user', 'disable', 'zoya.service']);
+    Bun.spawnSync(['systemctl', '--user', 'stop', 'jarvis.service']);
+    Bun.spawnSync(['systemctl', '--user', 'disable', 'jarvis.service']);
 
     if (existsSync(SYSTEMD_SERVICE)) {
       unlinkSync(SYSTEMD_SERVICE);
@@ -216,23 +216,23 @@ function isSystemdInstalled(): boolean {
 // ── launchd (macOS) ──────────────────────────────────────────────────
 
 const LAUNCHD_DIR = join(homedir(), 'Library', 'LaunchAgents');
-const LAUNCHD_PLIST = join(LAUNCHD_DIR, 'ai.zoya.daemon.plist');
+const LAUNCHD_PLIST = join(LAUNCHD_DIR, 'ai.jarvis.daemon.plist');
 
 function generateLaunchdPlist(): string {
   const bunPath = getBunPath();
-  const zoyaPath = getZoyaPath();
-  const logDir = join(homedir(), '.zoya', 'logs');
+  const jarvisPath = getJarvisPath();
+  const logDir = join(homedir(), '.jarvis', 'logs');
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
   <key>Label</key>
-  <string>ai.zoya.daemon</string>
+  <string>ai.jarvis.daemon</string>
   <key>ProgramArguments</key>
   <array>
     <string>${bunPath}</string>
-    <string>${zoyaPath}</string>
+    <string>${jarvisPath}</string>
     <string>start</string>
     <string>--foreground</string>
   </array>
@@ -241,9 +241,9 @@ function generateLaunchdPlist(): string {
   <key>KeepAlive</key>
   <true/>
   <key>StandardOutPath</key>
-  <string>${logDir}/zoya.log</string>
+  <string>${logDir}/jarvis.log</string>
   <key>StandardErrorPath</key>
-  <string>${logDir}/zoya-error.log</string>
+  <string>${logDir}/jarvis-error.log</string>
   <key>EnvironmentVariables</key>
   <dict>
     <key>HOME</key>
@@ -263,7 +263,7 @@ async function installLaunchd(): Promise<boolean> {
     }
 
     // Ensure log directory exists
-    const logDir = join(homedir(), '.zoya', 'logs');
+    const logDir = join(homedir(), '.jarvis', 'logs');
     if (!existsSync(logDir)) {
       mkdirSync(logDir, { recursive: true });
     }
@@ -322,7 +322,7 @@ async function startLaunchdService(): Promise<boolean> {
     if (typeof uid === 'number') {
       const bootstrap = Bun.spawnSync(['launchctl', 'bootstrap', `gui/${uid}`, LAUNCHD_PLIST]);
       if (bootstrap.exitCode === 0 || isLaunchdAlreadyLoaded(bootstrap)) {
-        printOk('ZOYA launch agent is running.');
+        printOk('JARVIS launch agent is running.');
         return true;
       }
       bootstrapReason = launchctlReason(bootstrap);
@@ -341,7 +341,7 @@ async function startLaunchdService(): Promise<boolean> {
       return false;
     }
 
-    printOk('ZOYA launch agent is running.');
+    printOk('JARVIS launch agent is running.');
     return true;
   } catch (err) {
     printWarn(`Installed launchd plist, but could not start it immediately: ${err}`);
@@ -352,8 +352,8 @@ async function startLaunchdService(): Promise<boolean> {
 function scheduleLaunchdRestart(): boolean {
   const uid = process.getuid?.();
   const command = uid != null
-    ? `sleep 1; launchctl kickstart -k gui/${uid}/ai.zoya.daemon >/dev/null 2>&1`
-    : `sleep 1; launchctl kickstart -k gui/$(id -u)/ai.zoya.daemon >/dev/null 2>&1`;
+    ? `sleep 1; launchctl kickstart -k gui/${uid}/ai.jarvis.daemon >/dev/null 2>&1`
+    : `sleep 1; launchctl kickstart -k gui/$(id -u)/ai.jarvis.daemon >/dev/null 2>&1`;
   return spawnDetachedShell(command, ['bash', 'launchctl']);
 }
 
@@ -460,4 +460,3 @@ export function getAutostartName(): string {
   }
   return 'systemd (User Service)';
 }
-

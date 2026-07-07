@@ -179,7 +179,7 @@ export class LinuxAppController implements AppController {
     }
 
     try {
-      const tmpFile = `/tmp/zoya-screen-${Date.now()}.png`;
+      const tmpFile = `/tmp/jarvis-screen-${Date.now()}.png`;
 
       if (hasImport) {
         await $`import -window root ${tmpFile}`;
@@ -210,7 +210,7 @@ export class LinuxAppController implements AppController {
     try {
       const windowId = await this.findWindowByPid(pid);
 
-      const tmpFile = `/tmp/zoya-window-${pid}-${Date.now()}.png`;
+      const tmpFile = `/tmp/jarvis-window-${pid}-${Date.now()}.png`;
       await $`import -window ${windowId} ${tmpFile}`;
 
       const buffer = await Bun.file(tmpFile).arrayBuffer();
@@ -317,4 +317,3 @@ export class LinuxAppController implements AppController {
     return { x, y, width, height };
   }
 }
-

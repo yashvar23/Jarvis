@@ -1,6 +1,6 @@
 /**
- * Shared daemon lifecycle helpers used by `zoya update` and
- * `zoya uninstall`. Both need the same SIGTERM → poll → SIGKILL dance,
+ * Shared daemon lifecycle helpers used by `jarvis update` and
+ * `jarvis uninstall`. Both need the same SIGTERM → poll → SIGKILL dance,
  * and both need to release the lockfile afterward.
  */
 
@@ -84,4 +84,3 @@ export async function stopDaemonGracefully(options: StopOptions = {}): Promise<S
   releaseLock();
   return { wasRunning: true, pid, graceful };
 }
-

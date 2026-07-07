@@ -1,5 +1,5 @@
 /**
- * Connections panel: list `app_connection` rows + registered Zoya sources,
+ * Connections panel: list `app_connection` rows + registered Jarvis sources,
  * add / delete connections. Renders inline below the workflows list when the
  * "Connections" tab is active.
  *
@@ -34,7 +34,7 @@ export function ConnectionsPanel(): React.ReactElement {
           <p className="wf-conn__subtitle">
             {conn.loading
               ? "loading…"
-              : `${conn.connections.length} stored · ${conn.zoyaSources.length} Zoya source${conn.zoyaSources.length === 1 ? "" : "s"} registered`}
+              : `${conn.connections.length} stored · ${conn.jarvisSources.length} Jarvis source${conn.jarvisSources.length === 1 ? "" : "s"} registered`}
             {conn.error ? ` · ${conn.error}` : null}
           </p>
         </div>
@@ -50,12 +50,12 @@ export function ConnectionsPanel(): React.ReactElement {
 
       {toast ? <div className={`wf-toast wf-toast--${toast.tone}`}>{toast.text}</div> : null}
 
-      {conn.zoyaSources.length > 0 ? (
+      {conn.jarvisSources.length > 0 ? (
         <div className="wf-conn__sources">
-          <span className="wf-conn__sources-label">Reusable Zoya credentials:</span>
-          {conn.zoyaSources.map((s) => (
+          <span className="wf-conn__sources-label">Reusable Jarvis credentials:</span>
+          {conn.jarvisSources.map((s) => (
             <Chip key={s.id} tone="ok">
-              <code>zoya:{s.id}</code>
+              <code>jarvis:{s.id}</code>
             </Chip>
           ))}
           <span className="wf-conn__sources-help">

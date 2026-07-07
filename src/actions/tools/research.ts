@@ -19,7 +19,7 @@ export function setResearchQueueRef(queue: ResearchQueue): void {
 
 export const researchQueueTool: ToolDefinition = {
   name: 'research_queue',
-  description: 'Manage the background research queue. Add topics for ZOYA to research during idle time, list current queue, or remove topics.',
+  description: 'Manage the background research queue. Add topics for JARVIS to research during idle time, list current queue, or remove topics.',
   category: 'productivity',
   parameters: {
     action: {
@@ -109,4 +109,3 @@ export const researchQueueTool: ToolDefinition = {
     }
   },
 };
-

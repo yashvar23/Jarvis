@@ -2,7 +2,7 @@
  * Webapp Templates — Pre-built browser navigation instructions
  *
  * Stores per-app instructions that get injected into the system prompt
- * when Zoya detects a relevant webapp in the user's message or URL.
+ * when Jarvis detects a relevant webapp in the user's message or URL.
  */
 
 import { getDb, generateId } from './schema.ts';
@@ -242,4 +242,3 @@ export function getWebappInstructionsForMessage(message: string): string {
     return '';
   }
 }
-

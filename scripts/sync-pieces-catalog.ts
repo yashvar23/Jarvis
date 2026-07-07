@@ -68,7 +68,7 @@ import {
 const PINNED_SHA = "d04e6807c485ecd788a72af0d04abffba78563c7";
 
 const REPO_URL = "https://github.com/activepieces/activepieces.git";
-const WORK_DIR = join(tmpdir(), `zoya-pieces-sync-${PINNED_SHA.slice(0, 12)}`);
+const WORK_DIR = join(tmpdir(), `jarvis-pieces-sync-${PINNED_SHA.slice(0, 12)}`);
 const OUT_FILE = resolve(import.meta.dir, "../src/workflows/pieces-library/catalog-generated.ts");
 
 interface NpmInfo {
@@ -323,7 +323,7 @@ function renderCatalogFile(entries: PieceMetadata[]): string {
   lines.push(" */");
   lines.push("");
   lines.push("export interface GeneratedCatalogEntry {");
-  lines.push("  /** Stable Zoya-side id. NEVER rename once shipped. */");
+  lines.push("  /** Stable Jarvis-side id. NEVER rename once shipped. */");
   lines.push("  id: string;");
   lines.push("  /** Full npm package name. */");
   lines.push("  npmPackage: string;");
@@ -504,4 +504,3 @@ function fatal(msg: string): never {
 }
 
 await main();
-

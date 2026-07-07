@@ -143,4 +143,3 @@ export function hasMovableOrExportableItems(selected: SelectedItemsMap) {
   }
   return false;
 }
-

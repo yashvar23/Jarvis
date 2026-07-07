@@ -33,4 +33,3 @@ export const foldersApi = {
     return api.post<Folder>(`/v1/folders/${folderId}`, req);
   },
 };
-

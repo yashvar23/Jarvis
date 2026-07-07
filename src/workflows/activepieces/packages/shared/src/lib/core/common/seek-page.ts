@@ -14,4 +14,3 @@ export const SeekPage = (t: z.ZodType): z.ZodType => z.object({
     next: Nullable(z.string()),
     previous: Nullable(z.string()),
 })
-

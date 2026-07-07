@@ -155,4 +155,3 @@ describe('DialogueCompactor', () => {
     expect(provider.callCount).toBe(1);
   });
 });
-

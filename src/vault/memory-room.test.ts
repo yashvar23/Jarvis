@@ -97,4 +97,3 @@ describe('memory room — create chain', () => {
     expect(() => createFact('does-not-exist', 'p', 'o')).toThrow(/FOREIGN KEY/);
   });
 });
-

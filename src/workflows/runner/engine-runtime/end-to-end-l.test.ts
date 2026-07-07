@@ -1,9 +1,9 @@
 /**
- * Phase L plumbing smoke (gated on ZOYA_TEST_ENGINE_BUILD=1).
+ * Phase L plumbing smoke (gated on JARVIS_TEST_ENGINE_BUILD=1).
  *
  * Validates the same surface the proposal called out for the gmail end-to-end
  * smoke -- connection resolver, store, run-progress, full plumbing -- without
- * dragging in `googleapis` and friends. Uses the `zoya-validate` test
+ * dragging in `googleapis` and friends. Uses the `jarvis-validate` test
  * piece, which declares `PieceAuth.OAuth2` so the engine has to round-trip
  * the connection through `/v1/worker/app-connections/:externalId`.
  *
@@ -12,7 +12,7 @@
  * piece bundle compiles standalone).
  *
  * What this test asserts:
- *   - The engine resolves `{{connections['zoya:validate']}}` against the
+ *   - The engine resolves `{{connections['jarvis:validate']}}` against the
  *     `CredentialResolver`, forwarding our registered OAuth2 source's value.
  *   - The action's `context.auth.access_token` matches what the source minted.
  *   - `context.store.put` + `context.store.get` round-trip through
@@ -38,7 +38,7 @@ import { createFlowRun, getFlowRun } from "../../db/repos/flow-run";
 import { DEFAULT_IDS } from "../../db/schema";
 import {
   CredentialResolver,
-  type ZoyaConnectionSource,
+  type JarvisConnectionSource,
 } from "../../credentials/adapter";
 import { SandboxApi } from "../../sandbox-api/server";
 import {
@@ -46,34 +46,34 @@ import {
   ENGINE_BUILD_PATHS,
   findCachedBundle,
 } from "./build";
-import { buildAllZoyaPieces } from "./build-pieces";
+import { buildAllJarvisPieces } from "./build-pieces";
 import { EngineRuntime } from "./engine-runtime";
 import { EngineFlowExecutor } from "./engine-flow-executor";
 import type { Job } from "../../db/repos/job-queue";
 import type { RunFlowJobPayload } from "../handler";
 
-const buildOptIn = process.env.ZOYA_TEST_ENGINE_BUILD === "1";
+const buildOptIn = process.env.JARVIS_TEST_ENGINE_BUILD === "1";
 const initialCached = findCachedBundle();
 const skipBundleTests = initialCached === null && !buildOptIn;
 const piecesAlreadyBuilt = existsSync(
   resolve(
     ENGINE_BUILD_PATHS.VENDOR_PACKAGES,
-    "pieces/zoya/validate/dist/src/index.js",
+    "pieces/jarvis/validate/dist/src/index.js",
   ),
 );
 const skipE2eTests = skipBundleTests || (!piecesAlreadyBuilt && !buildOptIn);
 
-const PIECE_TEST_NAME = "@zoyapieces/piece-zoya-test";
-const PIECE_VALIDATE_NAME = "@zoyapieces/piece-zoya-validate";
+const PIECE_TEST_NAME = "@jarvispieces/piece-jarvis-test";
+const PIECE_VALIDATE_NAME = "@jarvispieces/piece-jarvis-validate";
 const PIECE_VERSION = "0.0.1";
 const FAKE_TOKEN = "test-access-token-zzz";
-const CONNECTION_EXTERNAL_ID = "zoya:validate";
+const CONNECTION_EXTERNAL_ID = "jarvis:validate";
 
 describe("Phase L: plumbing smoke (connection resolver + store + run-progress)", () => {
   let api: SandboxApi;
   let runtime: EngineRuntime | null = null;
 
-  const validateSource: ZoyaConnectionSource = {
+  const validateSource: JarvisConnectionSource = {
     id: "validate",
     canResolve: (externalId) => externalId === CONNECTION_EXTERNAL_ID,
     resolve: async () => ({
@@ -96,7 +96,7 @@ describe("Phase L: plumbing smoke (connection resolver + store + run-progress)",
     let cached = initialCached;
     if (!cached && buildOptIn) cached = await buildEngineBundle();
     if (!cached) return;
-    if (buildOptIn) await buildAllZoyaPieces();
+    if (buildOptIn) await buildAllJarvisPieces();
     runtime = new EngineRuntime({ api, bundlePath: cached.bundlePath });
   });
 
@@ -202,4 +202,3 @@ describe("Phase L: plumbing smoke (connection resolver + store + run-progress)",
     60_000,
   );
 });
-

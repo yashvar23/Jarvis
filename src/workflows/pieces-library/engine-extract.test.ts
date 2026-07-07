@@ -17,10 +17,10 @@
  *     metadata extracted.
  *
  * Run with:
- *   ZOYA_TEST_ENGINE_EXTRACT_PIECE=1 bun test src/workflows/pieces-library/engine-extract.test.ts
+ *   JARVIS_TEST_ENGINE_EXTRACT_PIECE=1 bun test src/workflows/pieces-library/engine-extract.test.ts
  *
- * The double gate (`ZOYA_TEST_ENGINE_BUILD` for the engine bundle +
- * `ZOYA_TEST_ENGINE_EXTRACT_PIECE` for this test) keeps the regular
+ * The double gate (`JARVIS_TEST_ENGINE_BUILD` for the engine bundle +
+ * `JARVIS_TEST_ENGINE_EXTRACT_PIECE` for this test) keeps the regular
  * suite fast: this test does a real bun-install + spawns a real engine,
  * which costs ~10-15s.
  */
@@ -39,8 +39,8 @@ import { buildPieceCatalog } from "../runtime/piece-catalog";
 import { DEFAULT_IDS } from "../db/schema";
 import { CATALOG } from "./catalog";
 
-const EXTRACT_GATE = process.env.ZOYA_TEST_ENGINE_EXTRACT_PIECE === "1";
-const BUILD_GATE = process.env.ZOYA_TEST_ENGINE_BUILD === "1";
+const EXTRACT_GATE = process.env.JARVIS_TEST_ENGINE_EXTRACT_PIECE === "1";
+const BUILD_GATE = process.env.JARVIS_TEST_ENGINE_BUILD === "1";
 
 // Gmail is the canary. It's the heaviest dep tree (165MB through
 // googleapis), so if anything regresses around shared-node_modules
@@ -62,14 +62,14 @@ describe("engine extracts metadata for an npm-installed piece (gated)", () => {
     if (!cached && BUILD_GATE) cached = await buildEngineBundle();
     if (!cached) {
       throw new Error(
-        "Engine bundle not cached. Pass ZOYA_TEST_ENGINE_BUILD=1 alongside this gate to build one.",
+        "Engine bundle not cached. Pass JARVIS_TEST_ENGINE_BUILD=1 alongside this gate to build one.",
       );
     }
 
     // Set up a real pieces dir with one piece installed. Same shape as the
-    // production `~/.zoya/pieces/` -- package.json + bun install ->
+    // production `~/.jarvis/pieces/` -- package.json + bun install ->
     // node_modules/@activepieces/piece-<id>/...
-    piecesDir = mkdtempSync(join(tmpdir(), "zoya-engine-extract-"));
+    piecesDir = mkdtempSync(join(tmpdir(), "jarvis-engine-extract-"));
     const entry = CATALOG.find((e) => e.id === CANARY_ID);
     if (!entry) throw new Error(`catalog missing canary entry "${CANARY_ID}"`);
     writeFileSync(
@@ -159,4 +159,3 @@ describe("engine extracts metadata for an npm-installed piece (gated)", () => {
     120_000,
   );
 });
-

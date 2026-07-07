@@ -10,7 +10,7 @@ package main
 //
 // Motion + state + the [POINT:..] machine + lifecycle live in the shared
 // pebbleCore runtime (pebble_runtime.go); the frame loop runs on its own
-// goroutine and pushes each eased frame here via zoyaPebblePresent. This file
+// goroutine and pushes each eased frame here via jarvisPebblePresent. This file
 // owns only the native window + drawing.
 //
 // IMPORTANT: AppKit windows + drawing are MAIN THREAD ONLY. The cgo bridge here
@@ -31,7 +31,7 @@ package main
 // Global state shared across the AppKit objects (one pebble per process).
 // Position/easing/offset moved to pebbleCore (Go) — no gCurX/gCurY/gOffset/
 // gTimer here anymore. State + frame tick are pushed every frame by
-// zoyaPebblePresent (the shared Go runtime drives motion); drawRect: reads them.
+// jarvisPebblePresent (the shared Go runtime drives motion); drawRect: reads them.
 static NSWindow*  gPebbleWindow      = nil;
 static NSView*    gPebbleView        = nil;
 static int        gPebbleState       = 0; // 0=idle, 1=listening, 2=thinking, 3=speaking, 4=working
@@ -123,10 +123,10 @@ static void draw_answer_cg(CGContextRef ctx, CGFloat by1, BOOL speaking) {
     [label drawAtPoint:NSMakePoint(bxL + 12, byTop + 5)];
 }
 
-@interface ZoyaPebbleView : NSView
+@interface JarvisPebbleView : NSView
 @end
 
-@implementation ZoyaPebbleView
+@implementation JarvisPebbleView
 
 - (BOOL)isFlipped { return YES; } // top-left origin to match the Windows code
 
@@ -292,7 +292,7 @@ static void draw_answer_cg(CGContextRef ctx, CGFloat by1, BOOL speaking) {
             NSForegroundColorAttributeName: [NSColor colorWithCalibratedRed:eyR green:eyG blue:eyB alpha:1.0],
             NSKernAttributeName: @1.0,
         };
-        NSAttributedString* eyebrow = [[NSAttributedString alloc] initWithString:@"ZOYA" attributes:eyebrowAttrs];
+        NSAttributedString* eyebrow = [[NSAttributedString alloc] initWithString:@"JARVIS" attributes:eyebrowAttrs];
         [eyebrow drawAtPoint:NSMakePoint(26, 64)];
 
         NSDictionary* bodyAttrs = @{
@@ -378,9 +378,9 @@ static void draw_answer_cg(CGContextRef ctx, CGFloat by1, BOOL speaking) {
 }
 @end
 
-// zoyaPebbleSpawnImpl creates the overlay window only — the shared Go loop
-// drives motion + repaint via zoyaPebblePresent. Runs on the main thread.
-static void zoyaPebbleSpawnImpl(void) {
+// jarvisPebbleSpawnImpl creates the overlay window only — the shared Go loop
+// drives motion + repaint via jarvisPebblePresent. Runs on the main thread.
+static void jarvisPebbleSpawnImpl(void) {
     if (gPebbleWindow != nil) return;
 
     NSRect frame = NSMakeRect(0, 0, kWindowW, kWindowH);
@@ -400,19 +400,19 @@ static void zoyaPebbleSpawnImpl(void) {
         NSWindowCollectionBehaviorIgnoresCycle |
         NSWindowCollectionBehaviorFullScreenAuxiliary];
 
-    gPebbleView = [[ZoyaPebbleView alloc] initWithFrame:frame];
+    gPebbleView = [[JarvisPebbleView alloc] initWithFrame:frame];
     [gPebbleWindow setContentView:gPebbleView];
 
     [gPebbleWindow makeKeyAndOrderFront:nil];
     // No NSTimer — runPebbleLoop (Go) ticks at 16ms and calls present() each
-    // frame, which dispatch_async's zoyaPebblePresentImpl onto the main queue.
+    // frame, which dispatch_async's jarvisPebblePresentImpl onto the main queue.
 }
 
-// zoyaPebblePresentImpl applies one eased frame on the main thread: the shared
+// jarvisPebblePresentImpl applies one eased frame on the main thread: the shared
 // Go runtime already eased the position (x,y in top-left space) and bumped the
 // frame tick; we push state/tick/text, convert to the bottom-left window origin
 // (Y-flip), and redraw.
-static void zoyaPebblePresentImpl(int x, int y, int state, unsigned long long tick,
+static void jarvisPebblePresentImpl(int x, int y, int state, unsigned long long tick,
                                     int eye, int blinded, int answerOverflow, int alphaPct, NSString* body) {
     if (!gPebbleWindow || !gPebbleView) return;
     // Ethereal-mode window opacity (0..100 from the Go runtime).
@@ -437,7 +437,7 @@ static void zoyaPebblePresentImpl(int x, int y, int state, unsigned long long ti
     [gPebbleView setNeedsDisplay:YES];
 }
 
-static void zoyaPebbleCloseImpl(void) {
+static void jarvisPebbleCloseImpl(void) {
     if (gPebbleWindow) {
         [gPebbleWindow orderOut:nil];
         gPebbleWindow = nil;
@@ -448,26 +448,26 @@ static void zoyaPebbleCloseImpl(void) {
 
 // Public C entry points marshalled onto the main thread.
 
-// zoyaPebbleSpawn creates the window only.
-void zoyaPebbleSpawn(void) {
-    dispatch_async(dispatch_get_main_queue(), ^{ zoyaPebbleSpawnImpl(); });
+// jarvisPebbleSpawn creates the window only.
+void jarvisPebbleSpawn(void) {
+    dispatch_async(dispatch_get_main_queue(), ^{ jarvisPebbleSpawnImpl(); });
 }
 
-// zoyaPebblePresent pushes one eased frame from the Go runtime. text may be
+// jarvisPebblePresent pushes one eased frame from the Go runtime. text may be
 // NULL/empty (drawRect: falls back to the per-state placeholder).
-void zoyaPebblePresent(int x, int y, int state, unsigned long long tick,
+void jarvisPebblePresent(int x, int y, int state, unsigned long long tick,
                          int eye, int blinded, int answerOverflow, int alphaPct, const char* text) {
     // Copy onto the heap so the Go-side buffer can be freed immediately.
     char* copy = (text && *text) ? strdup(text) : NULL;
     dispatch_async(dispatch_get_main_queue(), ^{
         NSString* body = copy ? [NSString stringWithUTF8String:copy] : nil;
-        zoyaPebblePresentImpl(x, y, state, tick, eye, blinded, answerOverflow, alphaPct, body);
+        jarvisPebblePresentImpl(x, y, state, tick, eye, blinded, answerOverflow, alphaPct, body);
         if (copy) free(copy);
     });
 }
 
-void zoyaPebbleClose(void) {
-    dispatch_async(dispatch_get_main_queue(), ^{ zoyaPebbleCloseImpl(); });
+void jarvisPebbleClose(void) {
+    dispatch_async(dispatch_get_main_queue(), ^{ jarvisPebbleCloseImpl(); });
 }
 */
 import "C"
@@ -550,7 +550,7 @@ func (s *pebbleServiceDarwin) Spawn(spec PebbleSpec) error {
 
 // ─── pebblePlatform primitives (all AppKit work marshals to the main queue) ──
 
-func (s *pebbleServiceDarwin) createWindow() error { C.zoyaPebbleSpawn(); return nil }
+func (s *pebbleServiceDarwin) createWindow() error { C.jarvisPebbleSpawn(); return nil }
 func (s *pebbleServiceDarwin) pumpMessages()       {} // the Cocoa runloop pumps for us
 
 func (s *pebbleServiceDarwin) present() error {
@@ -569,7 +569,7 @@ func (s *pebbleServiceDarwin) present() error {
 	} else if alpha > 1 {
 		alpha = 1
 	}
-	C.zoyaPebblePresent(
+	C.jarvisPebblePresent(
 		C.int(s.renderedX.Load()), C.int(s.renderedY.Load()),
 		C.int(pebbleStateToInt(state)), C.ulonglong(s.frameTick),
 		pebbleBoolToCInt(s.eyeActive.Load()), pebbleBoolToCInt(s.blinded.Load()),
@@ -586,7 +586,7 @@ func pebbleBoolToCInt(b bool) C.int {
 	return 0
 }
 
-func (s *pebbleServiceDarwin) destroyWindow() { C.zoyaPebbleClose() }
+func (s *pebbleServiceDarwin) destroyWindow() { C.jarvisPebbleClose() }
 
 func (s *pebbleServiceDarwin) Close() error {
 	if !s.spawned.CompareAndSwap(true, false) {

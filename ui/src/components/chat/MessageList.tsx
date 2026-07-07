@@ -41,7 +41,7 @@ export function MessageList({ messages }: Props) {
         <div className="chat-empty-orb" />
         <div className="chat-empty-title">Ready to assist</div>
         <div className="chat-empty-sub">
-          Type a message below to start a conversation with ZOYA.
+          Type a message below to start a conversation with JARVIS.
         </div>
       </div>
     );

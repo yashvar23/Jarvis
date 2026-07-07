@@ -13,4 +13,3 @@ export class ApStorage {
     ApStorage.instance = window.sessionStorage;
   }
 }
-

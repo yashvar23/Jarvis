@@ -10,4 +10,3 @@ export {
   passwordRules,
   passwordValidation,
 } from './utils/password-validation-utils';
-

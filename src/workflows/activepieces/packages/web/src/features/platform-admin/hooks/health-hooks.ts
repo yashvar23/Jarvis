@@ -13,4 +13,3 @@ export const healthQueries = {
       queryFn: () => healthApi.getSystemHealthChecks(),
     }),
 };
-

@@ -286,7 +286,7 @@ func handleGetWindowTree(params map[string]any) (*RPCResult, error) {
 // tryATSPI runs the embedded Python3 AT-SPI2 script and parses its output.
 func tryATSPI(pid, depth int) (map[string]any, error) {
 	// Write script to a temp file to avoid shell escaping issues
-	tmpFile, err := os.CreateTemp("", "zoya-atspi-*.py")
+	tmpFile, err := os.CreateTemp("", "jarvis-atspi-*.py")
 	if err != nil {
 		return nil, fmt.Errorf("could not create temp script: %w", err)
 	}

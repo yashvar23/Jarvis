@@ -193,8 +193,8 @@ func (s *regionSelectionWindows) run() {
 	defer close(s.doneCh)
 	defer activeSel.Store(nil)
 
-	className, _ := syscall.UTF16PtrFromString("ZoyaRegionOverlay")
-	windowName, _ := syscall.UTF16PtrFromString("ZOYA Region Select")
+	className, _ := syscall.UTF16PtrFromString("JarvisRegionOverlay")
+	windowName, _ := syscall.UTF16PtrFromString("JARVIS Region Select")
 
 	hInstance, _, _ := procGetModuleHandleW.Call(0)
 

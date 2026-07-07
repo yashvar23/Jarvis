@@ -18,4 +18,3 @@ export const apiKeyApi = {
     return api.post<ApiKeyResponseWithValue>(`/v1/api-keys/`, request);
   },
 };
-

@@ -18,7 +18,7 @@ function makeManager(projectsDir: string): ProjectManager {
 
 describe('ProjectManager path containment', () => {
   test('returns null for project ids that resolve outside projects dir', async () => {
-    const projectsDir = await mkdtemp(join(tmpdir(), 'zoya-sites-'));
+    const projectsDir = await mkdtemp(join(tmpdir(), 'jarvis-sites-'));
     try {
       const manager = makeManager(projectsDir);
 
@@ -29,7 +29,7 @@ describe('ProjectManager path containment', () => {
   });
 
   test('blocks sibling directory traversal with a shared prefix', async () => {
-    const projectsDir = await mkdtemp(join(tmpdir(), 'zoya-sites-'));
+    const projectsDir = await mkdtemp(join(tmpdir(), 'jarvis-sites-'));
     try {
       await mkdir(join(projectsDir, 'app'), { recursive: true });
       await mkdir(join(projectsDir, 'app-backup'), { recursive: true });
@@ -44,7 +44,7 @@ describe('ProjectManager path containment', () => {
   });
 
   test('allows descendant paths whose segment starts with two dots', async () => {
-    const projectsDir = await mkdtemp(join(tmpdir(), 'zoya-sites-'));
+    const projectsDir = await mkdtemp(join(tmpdir(), 'jarvis-sites-'));
     try {
       await mkdir(join(projectsDir, 'app'), { recursive: true });
       const manager = makeManager(projectsDir);
@@ -57,4 +57,3 @@ describe('ProjectManager path containment', () => {
     }
   });
 });
-

@@ -18,7 +18,7 @@ export function GeneralTab({
   const [restarting, setRestarting] = useState(false);
 
   const handleRestart = async () => {
-    if (!confirm("Restart Zoya now? Your dashboard will reconnect after a few seconds.")) return;
+    if (!confirm("Restart Jarvis now? Your dashboard will reconnect after a few seconds.")) return;
     setRestarting(true);
     const r = await data.restartDaemon();
     onToast(r.message, r.ok ? "ok" : "warn");
@@ -33,7 +33,7 @@ export function GeneralTab({
           <div>
             <h3 className="v2-set__section-title">24/7 Service</h3>
             <div className="v2-set__section-sub">
-              Keepalive that runs Zoya in the background after the terminal closes.
+              Keepalive that runs Jarvis in the background after the terminal closes.
             </div>
           </div>
           {autostart && (
@@ -74,7 +74,7 @@ export function GeneralTab({
                 disabled={!autostart.restart_supported || restarting}
                 onClick={handleRestart}
               >
-                {restarting ? "Restarting…" : "Restart Zoya"}
+                {restarting ? "Restarting…" : "Restart Jarvis"}
               </button>
               <button
                 type="button"
@@ -96,7 +96,7 @@ export function GeneralTab({
           <div>
             <h3 className="v2-set__section-title">Heartbeat</h3>
             <div className="v2-set__section-sub">
-              How often Zoya checks in with you proactively.
+              How often Jarvis checks in with you proactively.
             </div>
           </div>
         </div>
@@ -361,7 +361,7 @@ function PrefBar({ label, value, max = 10 }: { label: string; value: number; max
 /**
  * Onboarding reset section (Phase A — reset gate). Lets the user (or a
  * developer rehearsing a fresh-install run) replay any phase of the
- * onboarding flow without nuking `~/.zoya/`. The same reset is also
+ * onboarding flow without nuking `~/.jarvis/`. The same reset is also
  * reachable via voice ("replay onboarding") and via the URL trigger
  * `?onboarding=reset[&scope=...]` — see `resetClient.ts`.
  */
@@ -403,7 +403,7 @@ function OnboardingDebugSection({
         <div>
           <h3 className="v2-set__section-title">Onboarding</h3>
           <div className="v2-set__section-sub">
-            Replay any phase of first-run onboarding. Useful after Zoya
+            Replay any phase of first-run onboarding. Useful after Jarvis
             updates or for testing. Page reloads after the reset fires.
           </div>
         </div>

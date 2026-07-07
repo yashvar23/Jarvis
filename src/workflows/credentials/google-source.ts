@@ -1,10 +1,10 @@
 /**
- * `ZoyaGoogleConnectionSource` -- bridges Zoya's existing Google OAuth
- * file (`~/.zoya/google-tokens.json`) into the workflow runtime's
- * `CredentialResolver`. When a piece asks for `zoya:google` (or any
- * `zoya:google:*` sub-id), the source returns the live access token
+ * `JarvisGoogleConnectionSource` -- bridges Jarvis's existing Google OAuth
+ * file (`~/.jarvis/google-tokens.json`) into the workflow runtime's
+ * `CredentialResolver`. When a piece asks for `jarvis:google` (or any
+ * `jarvis:google:*` sub-id), the source returns the live access token
  * (refreshed on demand by `GoogleAuth.getAccessToken`) so users who already
- * authenticated Zoya with Google see a "Zoya Google" connection in the
+ * authenticated Jarvis with Google see a "Jarvis Google" connection in the
  * workflow piece picker without re-authenticating per piece.
  *
  * The piece sees an `OAUTH2`-shaped value:
@@ -17,19 +17,19 @@
 
 import type { GoogleAuth } from "../../integrations/google-auth";
 import type {
-  ZoyaConnectionSource,
+  JarvisConnectionSource,
   ResolvedConnection,
 } from "./adapter";
 
-export const ZOYA_GOOGLE_PREFIX = "zoya:google";
+export const JARVIS_GOOGLE_PREFIX = "jarvis:google";
 
-export class ZoyaGoogleConnectionSource implements ZoyaConnectionSource {
+export class JarvisGoogleConnectionSource implements JarvisConnectionSource {
   readonly id = "google";
 
   constructor(private readonly googleAuth: GoogleAuth) {}
 
   canResolve(externalId: string): boolean {
-    return externalId === ZOYA_GOOGLE_PREFIX || externalId.startsWith(`${ZOYA_GOOGLE_PREFIX}:`);
+    return externalId === JARVIS_GOOGLE_PREFIX || externalId.startsWith(`${JARVIS_GOOGLE_PREFIX}:`);
   }
 
   async resolve(_externalId: string): Promise<ResolvedConnection | null> {
@@ -54,4 +54,3 @@ export class ZoyaGoogleConnectionSource implements ZoyaConnectionSource {
     };
   }
 }
-

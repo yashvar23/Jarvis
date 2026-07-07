@@ -22,7 +22,7 @@ import { useSyncExternalStore } from "react";
  * the list view if they were in the middle of editing a project.
  */
 
-const STORAGE_KEY = "zoya:v2:workspaces-ui";
+const STORAGE_KEY = "jarvis:v2:workspaces-ui";
 
 export interface WorkspacesUIState {
   /** Project IDs currently open as tabs in the IDE. */
@@ -107,4 +107,3 @@ function subscribe(fn: () => void): () => void {
 export function useWorkspacesUIState(): WorkspacesUIState {
   return useSyncExternalStore(subscribe, getWorkspacesUIState, getWorkspacesUIState);
 }
-

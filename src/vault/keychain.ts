@@ -1,8 +1,8 @@
 /**
- * Encrypted secrets store for ZOYA.
+ * Encrypted secrets store for JARVIS.
  *
- * Stores secrets in an AES-256-GCM encrypted file (~/.zoya/.secrets.enc)
- * with a random key stored in ~/.zoya/.secrets.key (chmod 600).
+ * Stores secrets in an AES-256-GCM encrypted file (~/.jarvis/.secrets.enc)
+ * with a random key stored in ~/.jarvis/.secrets.key (chmod 600).
  *
  * This avoids depending on OS keychain daemons (which are unreliable on WSL2).
  */
@@ -12,18 +12,18 @@ import { constants as fsConstants, existsSync, readFileSync, mkdirSync, chmodSyn
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 
-const ZOYA_DIR = join(homedir(), '.zoya');
-const KEY_PATH = join(ZOYA_DIR, '.secrets.key');
-const SECRETS_PATH = join(ZOYA_DIR, '.secrets.enc');
+const JARVIS_DIR = join(homedir(), '.jarvis');
+const KEY_PATH = join(JARVIS_DIR, '.secrets.key');
+const SECRETS_PATH = join(JARVIS_DIR, '.secrets.enc');
 const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 12;
 const TAG_LENGTH = 16;
 
 function ensureDir(): void {
-  mkdirSync(ZOYA_DIR, { recursive: true, mode: 0o700 });
-  try { chmodSync(ZOYA_DIR, 0o700); } catch (err) {
+  mkdirSync(JARVIS_DIR, { recursive: true, mode: 0o700 });
+  try { chmodSync(JARVIS_DIR, 0o700); } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    console.warn(`[Keychain] Failed to chmod ${ZOYA_DIR} to 700: ${message}`);
+    console.warn(`[Keychain] Failed to chmod ${JARVIS_DIR} to 700: ${message}`);
   }
 }
 
@@ -115,4 +115,3 @@ export function hasSecret(name: string): boolean {
   const secrets = loadSecrets();
   return name in secrets;
 }
-

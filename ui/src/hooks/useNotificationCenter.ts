@@ -41,7 +41,7 @@ export interface NotificationCenterInput {
   notices: SystemNotice[];
 }
 
-const STORAGE_KEY = "zoya:notif-read";
+const STORAGE_KEY = "jarvis:notif-read";
 /** Cap localStorage growth — once an id falls off the live streams it can
  *  never be re-shown anyway, so we don't need to remember it forever. */
 const READ_SET_LIMIT = 500;
@@ -199,4 +199,3 @@ export function useNotificationCenter({
 
   return { items, unreadCount, markRead, markAllRead };
 }
-

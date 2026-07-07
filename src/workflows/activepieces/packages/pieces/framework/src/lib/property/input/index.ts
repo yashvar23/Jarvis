@@ -269,4 +269,3 @@ export const Property = {
       : ColorProperty<false>;
   },
 };
-

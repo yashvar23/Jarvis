@@ -23,9 +23,9 @@ import { REALTIME_URL, buildSessionUpdate } from '../src/comms/realtime.ts';
 import type { ResolvedRealtimeVoice } from '../src/config/realtime.ts';
 import type { RealtimeReasoningEffort } from '../src/config/types.ts';
 
-const key = (process.env.OPENAI_API_KEY || process.env.ZOYA_OPENAI_KEY || '').trim();
+const key = (process.env.OPENAI_API_KEY || process.env.JARVIS_OPENAI_KEY || '').trim();
 if (!key) {
-  console.error('✗ No API key. Set OPENAI_API_KEY (or ZOYA_OPENAI_KEY) and retry.');
+  console.error('✗ No API key. Set OPENAI_API_KEY (or JARVIS_OPENAI_KEY) and retry.');
   process.exit(1);
 }
 
@@ -119,4 +119,3 @@ ws.addEventListener('error', () => {
 ws.addEventListener('close', (ev: CloseEvent) => {
   if (ev.code !== 1000) console.error(`✗ Socket closed: code=${ev.code} reason="${ev.reason}"`);
 });
-

@@ -52,7 +52,7 @@ export function RestartRequiredBanner({ status }: { status: OnboardingStatus | n
     >
       <span aria-hidden style={{ fontSize: 16 }}>↻</span>
       <span>
-        <strong>Restart Zoya</strong> to enable background processing —
+        <strong>Restart Jarvis</strong> to enable background processing —
         your heartbeat, commitments, and awareness services will activate
         after the next start.
       </span>
@@ -64,7 +64,7 @@ export function RestartRequiredBanner({ status }: { status: OnboardingStatus | n
           borderRadius: 4,
         }}
       >
-        zoya restart
+        jarvis restart
       </code>
     </div>
   );

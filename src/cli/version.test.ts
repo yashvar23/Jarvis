@@ -8,7 +8,7 @@ import { getInstalledVersion, selectInstalledVersion } from './version.ts';
 const TEMP_DIRS: string[] = [];
 
 function makeTempDir(name: string): string {
-  const dir = mkdtempSync(join(tmpdir(), `zoya-version-test-${name}-`));
+  const dir = mkdtempSync(join(tmpdir(), `jarvis-version-test-${name}-`));
   const resolved = resolve(dir);
   if (resolved === resolve(process.cwd())) {
     throw new Error('Refusing to use the current worktree as a test temp directory');
@@ -18,7 +18,7 @@ function makeTempDir(name: string): string {
 }
 
 async function writePackageJson(dir: string, version: string): Promise<void> {
-  await Bun.write(join(dir, 'package.json'), JSON.stringify({ name: 'zoya', version }, null, 2));
+  await Bun.write(join(dir, 'package.json'), JSON.stringify({ name: '@usejarvis/brain', version }, null, 2));
 }
 
 async function writeFakeGit(dir: string, script: string): Promise<void> {
@@ -53,15 +53,15 @@ async function withFakeGit<T>(
   await writePackageJson(dir, '0.4.0');
   await writeFakeGit(dir, fakeGitScript(describeBranch));
 
-  const previousGitBin = process.env.ZOYA_GIT_BIN;
-  process.env.ZOYA_GIT_BIN = join(dir, 'bin', 'git');
+  const previousGitBin = process.env.JARVIS_GIT_BIN;
+  process.env.JARVIS_GIT_BIN = join(dir, 'bin', 'git');
   try {
     return await run(dir);
   } finally {
     if (previousGitBin === undefined) {
-      delete process.env.ZOYA_GIT_BIN;
+      delete process.env.JARVIS_GIT_BIN;
     } else {
-      process.env.ZOYA_GIT_BIN = previousGitBin;
+      process.env.JARVIS_GIT_BIN = previousGitBin;
     }
   }
 }
@@ -143,15 +143,15 @@ fi`,
   test('falls back to package.json when not a git checkout', async () => {
     const dir = makeTempDir('non-git');
     await writePackageJson(dir, '3.2.1');
-    // Point ZOYA_GIT_BIN at a non-existent file so rev-parse fails →
+    // Point JARVIS_GIT_BIN at a non-existent file so rev-parse fails →
     // isGitCheckout returns false and we never call describe.
-    const previousGitBin = process.env.ZOYA_GIT_BIN;
-    process.env.ZOYA_GIT_BIN = join(dir, 'no-such-git-binary');
+    const previousGitBin = process.env.JARVIS_GIT_BIN;
+    process.env.JARVIS_GIT_BIN = join(dir, 'no-such-git-binary');
     try {
       expect(getInstalledVersion(dir)).toBe('3.2.1');
     } finally {
-      if (previousGitBin === undefined) delete process.env.ZOYA_GIT_BIN;
-      else process.env.ZOYA_GIT_BIN = previousGitBin;
+      if (previousGitBin === undefined) delete process.env.JARVIS_GIT_BIN;
+      else process.env.JARVIS_GIT_BIN = previousGitBin;
     }
   });
 
@@ -175,16 +175,16 @@ fi`,
 });
 
 // ── End-to-end CLI smoke tests ──────────────────────────────────────
-// Run the real `bin/zoya.ts --version` / `version` paths so the banner
+// Run the real `bin/jarvis.ts --version` / `version` paths so the banner
 // `v`-prefixing contract is locked. The matcher unit tests above verify
 // the resolver's shape; these prove the call sites add `v` consistently.
 
 describe('CLI --version output', () => {
   const REPO_ROOT = resolve(import.meta.dir, '..', '..');
-  const ZOYA_BIN = join(REPO_ROOT, 'bin', 'zoya.ts');
+  const JARVIS_BIN = join(REPO_ROOT, 'bin', 'jarvis.ts');
 
   async function runCli(args: string[]): Promise<{ exitCode: number; stdout: string }> {
-    const proc = Bun.spawn(['bun', ZOYA_BIN, ...args], {
+    const proc = Bun.spawn(['bun', JARVIS_BIN, ...args], {
       stdout: 'pipe',
       stderr: 'pipe',
       cwd: REPO_ROOT,
@@ -194,14 +194,14 @@ describe('CLI --version output', () => {
     return { exitCode, stdout };
   }
 
-  test('`zoya --version` prints v-prefixed version with no doubling', async () => {
+  test('`jarvis --version` prints v-prefixed version with no doubling', async () => {
     const { exitCode, stdout } = await runCli(['--version']);
     expect(exitCode).toBe(0);
     expect(stdout).toMatch(/^v\d+\.\d+/);
     expect(stdout.startsWith('vv')).toBe(false);
   }, { timeout: 15000 });
 
-  test('`zoya version` matches `--version` output', async () => {
+  test('`jarvis version` matches `--version` output', async () => {
     const a = await runCli(['version']);
     const b = await runCli(['--version']);
     expect(a.exitCode).toBe(0);
@@ -209,7 +209,7 @@ describe('CLI --version output', () => {
     expect(a.stdout).toBe(b.stdout);
   }, { timeout: 15000 });
 
-  test('`zoya -v` matches `--version` output', async () => {
+  test('`jarvis -v` matches `--version` output', async () => {
     const a = await runCli(['-v']);
     const b = await runCli(['--version']);
     expect(a.exitCode).toBe(0);
@@ -217,11 +217,10 @@ describe('CLI --version output', () => {
     expect(a.stdout).toBe(b.stdout);
   }, { timeout: 15000 });
 
-  test('`zoya help` banner contains exactly one v-prefixed version (no vv)', async () => {
+  test('`jarvis help` banner contains exactly one v-prefixed version (no vv)', async () => {
     const { exitCode, stdout } = await runCli(['help']);
     expect(exitCode).toBe(0);
     expect(stdout).not.toMatch(/vv\d+\.\d+/);
     expect(stdout).toMatch(/v\d+\.\d+/);
   }, { timeout: 15000 });
 });
-

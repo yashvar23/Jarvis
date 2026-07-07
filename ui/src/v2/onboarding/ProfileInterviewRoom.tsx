@@ -7,11 +7,11 @@ import "./ProfileInterviewRoom.css";
 
 /**
  * Phase B — fullscreen conversational onboarding interview. Centered
- * MicOrb that pulses while Zoya speaks; live transcript bubbles
+ * MicOrb that pulses while Jarvis speaks; live transcript bubbles
  * for the conversation; type-or-talk composer at the bottom; Skip
  * button always available.
  *
- * Voice flow: Zoya speaks → orb pulses speaking → on TTS end the
+ * Voice flow: Jarvis speaks → orb pulses speaking → on TTS end the
  * orb flips to listening → browser SpeechRecognition collects user
  * audio → user clicks Send (or hits Enter) → daemon runs another
  * agent turn. Text-only fallback uses the same composer without TTS.
@@ -136,7 +136,7 @@ export function ProfileInterviewRoom({
             <h1 className="v2-interview__done-title">Got it.</h1>
             <p className="v2-interview__done-body">
               {session.farewell ||
-                "I have plenty to start with. Welcome to Zoya."}
+                "I have plenty to start with. Welcome to Jarvis."}
             </p>
             <p className="v2-interview__done-meta">
               {session.factsRecorded} {session.factsRecorded === 1 ? "fact" : "facts"} captured.
@@ -155,7 +155,7 @@ export function ProfileInterviewRoom({
     <div className="v2-interview" role="dialog" aria-modal="true" aria-label="Onboarding interview">
       <div className="v2-interview__wrap">
         <header className="v2-interview__head">
-          <div className="v2-interview__brand">ZOYA · onboarding</div>
+          <div className="v2-interview__brand">JARVIS · onboarding</div>
           <div className="v2-interview__meta">
             <span className="v2-interview__facts-count">
               {session.factsRecorded} {session.factsRecorded === 1 ? "fact" : "facts"} captured
@@ -256,8 +256,8 @@ export function ProfileInterviewRoom({
 function phaseLabel(phase: string): string {
   switch (phase) {
     case "connecting": return "Connecting…";
-    case "thinking": return "Zoya is thinking…";
-    case "speaking": return "Zoya is speaking — listen up";
+    case "thinking": return "Jarvis is thinking…";
+    case "speaking": return "Jarvis is speaking — listen up";
     case "listening": return "Your turn — speak or type";
     case "ready": return "Ready";
     case "error": return "Error";

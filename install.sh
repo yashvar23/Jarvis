@@ -1,22 +1,22 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# ── ZOYA Installer ──────────────────────────────────────────
+# ── J.A.R.V.I.S. Installer ──────────────────────────────────────────
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/yashvar23/zoya/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/vierisid/jarvis/main/install.sh | bash
 #
 # What this does:
 #   1. Detects your OS (macOS / Linux / WSL)
 #   2. Installs Bun if not already installed
 #   3. Clones the repo & installs dependencies
-#   4. Links the `zoya` command globally
+#   4. Links the `jarvis` command globally
 #
 # ─────────────────────────────────────────────────────────────────────
 
-REPO_URL="https://github.com/yashvar23/zoya.git"
-INSTALL_DIR="$HOME/.zoya/daemon"
-TRACKING_URL="https://getzoya.dev/api/install"
+REPO_URL="https://github.com/vierisid/jarvis.git"
+INSTALL_DIR="$HOME/.jarvis/daemon"
+TRACKING_URL="https://getjarvis.dev/api/install"
 
 CYAN='\033[0;36m'
 GREEN='\033[0;32m'
@@ -28,14 +28,14 @@ RESET='\033[0m'
 
 print_banner() {
   echo -e "${CYAN}"
-  echo "███████╗ ██████╗ ██╗   ██╗ █████╗"
-  echo "╚══███╔╝██╔═══██╗╚██╗ ██╔╝██╔══██╗"
-  echo "  ███╔╝ ██║   ██║ ╚████╔╝ ███████║"
-  echo " ███╔╝  ██║   ██║  ╚██╔╝  ██╔══██║"
-  echo "███████╗╚██████╔╝   ██║   ██║  ██║"
-  echo "╚══════╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝"
+  echo "     ██╗ █████╗ ██████╗ ██╗   ██╗██╗███████╗"
+  echo "     ██║██╔══██╗██╔══██╗██║   ██║██║██╔════╝"
+  echo "     ██║███████║██████╔╝██║   ██║██║███████╗"
+  echo "██   ██║██╔══██║██╔══██╗╚██╗ ██╔╝██║╚════██║"
+  echo "╚█████╔╝██║  ██║██║  ██║ ╚████╔╝ ██║███████║"
+  echo " ╚════╝ ╚═╝  ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚═╝╚══════╝"
   echo -e "${RESET}"
-  echo -e "${DIM}  An always-on autonomous AI daemon${RESET}"
+  echo -e "${DIM}  Just A Rather Very Intelligent System${RESET}"
   echo ""
 }
 
@@ -127,7 +127,7 @@ ensure_libc_headers() {
     return 0
   else
     warn "Unknown package manager - cannot auto-install libc headers."
-    warn "If 'zoya' fails with \"sys/file.h not found\", install your distro's libc dev headers."
+    warn "If 'jarvis' fails with \"sys/file.h not found\", install your distro's libc dev headers."
     return 0
   fi
 
@@ -172,11 +172,11 @@ add_path_to_shell() {
   if ! grep -q "\.bun/bin" "$profile" 2>/dev/null; then
     if [ "$shell_name" = "fish" ]; then
       echo "" >> "$profile"
-      echo "# Bun global bin (added by ZOYA installer)" >> "$profile"
+      echo "# Bun global bin (added by JARVIS installer)" >> "$profile"
       echo "set -gx PATH \$HOME/.bun/bin \$PATH" >> "$profile"
     else
       echo "" >> "$profile"
-      echo "# Bun global bin (added by ZOYA installer)" >> "$profile"
+      echo "# Bun global bin (added by JARVIS installer)" >> "$profile"
       echo "export PATH=\"\$HOME/.bun/bin:\$PATH\"" >> "$profile"
     fi
     info "Added bun bin to ${profile}"
@@ -194,13 +194,13 @@ main() {
   echo ""
 
   if [ "$OS" = "unknown" ]; then
-    err "Unsupported operating system. ZOYA supports macOS, Linux, and WSL."
+    err "Unsupported operating system. JARVIS supports macOS, Linux, and WSL."
     exit 1
   fi
 
   if [ "$OS" = "windows-native" ]; then
-    err "Native Windows installs are not supported for the ZOYA daemon."
-    err "Use WSL2 for the Bun install, or run ZOYA with Docker on Windows."
+    err "Native Windows installs are not supported for the JARVIS daemon."
+    err "Use WSL2 for the Bun install, or run JARVIS with Docker on Windows."
     err "The Windows sidecar is still supported separately."
     exit 1
   fi
@@ -273,7 +273,7 @@ main() {
 
   # ── Step 2: Clone / Update repo ─────────────────────────────────
 
-  echo -e "${CYAN}[2/3]${RESET} ${BOLD}Downloading ZOYA..${RESET}"
+  echo -e "${CYAN}[2/3]${RESET} ${BOLD}Downloading J.A.R.V.I.S...${RESET}"
 
   if ! command -v git &> /dev/null; then
     info "git not found. Installing..."
@@ -327,7 +327,7 @@ main() {
       err "Failed to clone repository. Check your internet connection."
       exit 1
     }
-    ok "Downloaded ZOYA ${LATEST_TAG}"
+    ok "Downloaded JARVIS ${LATEST_TAG}"
   fi
 
   echo ""
@@ -347,26 +347,26 @@ main() {
   fi
   ok "Dependencies installed"
 
-  # Stamp install-method marker so `zoya update` / `zoya uninstall` know
+  # Stamp install-method marker so `jarvis update` / `jarvis uninstall` know
   # this is a script install (git clone) and dispatch to `git pull` / `rm -rf`
   # rather than `bun uninstall -g` or docker instructions.
   printf '{"method":"script","installedAt":"%s"}\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
     > "$INSTALL_DIR/.install-method"
 
   # Create shell wrapper directly (avoids bun link registry lookups)
-  rm -f "$HOME/.bun/bin/zoya" 2>/dev/null || true
+  rm -f "$HOME/.bun/bin/jarvis" 2>/dev/null || true
   local bun_bin="$HOME/.bun/bin"
   mkdir -p "$bun_bin"
-  printf '#!/usr/bin/env bash\nexec bun "%s/bin/zoya.ts" "$@"\n' "$INSTALL_DIR" > "$bun_bin/zoya"
-  chmod +x "$bun_bin/zoya"
+  printf '#!/usr/bin/env bash\nexec bun "%s/bin/jarvis.ts" "$@"\n' "$INSTALL_DIR" > "$bun_bin/jarvis"
+  chmod +x "$bun_bin/jarvis"
 
   ensure_bun_path
   add_path_to_shell
 
-  if command -v zoya &> /dev/null; then
-    ok "zoya command is available"
+  if command -v jarvis &> /dev/null; then
+    ok "jarvis command is available"
   else
-    warn "zoya installed but not in PATH yet. Restart your terminal or run:"
+    warn "jarvis installed but not in PATH yet. Restart your terminal or run:"
     echo -e "    ${DIM}export PATH=\"\$HOME/.bun/bin:\$PATH\"${RESET}"
   fi
 
@@ -383,7 +383,7 @@ main() {
   # ── Done ─────────────────────────────────────────────────────────
 
   echo ""
-  echo -e "${GREEN}${BOLD}✓ ZOYA installed successfully!${RESET}"
+  echo -e "${GREEN}${BOLD}✓ J.A.R.V.I.S. installed successfully!${RESET}"
   echo ""
 
   if [ -n "$PATH_ADDED_PROFILE" ]; then
@@ -393,7 +393,7 @@ main() {
   fi
 
   echo -e "  Start the daemon and finish setup in your browser:"
-  echo -e "    ${CYAN}zoya start${RESET}"
+  echo -e "    ${CYAN}jarvis start${RESET}"
   echo -e "    ${DIM}→ http://localhost:3142 (dashboard guides you through LLM, voice, and profile)${RESET}"
 }
 

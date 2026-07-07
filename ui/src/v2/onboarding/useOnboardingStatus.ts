@@ -41,7 +41,7 @@ export interface OnboardingStatus {
   /** True once the LLM-dependent background services (bgAgent,
    *  commitment executor, awareness) are running. The normal flow
    *  constructs them in-process at `/api/onboarding/setup`, so this
-   *  flips to true without a daemon restart. The "Restart Zoya"
+   *  flips to true without a daemon restart. The "Restart Jarvis"
    *  banner only shows when setup is complete but this is false — a
    *  defensive fallback for failed in-process construction or daemons
    *  on a pre-fix binary. */
@@ -187,4 +187,3 @@ function phaseFlagsChanged(a: OnboardingStatus, b: OnboardingStatus): boolean {
     a.tutorial_dismissed !== b.tutorial_dismissed
   );
 }
-

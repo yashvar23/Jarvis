@@ -1,22 +1,22 @@
 {
-  "name": "zoya",
-  "version": "0.8.1",
-  "description": "ZOYA — An always-on autonomous AI daemon.",
+  "name": "@yashvar23/brain",
+  "version": "0.0.1",
+  "description": "J.A.R.V.I.S. — Just A Rather Very Intelligent System. An always-on autonomous AI daemon.",
   "module": "src/daemon/index.ts",
   "type": "module",
   "bin": {
-    "zoya": "bin/zoya.ts"
+    "jarvis": "bin/jarvis.ts"
   },
   "engines": {
     "bun": ">=1.0.0"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yashvar23/zoya.git"
+    "url": "git+https://github.com/yashvar23/jarvis.git"
   },
   "license": "SEE LICENSE IN LICENSE",
   "keywords": [
-    "zoya",
+    "jarvis",
     "ai",
     "daemon",
     "assistant",
@@ -34,7 +34,7 @@
   "scripts": {
     "start": "bun run src/daemon/index.ts",
     "dev": "bun --hot run src/daemon/index.ts",
-    "copy:models": "mkdir -p ui/public/openwakeword/models ui/public/ort && cp node_modules/openwakeword-wasm-browser/models/melspectrogram.onnx node_modules/openwakeword-wasm-browser/models/embedding_model.onnx node_modules/openwakeword-wasm-browser/models/silero_vad.onnx ui/public/openwakeword/models/ && cp node_modules/openwakeword-wasm-browser/models/hey_jarvis_v0.1.onnx ui/public/openwakeword/models/hey_zoya_v0.1.onnx && cp node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.jsep.wasm node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.wasm node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.jsep.mjs node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.mjs ui/public/ort/",
+    "copy:models": "mkdir -p ui/public/openwakeword/models ui/public/ort && cp node_modules/openwakeword-wasm-browser/models/melspectrogram.onnx node_modules/openwakeword-wasm-browser/models/embedding_model.onnx node_modules/openwakeword-wasm-browser/models/silero_vad.onnx node_modules/openwakeword-wasm-browser/models/hey_jarvis_v0.1.onnx ui/public/openwakeword/models/ && cp node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.jsep.wasm node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.wasm node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.jsep.mjs node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.mjs ui/public/ort/",
     "prebuild:ui": "bun run copy:models",
     "build:ui": "bun build ui/index.html ui/pebble.html --outdir ui/dist",
     "test": "bun test",
@@ -94,4 +94,3 @@
     "typescript": "^5"
   }
 }
-

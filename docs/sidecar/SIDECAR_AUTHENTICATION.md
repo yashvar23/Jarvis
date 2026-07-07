@@ -2,7 +2,7 @@
 
 ## Overview
 
-Sidecars are lightweight processes running on user PCs that expose local capabilities (terminal, filesystem, desktop, browser) to the Zoya brain (the central server). This document describes how sidecars are enrolled and authenticated.
+Sidecars are lightweight processes running on user PCs that expose local capabilities (terminal, filesystem, desktop, browser) to the Jarvis brain (the central server). This document describes how sidecars are enrolled and authenticated.
 
 ## Choosing the Brain and JWKS URLs
 
@@ -13,7 +13,7 @@ Each enrollment token contains two operator-controlled URLs:
 
 In the current daemon, those claims are chosen from a single configured brain origin with this precedence:
 
-1. `ZOYA_BRAIN_DOMAIN`
+1. `JARVIS_BRAIN_DOMAIN`
 2. `daemon.brain_domain`
 3. `localhost:<daemon.port>` fallback
 
@@ -25,7 +25,7 @@ At startup, the daemon applies the env override in `src/config/loader.ts`, then 
 
 ### What to Set for Remote Sidecars
 
-For sidecars running on another machine, set `ZOYA_BRAIN_DOMAIN` or `daemon.brain_domain` to the public origin that machine can actually reach.
+For sidecars running on another machine, set `JARVIS_BRAIN_DOMAIN` or `daemon.brain_domain` to the public origin that machine can actually reach.
 
 Good examples:
 
@@ -84,7 +84,7 @@ Asymmetric signing (ES256) allows sidecars to **verify** that a token was genuin
 
 ### Step 1: User Initiates Enrollment (Dashboard)
 
-On the Zoya dashboard, the user clicks **"Add Sidecar"** and provides:
+On the Jarvis dashboard, the user clicks **"Add Sidecar"** and provides:
 
 - **Sidecar name** — a human-readable identifier (e.g., `home-desktop`, `work-laptop`)
 
@@ -125,7 +125,7 @@ If those claims point at the wrong domain, an old ingress, or a host unreachable
 
 ### Step 3: User Copies Token to Sidecar
 
-The dashboard displays the JWT as a copyable string. The user pastes it into the sidecar process configuration (e.g., `~/.zoya-sidecar/config.yaml`).
+The dashboard displays the JWT as a copyable string. The user pastes it into the sidecar process configuration (e.g., `~/.jarvis-sidecar/config.yaml`).
 
 ### Step 4: Sidecar Verifies Token
 
@@ -210,8 +210,8 @@ Symptoms:
 
 Fix:
 
-1. Set `ZOYA_BRAIN_DOMAIN` or `daemon.brain_domain` to the correct public origin
-2. Restart/reload Zoya so the daemon uses the new value
+1. Set `JARVIS_BRAIN_DOMAIN` or `daemon.brain_domain` to the correct public origin
+2. Restart/reload Jarvis so the daemon uses the new value
 3. Re-enroll the sidecar so a fresh token is minted with corrected claims
 
 Remember: existing tokens keep the URLs they were issued with.
@@ -226,7 +226,7 @@ Symptoms:
 Fix:
 
 1. Verify the configured origin serves `GET /api/sidecars/.well-known/jwks.json`
-2. Confirm your proxy/tunnel forwards that path to Zoya
+2. Confirm your proxy/tunnel forwards that path to Jarvis
 3. Make sure the sidecar machine can resolve and reach the configured host
 4. Use a certificate trusted by the sidecar machine when using HTTPS
 
@@ -246,7 +246,7 @@ Fix:
 
 ### YAML and environment disagree
 
-`ZOYA_BRAIN_DOMAIN` overrides `daemon.brain_domain`. If the token does not match the YAML value you expected, check the daemon process environment first.
+`JARVIS_BRAIN_DOMAIN` overrides `daemon.brain_domain`. If the token does not match the YAML value you expected, check the daemon process environment first.
 
 ## Security Considerations
 
@@ -287,4 +287,3 @@ CREATE TABLE IF NOT EXISTS sidecars (
 | `os`           | Operating system (e.g., `windows`, `linux`, `darwin`)                |
 | `platform`     | Platform identifier (e.g., `win32`, `linux`)                         |
 | `capabilities` | JSON array of capabilities (e.g., `["terminal","desktop","browser"]`) |
-

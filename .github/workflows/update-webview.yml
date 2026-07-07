@@ -1,11 +1,11 @@
 name: Update webview_go
 
 # Monthly check for a newer github.com/webview/webview_go, re-vendor it into
-# sidecar/third_party/webview_go, re-apply our SW_HIDE patch (zoya.patch), and
+# sidecar/third_party/webview_go, re-apply our SW_HIDE patch (jarvis.patch), and
 # -- only if it still builds on every toolchain -- open a PR for review.
 #
 # Why this exists: we vendor + patch webview_go (see the vendor dir's
-# ZOYA_PATCH.md), so Dependabot/Renovate can't bump it. This job is the
+# JARVIS_PATCH.md), so Dependabot/Renovate can't bump it. This job is the
 # replacement: a PR is opened ONLY when the patch re-applies cleanly AND the
 # sidecar still compiles (linux-native cgo + windows-cross mingw, the same gate
 # as test.yml's sidecar-build, which specifically exercises the patched win32
@@ -107,7 +107,7 @@ jobs:
             [ -f "$d/javascriptcoregtk-4.1.pc" ] && sudo ln -sf "$d/javascriptcoregtk-4.1.pc" "$d/javascriptcoregtk-4.0.pc" || true
           done
 
-      - name: Re-vendor + re-apply zoya.patch
+      - name: Re-vendor + re-apply jarvis.patch
         env:
           VERSION: ${{ needs.check.outputs.version }}
         run: scripts/vendor-webview.sh "$VERSION"
@@ -116,7 +116,7 @@ jobs:
         run: |
           set -euo pipefail
           h=sidecar/third_party/webview_go/libs/webview/include/webview.h
-          grep -q "PATCHED (zoya)" "$h"
+          grep -q "PATCHED (jarvis)" "$h"
           grep -q "ShowWindow(m_window, SW_HIDE)" "$h"
 
       # ── Compatibility gate ─────────────────────────────────────
@@ -141,7 +141,7 @@ jobs:
         run: |
           set -euo pipefail
           export CGO_CFLAGS="-I$(pwd)/include" CGO_CXXFLAGS="-I$(pwd)/include"
-          go build -o /tmp/zoya-sidecar.exe .
+          go build -o /tmp/jarvis-sidecar.exe .
 
       - name: Open / update the bump PR
         id: pr
@@ -164,7 +164,7 @@ jobs:
             - To:   `${{ needs.check.outputs.version }}`
 
             Re-vendored via `scripts/vendor-webview.sh` and re-applied
-            `zoya.patch` (the SW_HIDE hidden-window patch). The compatibility
+            `jarvis.patch` (the SW_HIDE hidden-window patch). The compatibility
             gate in this run passed:
 
             - linux/amd64 cgo `go vet` + `go build` + `go test`
@@ -173,7 +173,7 @@ jobs:
             Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
             Note: the gate proves it still **compiles**; it can't exercise the
-            runtime hidden-window behavior. Skim the `zoya.patch` hunk in the
+            runtime hidden-window behavior. Skim the `jarvis.patch` hunk in the
             diff to confirm the SW_HIDE edit still sits in the win32 constructor.
 
       # If anything above failed (patch no longer applies, or upstream broke the
@@ -194,5 +194,5 @@ jobs:
             exit 0
           fi
           gh issue create --title "$title" --label automated,dependencies \
-            --body "The monthly webview_go update to \`${VERSION}\` failed (patch no longer applies, or the bump broke the build). Re-apply the SW_HIDE patch, regenerate \`sidecar/third_party/webview_go/zoya.patch\`, then re-run. Run: ${RUN_URL}" \
+            --body "The monthly webview_go update to \`${VERSION}\` failed (patch no longer applies, or the bump broke the build). Re-apply the SW_HIDE patch, regenerate \`sidecar/third_party/webview_go/jarvis.patch\`, then re-run. Run: ${RUN_URL}" \
             || true

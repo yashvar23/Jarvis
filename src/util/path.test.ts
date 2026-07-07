@@ -43,4 +43,3 @@ describe('isWithin', () => {
     expect(escaping.startsWith(`..${sep}`)).toBe(true);
   });
 });
-

@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * CLI: build the workflow runtime in one go -- every Zoya piece's
+ * CLI: build the workflow runtime in one go -- every Jarvis piece's
  * `dist/src/index.js` AND the activepieces engine bundle. Both are
  * needed for catalog metadata extraction to see fresh source: the
  * engine reads compiled pieces via dev-pieces mode, and the engine
@@ -20,17 +20,17 @@
  */
 
 import { statSync } from "node:fs";
-import { buildAllZoyaPieces } from "../src/workflows/runner/engine-runtime/build-pieces";
+import { buildAllJarvisPieces } from "../src/workflows/runner/engine-runtime/build-pieces";
 import { buildEngineBundle } from "../src/workflows/runner/engine-runtime/build";
 
 const force = process.argv.includes("--force");
 
-console.log("Building Zoya pieces...");
+console.log("Building Jarvis pieces...");
 const piecesStart = Date.now();
-const pieces = await buildAllZoyaPieces({ force });
+const pieces = await buildAllJarvisPieces({ force });
 const piecesElapsed = Date.now() - piecesStart;
 if (pieces.length === 0) {
-  console.log("  (no Zoya pieces found)");
+  console.log("  (no Jarvis pieces found)");
 } else {
   let builtCount = 0;
   let cachedCount = 0;
@@ -57,4 +57,3 @@ console.log(`  built:  ${engineElapsed} ms`);
 console.log(
   "\nDone. Restart the daemon so the piece-catalog cache is rebuilt against the new artifacts.",
 );
-

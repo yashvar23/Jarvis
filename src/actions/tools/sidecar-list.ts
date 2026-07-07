@@ -55,4 +55,3 @@ export const listSidecarsTool: ToolDefinition = {
     }).join('\n\n');
   },
 };
-

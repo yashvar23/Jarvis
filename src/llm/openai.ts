@@ -79,7 +79,6 @@ type OpenAIResponse = {
     prompt_tokens: number;
     completion_tokens: number;
     total_tokens: number;
-    prompt_tokens_details?: { cached_tokens?: number };
   };
 };
 
@@ -420,15 +419,8 @@ export class OpenAIProvider implements LLMProvider {
       content,
       tool_calls,
       usage: {
-        // Normalized semantics (see LLMResponse.usage): input_tokens counts
-        // only UNCACHED prompt tokens. OpenAI's prompt_tokens includes cached
-        // tokens, so subtract them out; Anthropic already reports cache
-        // tokens separately from input_tokens.
-        input_tokens: response.usage.prompt_tokens
-          - (response.usage.prompt_tokens_details?.cached_tokens ?? 0),
+        input_tokens: response.usage.prompt_tokens,
         output_tokens: response.usage.completion_tokens,
-        ...(response.usage.prompt_tokens_details?.cached_tokens !== undefined
-          ? { cache_read_input_tokens: response.usage.prompt_tokens_details.cached_tokens } : {}),
       },
       model: response.model,
       finish_reason: this.mapFinishReason(choice!.finish_reason),
@@ -450,4 +442,3 @@ export class OpenAIProvider implements LLMProvider {
     }
   }
 }
-

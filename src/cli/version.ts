@@ -12,10 +12,10 @@ function readPackageVersion(packageRoot: string): string {
   }
 }
 
-// ZOYA_GIT_BIN is a test-only seam: lets unit tests substitute a fake
+// JARVIS_GIT_BIN is a test-only seam: lets unit tests substitute a fake
 // git binary so we don't depend on the host's real git installation.
 function runGit(args: string[], cwd: string): string | null {
-  const gitBin = process.env.ZOYA_GIT_BIN || 'git';
+  const gitBin = process.env.JARVIS_GIT_BIN || 'git';
   let result: ReturnType<typeof spawnSync>;
   try {
     result = spawnSync([gitBin, '-C', cwd, ...args], {
@@ -79,4 +79,3 @@ export function getInstalledVersion(packageRoot: string): string {
   const described = describedRaw && looksLikeVersion(describedRaw) ? describedRaw : null;
   return selectInstalledVersion(null, described, pkgVersion);
 }
-

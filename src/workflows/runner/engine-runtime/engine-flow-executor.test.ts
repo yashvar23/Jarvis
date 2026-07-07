@@ -261,7 +261,7 @@ describe("EngineFlowExecutor", () => {
     const { promisify } = await import("node:util");
     const { zstdCompress: zstdCompressCb } = await import("node:zlib");
     const zstdCompress = promisify(zstdCompressCb);
-    const loaderBaseDir = mkdtempSync(join(tmpdir(), "zoya-resume-restore-"));
+    const loaderBaseDir = mkdtempSync(join(tmpdir(), "jarvis-resume-restore-"));
     try {
       const { runId, ctx } = setupRun();
       // The DB-side `flow_run.steps` only carries the outer (incomplete) shape.
@@ -344,7 +344,7 @@ describe("EngineFlowExecutor", () => {
     const { mkdtempSync, rmSync } = await import("node:fs");
     const { tmpdir } = await import("node:os");
     const { join } = await import("node:path");
-    const loaderBaseDir = mkdtempSync(join(tmpdir(), "zoya-resume-fallback-"));
+    const loaderBaseDir = mkdtempSync(join(tmpdir(), "jarvis-resume-fallback-"));
     try {
       const { runId, ctx } = setupRun();
       updateRun(runId, {
@@ -388,4 +388,3 @@ describe("EngineFlowExecutor", () => {
     }
   });
 });
-

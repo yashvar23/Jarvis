@@ -8,7 +8,7 @@
  *   "@every <duration>" where <duration> is `<n>(s|m|h)` -- e.g. `@every 10s`,
  *   `@every 30s`, `@every 5m`. Bounds: minimum 1s, maximum 24h. Implemented
  *   with `setInterval(durationMs)` rather than the per-minute matcher loop,
- *   so triggers like `zoya-trigger:on_event` can poll faster than once a
+ *   so triggers like `jarvis-trigger:on_event` can poll faster than once a
  *   minute.
  *
  * No external dependencies.
@@ -147,129 +147,6 @@ function parseExpression(expression: string): {
   };
 }
 
-// ── Timezone support ──
-//
-// Cron expressions describe WALL-CLOCK times ("0 7 * * *" = 7am where the
-// user lives). By default that is the machine's local time (self-host). A
-// hosted brain runs on a UTC VPS, so the daemon sets the user's IANA
-// timezone here once at boot (from the system config `timezone` key, which
-// the hosting server writes from the sidecar-reported value) and every cron
-// in the process - system morning/evening/hourly, workflow triggers, goal
-// windows - evaluates in that timezone.
-
-let cronTimezone: string | null = null;
-
-/** Set (or clear) the process-wide cron timezone. Throws on unknown zones. */
-export function setCronTimezone(tz: string | null): void {
-  if (tz) {
-    // Throws RangeError for unknown zone names.
-    new Intl.DateTimeFormat('en-US', { timeZone: tz });
-  }
-  cronTimezone = tz;
-  wallClockFormatter = null;
-}
-
-export function getCronTimezone(): string | null {
-  return cronTimezone;
-}
-
-let wallClockFormatter: Intl.DateTimeFormat | null = null;
-
-const DOW_INDEX: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
-
-interface WallClock {
-  minute: number;
-  hour: number;
-  dom: number;
-  month: number;
-  dow: number;
-  year: number;
-}
-
-/** Wall-clock components of a timestamp in the configured cron timezone. */
-function wallClock(date: Date): WallClock {
-  if (!cronTimezone) {
-    return {
-      minute: date.getMinutes(),
-      hour: date.getHours(),
-      dom: date.getDate(),
-      month: date.getMonth() + 1,
-      dow: date.getDay(),
-      year: date.getFullYear(),
-    };
-  }
-  wallClockFormatter ??= new Intl.DateTimeFormat('en-US', {
-    timeZone: cronTimezone,
-    hourCycle: 'h23',
-    minute: 'numeric',
-    hour: 'numeric',
-    day: 'numeric',
-    month: 'numeric',
-    weekday: 'short',
-    year: 'numeric',
-  });
-  const parts: Record<string, string> = {};
-  for (const part of wallClockFormatter.formatToParts(date)) {
-    parts[part.type] = part.value;
-  }
-  return {
-    minute: Number(parts.minute),
-    hour: Number(parts.hour) % 24, // h23 still yields "24" for midnight in some ICU versions
-    dom: Number(parts.day),
-    month: Number(parts.month),
-    dow: DOW_INDEX[parts.weekday!] ?? 0,
-    year: Number(parts.year),
-  };
-}
-
-/** Local calendar date as a single comparable number (yyyymmdd). */
-function localDateKey(wc: WallClock): number {
-  return wc.year * 10_000 + wc.month * 100 + wc.dom;
-}
-
-/**
- * First timestamp of the NEXT local calendar date in the cron timezone.
- * Anchored on the calendar date, not on "wall clock reads 00:00", because
- * both can lie under DST:
- *  - spring-forward days are 23h, so a fixed +24h jump overshoots and a
- *    forward-only "snap to hour 0" then skips an entire day (the original
- *    bug: nextRun for a Monday cron landing on the transition returned the
- *    Monday AFTER);
- *  - in zones where DST starts AT midnight (America/Santiago) the next day
- *    has no 00:xx at all - its first instant reads 01:00.
- * Strategy: jump to the vicinity of the next midnight by wall-clock
- * arithmetic (bounded, over/undershoot at most an hour), then walk by
- * minutes until the local date is exactly `current date + 1 day-key`,
- * i.e. the first minute of the next date whatever its wall time is.
- */
-function startOfNextLocalDay(ts: number): number {
-  const startKey = localDateKey(wallClock(new Date(ts)));
-
-  // Coarse jump: minutes remaining to nominal midnight. Lands within an hour
-  // of the real boundary regardless of a 23/24/25-hour day.
-  const wc = wallClock(new Date(ts));
-  let candidate = ts + (24 * 60 - (wc.hour * 60 + wc.minute)) * 60_000;
-
-  // A 25-hour day can leave us still on the starting date: take another
-  // bounded hop until the date changes.
-  for (let i = 0; i < 3 && localDateKey(wallClock(new Date(candidate))) <= startKey; i++) {
-    const w = wallClock(new Date(candidate));
-    candidate += (24 * 60 - (w.hour * 60 + w.minute)) * 60_000;
-  }
-
-  // Walk BACK by minutes while the previous minute is still past the start
-  // date - this finds the exact first minute of the next date, and never
-  // crosses back onto the start date (so a skipped-midnight day converges on
-  // its true first instant, e.g. 01:00 in Santiago).
-  let guard = 0;
-  while (guard++ < 180) {
-    const prev = candidate - 60_000;
-    if (localDateKey(wallClock(new Date(prev))) <= startKey) break;
-    candidate = prev;
-  }
-  return candidate;
-}
-
 // ── CronScheduler ──
 
 export class CronScheduler {
@@ -282,7 +159,11 @@ export class CronScheduler {
     try {
       const { minutes, hours, daysOfMonth, months, daysOfWeek } = parseExpression(expression);
 
-      const { minute, hour, dom, month, dow } = wallClock(date);
+      const minute = date.getMinutes();
+      const hour = date.getHours();
+      const dom = date.getDate();
+      const month = date.getMonth() + 1;  // getMonth() is 0-based
+      const dow = date.getDay();           // 0 = Sunday
 
       return (
         minutes.includes(minute) &&
@@ -303,7 +184,6 @@ export class CronScheduler {
    * @returns Date of next execution, or null if none found within 1 year
    */
   static nextRun(expression: string, from: Date = new Date()): Date | null {
-    if (cronTimezone) return CronScheduler.nextRunInTimezone(expression, from);
     try {
       const { minutes, hours, daysOfMonth, months, daysOfWeek } = parseExpression(expression);
 
@@ -372,46 +252,6 @@ export class CronScheduler {
 
         // All fields match
         return new Date(candidate);
-      }
-
-      return null;
-    } catch {
-      return null;
-    }
-  }
-
-  /**
-   * nextRun for the configured cron timezone: walks timestamps and evaluates
-   * the WALL CLOCK at each step, so DST transitions are handled by the tz
-   * database instead of local Date setters. Coarse jumps (next local day /
-   * next hour boundary) keep it fast; hour offsets in :30/:45 zones are safe
-   * because jumps are derived from the wall-clock minute.
-   */
-  private static nextRunInTimezone(expression: string, from: Date): Date | null {
-    try {
-      const { minutes, hours, daysOfMonth, months, daysOfWeek } = parseExpression(expression);
-
-      // Start from the next whole minute.
-      let ts = Math.floor(from.getTime() / 60_000) * 60_000 + 60_000;
-      const limit = from.getTime() + 366 * 24 * 60 * 60_000;
-      let guard = 0;
-
-      while (ts < limit && ++guard < 600_000) {
-        const wc = wallClock(new Date(ts));
-        if (!months.includes(wc.month) || !daysOfMonth.includes(wc.dom) || !daysOfWeek.includes(wc.dow)) {
-          ts = startOfNextLocalDay(ts);
-          continue;
-        }
-        if (!hours.includes(wc.hour)) {
-          ts += (60 - wc.minute) * 60_000; // next local hour boundary
-          continue;
-        }
-        if (!minutes.includes(wc.minute)) {
-          const nextMinute = minutes.find((m) => m > wc.minute);
-          ts += nextMinute !== undefined ? (nextMinute - wc.minute) * 60_000 : (60 - wc.minute) * 60_000;
-          continue;
-        }
-        return new Date(ts);
       }
 
       return null;
@@ -545,4 +385,3 @@ export class CronScheduler {
     }));
   }
 }
-

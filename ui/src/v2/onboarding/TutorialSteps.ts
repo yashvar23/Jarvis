@@ -8,7 +8,7 @@ import type { RoomKey } from "../router";
  *   - `id`             stable string for resume-from-step support
  *   - `target`         CSS selector to spotlight, or "viewport" for
  *                       a centered card with no cut-out
- *   - `narration`      what Zoya speaks AND the bubble shows
+ *   - `narration`      what Jarvis speaks AND the bubble shows
  *   - `tryHint`        optional one-line "try it yourself" hint
  *   - `autoAdvanceOn`  optional event name; when fired by the AppShell,
  *                       the tour moves to the next step
@@ -42,7 +42,7 @@ export interface TutorialStep {
    *  dispatches a `v2-tutorial:open-room` window event with the key;
    *  AppShell handles it by calling `openRoom(key)`. Used for the
    *  per-room walkthrough block so the user sees each Room behind the
-   *  spotlight while Zoya explains it. */
+   *  spotlight while Jarvis explains it. */
   openRoomBefore?: RoomKey;
   /** Close any open Room before the step renders. Pairs with
    *  `openRoomBefore` on the step that exits the room block (the outro). */
@@ -54,7 +54,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     id: "intro-welcome",
     target: "viewport",
     narration:
-      "Welcome to Zoya. I'll take you through the dashboard in about ten minutes. You can press Next, say 'next', or just try the highlighted feature yourself to advance.",
+      "Welcome to Jarvis. I'll take you through the dashboard in about ten minutes. You can press Next, say 'next', or just try the highlighted feature yourself to advance.",
   },
   {
     id: "thread",
@@ -75,7 +75,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     id: "voice-rail",
     target: ".v2-rail",
     narration:
-      "I'm always listening for the wake word. Say 'Zoya' to interrupt me at any time, or hold the spacebar to push-to-talk. The orb shows my voice state — idle, listening, thinking, speaking.",
+      "I'm always listening for the wake word. Say 'Jarvis' to interrupt me at any time, or hold the spacebar to push-to-talk. The orb shows my voice state — idle, listening, thinking, speaking.",
     prefer: "left",
   },
   {
@@ -114,7 +114,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
 
   // ── Per-room mini-tour ────────────────────────────────────────────
   // One short step per Room, opened automatically as we advance. The
-  // user sees each surface behind the spotlight while Zoya explains
+  // user sees each surface behind the spotlight while Jarvis explains
   // what it's for. Single sentence each — this is "what does this do",
   // not "how to use it". Sequenced roughly by how often a typical user
   // touches each room.
@@ -235,4 +235,3 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     closeRoomBefore: true,
   },
 ];
-

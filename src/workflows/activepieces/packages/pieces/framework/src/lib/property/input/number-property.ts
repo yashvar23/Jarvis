@@ -9,4 +9,3 @@ export const NumberProperty = z.object({
 
 export type NumberProperty<R extends boolean> = BasePropertySchema &
   TPropertyValue<number, PropertyType.NUMBER, R>;
-

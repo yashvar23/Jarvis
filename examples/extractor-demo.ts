@@ -23,7 +23,7 @@ import {
 import type { LLMProvider } from '../src/llm/provider.ts';
 
 // Initialize database
-initDatabase('./data/zoya.db');
+initDatabase('./data/jarvis.db');
 
 console.log('=== Vault Extractor Demo ===\n');
 
@@ -137,4 +137,3 @@ console.log('- Integrate with a real LLM provider (Anthropic, OpenAI, etc.)');
 console.log('- Set up automatic extraction on every conversation');
 console.log('- Use extracted knowledge to personalize responses');
 console.log('- Build commitment tracking and reminder systems');
-

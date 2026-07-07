@@ -10,4 +10,3 @@ export const Cell = z.object({
 })
 
 export type Cell = z.infer<typeof Cell>
-

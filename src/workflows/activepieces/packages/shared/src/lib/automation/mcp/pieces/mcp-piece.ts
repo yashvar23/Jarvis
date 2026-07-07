@@ -31,4 +31,3 @@ export const McpTrigger = z.object({
 
 export type McpTrigger = z.infer<typeof McpTrigger>
 
-

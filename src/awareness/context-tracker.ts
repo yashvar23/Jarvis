@@ -20,8 +20,8 @@ const WEAK_ERROR_PATTERN = /\b(error|exception|failed|fatal|crash|denied|refused
 // Context that confirms a weak error is real (stack traces, error codes, build output, HTTP errors, etc.)
 const ERROR_CONFIRM_PATTERN = /(?:at .+:\d+|line \d+|\.ts:\d+|\.js:\d+|\.py:\d+|\.go:\d+|throw |exit code|status [45]\d{2}|Traceback|^\s+\^|command not found|No such file|permission denied|cannot find module|Module not found|Compilation failed|Build failed|ERR!|npm ERR|error\[\w+\]|✗|✘|FAIL|FAILED|returned non-zero|Process exited)/mi;
 
-// ZOYA own log lines — filter these out from error detection
-const ZOYA_LOG_PREFIX = /\[(CaptureEngine|ObserverManager|file-watcher|clipboard|processes|notifications|email|calendar|Daemon|ServiceRegistry|AgentService|WSService|OCREngine|Awareness|DesktopController|Executor|HealthMonitor|ChannelManager|TelegramAdapter|BackgroundAgent|WebSocketServer|EventReactor|Orchestrator|ChannelService|ObserverService)\]/;
+// JARVIS own log lines — filter these out from error detection
+const JARVIS_LOG_PREFIX = /\[(CaptureEngine|ObserverManager|file-watcher|clipboard|processes|notifications|email|calendar|Daemon|ServiceRegistry|AgentService|WSService|OCREngine|Awareness|DesktopController|Executor|HealthMonitor|ChannelManager|TelegramAdapter|BackgroundAgent|WebSocketServer|EventReactor|Orchestrator|ChannelService|ObserverService)\]/;
 
 // URL pattern in text
 const URL_PATTERN = /https?:\/\/[^\s<>"{}|\\^`[\]]+/;
@@ -174,10 +174,10 @@ export class ContextTracker {
     }
 
     // Error detection in OCR text
-    // First, filter out lines that are ZOYA's own log output
+    // First, filter out lines that are JARVIS's own log output
     const filteredOcrText = ocrText
       .split('\n')
-      .filter(line => !ZOYA_LOG_PREFIX.test(line))
+      .filter(line => !JARVIS_LOG_PREFIX.test(line))
       .join('\n');
 
     const strongMatch = filteredOcrText.match(STRONG_ERROR_PATTERN);
@@ -347,4 +347,3 @@ function simpleHash(str: string): string {
   }
   return hash.toString(36);
 }
-

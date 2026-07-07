@@ -25,4 +25,3 @@ export const Note = z.object({
     updatedAt: z.string(),
 })
 export type Note = z.infer<typeof Note>
-

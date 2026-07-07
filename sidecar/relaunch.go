@@ -24,7 +24,7 @@ const (
 	// UI can render "Restarting…" before this process tears down.
 	restartHandoffDelay = 200 * time.Millisecond
 	// restartRelaunchWait is how long the NEW process sleeps on startup (gated by
-	// the ZOYA_RELAUNCH marker) before initializing services. Must exceed
+	// the JARVIS_RELAUNCH marker) before initializing services. Must exceed
 	// restartHealthWindow + restartHandoffDelay (see invariant above).
 	restartRelaunchWait = 800 * time.Millisecond
 )
@@ -32,7 +32,7 @@ const (
 // relaunchSidecar starts a fresh copy of the sidecar executable as an
 // independent process (no args, so it reads the just-saved config) and returns
 // the command handle so the caller can detect an immediate crash. The
-// ZOYA_RELAUNCH marker makes the new process wait restartRelaunchWait on
+// JARVIS_RELAUNCH marker makes the new process wait restartRelaunchWait on
 // startup so the old one releases devices first. The child keeps running after
 // this process exits (neither Windows nor Unix kills it on parent exit).
 func relaunchSidecar() (*exec.Cmd, error) {
@@ -41,7 +41,7 @@ func relaunchSidecar() (*exec.Cmd, error) {
 		return nil, err
 	}
 	cmd := exec.Command(exe)
-	cmd.Env = append(os.Environ(), "ZOYA_RELAUNCH=1")
+	cmd.Env = append(os.Environ(), "JARVIS_RELAUNCH=1")
 	if err := cmd.Start(); err != nil {
 		return nil, err
 	}

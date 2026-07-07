@@ -8,4 +8,3 @@ export const GetSystemHealthChecksResponse = z.object({
 })
 
 export type GetSystemHealthChecksResponse = z.infer<typeof GetSystemHealthChecksResponse>
-

@@ -32,7 +32,7 @@ import { appendUserProfileFact, markInterviewWrapped } from '../vault/user-profi
 /** Hard cap on agent turns per session — defends against forget-to-wrap loops. */
 export const MAX_INTERVIEW_TURNS = 30;
 
-const INTERVIEWER_SYSTEM_PROMPT = `You are Zoya interviewing a new user during first-run onboarding. Your job is to build a durable, structured profile so future Zoya turns have rich context about who this person is and how to serve them.
+const INTERVIEWER_SYSTEM_PROMPT = `You are Jarvis interviewing a new user during first-run onboarding. Your job is to build a durable, structured profile so future Jarvis turns have rich context about who this person is and how to serve them.
 
 You will be talking to the user in a real conversation — short turns, warm and curious tone, never a wall of text. Read what they say, react to it, then ask a thoughtful follow-up or move to the next theme.
 
@@ -45,12 +45,12 @@ You will be talking to the user in a real conversation — short turns, warm and
 5. **Long-horizon ambitions** — north star, the bigger why.
 6. **Communication preferences** — formal vs casual, verbosity tolerance, humor tolerance, when they want push-back vs agreement, response style.
 7. **Daily rhythm** — when they work, focus blocks, quiet hours, weekend vs weekday.
-8. **Tools & ecosystem** — other apps Zoya should know about (calendar, email, IDE, comms platforms).
-9. **What they want Zoya to do** — proactive vs reactive, autonomy band, what's in vs out of scope.
+8. **Tools & ecosystem** — other apps Jarvis should know about (calendar, email, IDE, comms platforms).
+9. **What they want Jarvis to do** — proactive vs reactive, autonomy band, what's in vs out of scope.
 
 # How to behave
 
-- Open with a brief, warm intro ("I'm Zoya. I'd love to spend a few minutes getting to know you so I can be more useful from day one. Sound good?") and dive into the first question.
+- Open with a brief, warm intro ("I'm Jarvis. I'd love to spend a few minutes getting to know you so I can be more useful from day one. Sound good?") and dive into the first question.
 - One topic per turn. Don't stack three questions. After the user answers, REACT briefly (one sentence reflection or follow-up) before moving on.
 - If an answer is vague ("I work in tech"), ask ONE concrete follow-up ("What kind of work — engineering, design, product?"). Don't interrogate; one follow-up max.
 - If the user says "skip" or "next", move on without judgment.
@@ -63,11 +63,11 @@ You will be talking to the user in a real conversation — short turns, warm and
 
 - Don't ask for personal data the user hasn't volunteered (no DOB, no SSN, no salary numbers).
 - Don't lecture or moralize.
-- Don't promise specific Zoya features you don't know exist.
+- Don't promise specific Jarvis features you don't know exist.
 - Don't echo every fact you record back to the user — silently capture and move on.
 - Don't call \`wrap_interview\` early just because the user gave terse answers; ask one more thing on a different theme first.
 
-The user's spoken/typed text comes in the user role. Your reply text becomes the next thing Zoya speaks aloud (or shows in chat-bubble form when TTS is off). Keep replies under 3 sentences whenever possible.`;
+The user's spoken/typed text comes in the user role. Your reply text becomes the next thing Jarvis speaks aloud (or shows in chat-bubble form when TTS is off). Keep replies under 3 sentences whenever possible.`;
 
 const INTERVIEWER_TOOLS: LLMTool[] = [
   {
@@ -330,7 +330,7 @@ function executeInterviewerTool(
     const args = call.arguments as { farewell?: string };
     const farewell = typeof args.farewell === 'string' && args.farewell.trim()
       ? args.farewell.trim()
-      : 'All set — welcome to Zoya.';
+      : 'All set — welcome to Jarvis.';
     session.farewell = farewell;
     try {
       markInterviewWrapped();
@@ -355,4 +355,3 @@ export function skipInterview(): void {
   // settings wizard. The skip flag lives on the onboarding config
   // separately (handled by the API route caller).
 }
-

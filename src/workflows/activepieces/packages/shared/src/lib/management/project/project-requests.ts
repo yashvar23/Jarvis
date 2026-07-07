@@ -39,5 +39,3 @@ export const ListProjectRequestForPlatformQueryParams = z.object({
 })
 
 export type ListProjectRequestForPlatformQueryParams = z.infer<typeof ListProjectRequestForPlatformQueryParams>
-
-

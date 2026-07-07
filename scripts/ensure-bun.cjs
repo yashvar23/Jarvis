@@ -5,8 +5,8 @@ const { join, resolve, sep } = require('path');
 const os = require('os');
 
 if (process.platform === 'win32') {
-  console.error('Native Windows installs are not supported for the ZOYA daemon.');
-  console.error('Use WSL2 for the Bun install, or run ZOYA with Docker on Windows.');
+  console.error('Native Windows installs are not supported for the JARVIS daemon.');
+  console.error('Use WSL2 for the Bun install, or run JARVIS with Docker on Windows.');
   console.error('The Windows sidecar is still supported separately.');
   process.exit(1);
 }
@@ -20,7 +20,7 @@ try {
 
 // ── Stamp install-method marker for global installs ─────────────────
 //
-// When `bun install -g zoya` runs, the package root usually ends
+// When `bun install -g @usejarvis/brain` runs, the package root usually ends
 // up under ~/.bun/install/global. The uninstall/update commands (and usage
 // telemetry) need to know this later so update/uninstall dispatch correctly
 // and telemetry reports "bun-global" rather than "unknown".
@@ -49,7 +49,7 @@ const markerPath = join(packageRoot, '.install-method');
 if (
   isGlobalInstall &&
   !isDevCheckout &&
-  !process.env.ZOYA_INSTALL_METHOD &&
+  !process.env.JARVIS_INSTALL_METHOD &&
   !existsSync(markerPath)
 ) {
   const marker = {

@@ -1,11 +1,11 @@
 /**
  * In-process pub/sub bus. Lives at the runtime level so the daemon can
  * publish observer events / commitment events into it; subscribers are the
- * legacy `zoya-trigger:on_event` direct-subscribe path inside
+ * legacy `jarvis-trigger:on_event` direct-subscribe path inside
  * `TriggerManager` (kept as a fallback when no engine runtime is wired) and
- * the workflow event buffer mirror used by `/v1/zoya/events/poll`.
+ * the workflow event buffer mirror used by `/v1/jarvis/events/poll`.
  *
- * Replaces the previous `ZoyaEventBusAdapter` in `adapters/` (deleted with
+ * Replaces the previous `JarvisEventBusAdapter` in `adapters/` (deleted with
  * the rest of the legacy adapter tree); behaviour is identical.
  */
 
@@ -34,14 +34,14 @@ export class WorkflowEventBus {
   /**
    * Optional observer invoked on every publish. The daemon hooks this to
    * mirror events into the `WorkflowEventBuffer` that backs
-   * `/v1/zoya/events/poll`, so engine-managed `on_event` triggers see the
+   * `/v1/jarvis/events/poll`, so engine-managed `on_event` triggers see the
    * same stream as legacy direct subscribers.
    */
   setObserver(fn: (eventType: string, payload: Record<string, unknown>) => void): void {
     this.onPublish = fn;
   }
 
-  /** Publish from Zoya daemon code. Errors in handlers are swallowed-and-logged. */
+  /** Publish from Jarvis daemon code. Errors in handlers are swallowed-and-logged. */
   publish(eventType: string, payload: Record<string, unknown>): void {
     if (this.onPublish) {
       try {
@@ -63,4 +63,3 @@ export class WorkflowEventBus {
     }
   }
 }
-

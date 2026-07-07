@@ -25,7 +25,7 @@ var winOCRScript string
 func platformOCR(imagePath string) (OCRResult, error) {
 	start := time.Now()
 
-	scriptFile := filepath.Join(os.TempDir(), fmt.Sprintf("zoya-ocr-%d.ps1", start.UnixNano()))
+	scriptFile := filepath.Join(os.TempDir(), fmt.Sprintf("jarvis-ocr-%d.ps1", start.UnixNano()))
 	if err := os.WriteFile(scriptFile, []byte(winOCRScript), 0644); err != nil {
 		return OCRResult{}, fmt.Errorf("write ocr script: %w", err)
 	}

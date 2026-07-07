@@ -6,7 +6,7 @@
  *   1. persisted sampleData[step.name] -- user-pinned or run-captured for
  *      THIS specific step (the most authoritative source).
  *   2. declared output from the piece catalog -- `action.outputSample`
- *      (Zoya extension to AP) or `trigger.sampleData` (upstream-native).
+ *      (Jarvis extension to AP) or `trigger.sampleData` (upstream-native).
  *      Acts as the author's "this is what my action returns" contract.
  *   3. persisted sampleData from a SIBLING step that shares the same
  *      (pieceName, actionName) / (pieceName, triggerName). Lets a second
@@ -26,7 +26,7 @@ import type { FlowStepNode, PieceCatalogEntry } from "./useWorkflowEditor";
  * How many nested object levels the picker drills into. Most workflow event
  * payloads are 1-2 levels deep; capping prevents a pathological output (or a
  * sample with a recursive structure) from drowning the picker. Empirically
- * 3 covers every Zoya event taxonomy and the upstream piece samples we
+ * 3 covers every Jarvis event taxonomy and the upstream piece samples we
  * ship.
  */
 const MAX_PICKER_DEPTH = 3;
@@ -108,7 +108,7 @@ export function buildVariableRows(
  *
  * Why not flatten only -- the existing picker emitted a row for the parent
  * key (e.g. `payload`) and many flows rely on wiring the whole object into
- * a downstream JSON.stringify / zoya-tool input. Keeping the parent row
+ * a downstream JSON.stringify / jarvis-tool input. Keeping the parent row
  * preserves that contract; the nested rows are additive.
  *
  * Array values are emitted as a single leaf at their path; we deliberately
@@ -172,7 +172,7 @@ export function lookupDeclaredOutput(
     const trigger = piece.triggers.find((t) => t.name === triggerName);
     if (!trigger) return undefined;
     // Dynamic-output triggers: the envelope shape depends on a config
-    // value (zoya-trigger:on_event payload depends on `eventType`).
+    // value (jarvis-trigger:on_event payload depends on `eventType`).
     // Resolve the configured prop value, look up the matching sample;
     // fall back to the static sample when the prop isn't set yet or
     // its value isn't in the map.
@@ -297,4 +297,3 @@ export function pickUsableSample(
   }
   return null;
 }
-

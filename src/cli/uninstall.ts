@@ -1,5 +1,5 @@
 /**
- * `zoya uninstall` — install-method-aware uninstaller.
+ * `jarvis uninstall` — install-method-aware uninstaller.
  *
  * Work is split into two phases:
  *   1. Side-effect cleanup runs synchronously in the parent process:
@@ -43,13 +43,13 @@ export interface PlanOptions {
 }
 
 function resolveDataDir(env: NodeJS.ProcessEnv, home: string): string {
-  return env.ZOYA_HOME ? resolve(env.ZOYA_HOME) : join(home, '.zoya');
+  return env.JARVIS_HOME ? resolve(env.JARVIS_HOME) : join(home, '.jarvis');
 }
 
 function resolveWrapperCandidates(env: NodeJS.ProcessEnv, home: string): string[] {
   const bunRoot = env.BUN_INSTALL ? resolve(env.BUN_INSTALL) : join(home, '.bun');
   const bin = join(bunRoot, 'bin');
-  return ['zoya', 'zoya.cmd', 'zoya.ps1'].map((name) => join(bin, name));
+  return ['jarvis', 'jarvis.cmd', 'jarvis.ps1'].map((name) => join(bin, name));
 }
 
 function normalizePath(path: string): string {
@@ -99,7 +99,7 @@ export function createCleanupPlan(
     removablePaths.push(dataDir);
   }
   if (method === 'script') {
-    // dataDir already covers resolvedPackageRoot at ~/.zoya/daemon, so only
+    // dataDir already covers resolvedPackageRoot at ~/.jarvis/daemon, so only
     // add it explicitly if the script install was placed somewhere outside
     // dataDir (shouldn't happen via the normal installer, but be defensive).
     const pr = normalizePath(resolvedPackageRoot);
@@ -118,16 +118,16 @@ export function createCleanupPlan(
     autostartInstalled: isAutostartInstalled(),
     removablePaths: Array.from(new Set(removablePaths)),
     runBunUninstall: method === 'bun-global',
-    // ~/.zoya-uninstall.log sits next to, not inside, the data dir so it
+    // ~/.jarvis-uninstall.log sits next to, not inside, the data dir so it
     // survives the removal and is there for the user to inspect on failure.
-    logPath: join(home, '.zoya-uninstall.log'),
+    logPath: join(home, '.jarvis-uninstall.log'),
   };
 }
 
 // ── Detached cleanup script ─────────────────────────────────────────
 //
 // This is written to a temp file and spawned as a detached `bun` child. It
-// must be self-contained — no imports from the ZOYA codebase, since the
+// must be self-contained — no imports from the JARVIS codebase, since the
 // codebase is being deleted.
 
 export function buildCleanupScript(plan: CleanupPlan): string {
@@ -186,7 +186,7 @@ async function removePath(path) {
 
 log('cleanup started (pid=' + process.pid + ')');
 
-// Give the parent zoya CLI 1.5s to fully exit and release the wrapper /
+// Give the parent jarvis CLI 1.5s to fully exit and release the wrapper /
 // package directory. Windows holds file handles on executing binaries, so
 // without this wait wrapper unlink and package rm both fail.
 await sleep(1500);
@@ -198,7 +198,7 @@ for (const wrapperPath of payload.cliWrapperPaths) {
 
 if (payload.runBunUninstall) {
   try {
-    const r = spawnSync(payload.bunPath, ['uninstall', '-g', 'zoya'], {
+    const r = spawnSync(payload.bunPath, ['uninstall', '-g', '@usejarvis/brain'], {
       stdio: 'pipe',
       env: { ...process.env },
     });
@@ -216,7 +216,7 @@ for (const target of payload.removablePaths) {
 log('cleanup complete');
 
 // Self-destruct our own temp dir so tmpdir() doesn't accumulate
-// zoya-uninstall-* directories across repeated uninstall attempts.
+// jarvis-uninstall-* directories across repeated uninstall attempts.
 try {
   rmSync(TEMP_DIR, { recursive: true, force: true });
 } catch {}
@@ -248,7 +248,7 @@ async function runSideEffectCleanup(plan: CleanupPlan): Promise<void> {
 // ── Package removal (detached process) ──────────────────────────────
 
 async function schedulePackageRemoval(plan: CleanupPlan): Promise<void> {
-  const tempDir = mkdtempSync(join(tmpdir(), 'zoya-uninstall-'));
+  const tempDir = mkdtempSync(join(tmpdir(), 'jarvis-uninstall-'));
   const scriptPath = join(tempDir, 'cleanup.mjs');
   writeFileSync(scriptPath, buildCleanupScript(plan), 'utf-8');
 
@@ -263,7 +263,7 @@ async function schedulePackageRemoval(plan: CleanupPlan): Promise<void> {
 // ── Orchestrator ────────────────────────────────────────────────────
 
 function printPlan(plan: CleanupPlan): void {
-  console.log(c.red('\nZOYA Uninstall Wizard\n'));
+  console.log(c.red('\nJARVIS Uninstall Wizard\n'));
   console.log(`  Install method: ${c.bold(describeInstallMethod({ method: plan.method, reason: plan.methodReason }))}`);
   console.log(c.dim(`  (${plan.methodReason})`));
   console.log('');
@@ -279,7 +279,7 @@ function printPlan(plan: CleanupPlan): void {
     console.log(c.dim(`  • Remove CLI wrapper: ${wrapperPath}`));
   }
   if (plan.runBunUninstall) {
-    console.log(c.dim(`  • Run: bun uninstall -g zoya`));
+    console.log(c.dim(`  • Run: bun uninstall -g @usejarvis/brain`));
   }
   if (plan.method === 'dev') {
     console.log(c.dim(`  • Developer checkout at ${plan.packageRoot} will be LEFT IN PLACE.`));
@@ -293,13 +293,13 @@ function printPlan(plan: CleanupPlan): void {
 }
 
 function refuseDocker(plan: CleanupPlan): void {
-  console.log(c.yellow('\nZOYA is running inside a Docker container.\n'));
-  console.log('  `zoya uninstall` does not apply to container installs — the');
+  console.log(c.yellow('\nJARVIS is running inside a Docker container.\n'));
+  console.log('  `jarvis uninstall` does not apply to container installs — the');
   console.log('  container is the unit of uninstall.');
   console.log('');
   console.log('  From your host, run:');
-  console.log(c.dim('    docker rm -f zoya'));
-  console.log(c.dim('    docker volume rm zoya-data   # if you want to delete data too'));
+  console.log(c.dim('    docker rm -f jarvis'));
+  console.log(c.dim('    docker volume rm jarvis-data   # if you want to delete data too'));
   console.log('');
   console.log(c.dim(`  (detected: ${plan.methodReason})`));
 }
@@ -349,4 +349,3 @@ export async function runUninstallWizard(packageRoot = PACKAGE_ROOT): Promise<vo
   console.log(c.green('\n✓ Uninstall scheduled.'));
   console.log(c.dim(`  Background cleanup will finish shortly. See ${plan.logPath} if anything fails.`));
 }
-

@@ -192,4 +192,3 @@ function getFirstFiveOrAll(array: unknown[]) {
     return array.slice(0, 5);
   }
 }
-

@@ -12,7 +12,7 @@ import { homedir } from 'node:os';
 import { readdirSync, statSync, existsSync, mkdirSync, rmSync } from 'node:fs';
 import { isWithin } from '../util/path.ts';
 
-const META_FILE = '.zoya-project.json';
+const META_FILE = '.jarvis-project.json';
 
 // Directories to exclude from file tree
 const IGNORED_DIRS = new Set([
@@ -388,4 +388,3 @@ export class ProjectManager {
     return entry;
   }
 }
-

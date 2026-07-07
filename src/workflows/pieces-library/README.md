@@ -1,10 +1,10 @@
 # Pieces Library Catalog
 
-This directory owns the list of activepieces community pieces that Zoya
+This directory owns the list of activepieces community pieces that Jarvis
 users can install at runtime via the Library tab in the Workflows room.
 The catalog is split into two tiers:
 
-- **Verified** -- hand-reviewed by a Zoya maintainer + smoke-tested
+- **Verified** -- hand-reviewed by a Jarvis maintainer + smoke-tested
   end-to-end through the engine. Each entry is a promise: "this piece
   loads and runs correctly under our Bun + engine setup at `vettedVersion`."
 - **Community** -- auto-discovered from upstream + npm. Has not been
@@ -37,7 +37,7 @@ The catalog is committed source. Adding a Verified piece = code change +
 review. It is NOT a dynamic registry, NOT a marketplace. Community
 discovery is automated through the sync action; trust elevation is manual.
 
-The catalog is the *only* path by which pieces reach a Zoya install.
+The catalog is the *only* path by which pieces reach a Jarvis install.
 Users cannot side-load arbitrary npm packages -- the installer accepts ids
 defined in the merged CATALOG, nothing else.
 
@@ -45,11 +45,11 @@ defined in the merged CATALOG, nothing else.
 
 1. Catalog entry says "we trust `@activepieces/piece-gmail@^0.12.2`."
 2. User clicks Install in the Library UI.
-3. Daemon writes the requested piece into `~/.zoya/pieces/installed.json`,
-   then synthesizes `~/.zoya/pieces/package.json` from the manifest and
+3. Daemon writes the requested piece into `~/.jarvis/pieces/installed.json`,
+   then synthesizes `~/.jarvis/pieces/package.json` from the manifest and
    runs `bun install` in that directory.
 4. Bun resolves `^0.12.2` against npm to a concrete version (e.g. 0.12.3)
-   and places it under `~/.zoya/pieces/node_modules/@activepieces/piece-gmail/`.
+   and places it under `~/.jarvis/pieces/node_modules/@activepieces/piece-gmail/`.
 5. The daemon records the resolved version in `installed.json` and asks the
    engine to extract metadata for the new piece.
 6. The piece appears in the in-memory `PieceCatalog` and the flow editor's
@@ -59,7 +59,7 @@ defined in the merged CATALOG, nothing else.
 The directory layout after a couple of installs:
 
 ```
-~/.zoya/pieces/
+~/.jarvis/pieces/
   installed.json                    # source of truth: {id, npmPackage, versionRange, resolvedVersion, installedAt}
   package.json                      # synthesized from installed.json on each install/uninstall
   bun.lock                          # bun's resolution lock
@@ -73,7 +73,7 @@ The directory layout after a couple of installs:
     ...
 ```
 
-Docker: `~/.zoya` should be mounted as a persistent volume. The manifest
+Docker: `~/.jarvis` should be mounted as a persistent volume. The manifest
 + reconciler make a restored-from-backup install self-healing -- the daemon
 re-runs `bun install` on startup if any catalog-installed piece is missing
 from `node_modules`.
@@ -82,14 +82,14 @@ from `node_modules`.
 
 ```ts
 {
-  id: "gmail",                        // stable Zoya-side id; do not rename
+  id: "gmail",                        // stable Jarvis-side id; do not rename
   npmPackage: "@activepieces/piece-gmail",
   versionRange: "^0.12.2",            // semver range bun resolves at install
   displayName: "Gmail",
   description: "Send + read email via Google API.",
   iconUrl: "...",                     // optional; falls back to a generic icon
   vettedAt: "2026-05-08",             // ISO date of the audit
-  vettedVersion: "0.12.3",            // exact version Zoya verified
+  vettedVersion: "0.12.3",            // exact version Jarvis verified
   sourceUrl: "https://github.com/activepieces/activepieces/tree/main/packages/pieces/community/gmail",
   licenseSpdx: "MIT",                 // license of the piece, not its deps
 }
@@ -123,7 +123,7 @@ only. The choice signals intent and matters post-1.0.
   the reason in a code comment next to the entry.
 
 When in doubt, use `^`. Re-resolution on each install lets users pick up
-upstream patch fixes between Zoya releases.
+upstream patch fixes between Jarvis releases.
 
 ## Promoting a piece to Verified
 
@@ -161,7 +161,7 @@ at the verification path.
    find node_modules -name "*.node" -o -name "*.wasm" 2>/dev/null
    ```
 
-   Anything found needs verification that it loads under the Zoya Bun
+   Anything found needs verification that it loads under the Jarvis Bun
    version. As of this writing, googleapis is pure JS, openai is pure JS,
    tiktoken ships WASM (works under Bun).
 
@@ -175,7 +175,7 @@ at the verification path.
 5. **Gated install integration test**:
 
    ```sh
-   ZOYA_TEST_PIECES_LIBRARY=1 bun test src/workflows/pieces-library/integration.test.ts
+   JARVIS_TEST_PIECES_LIBRARY=1 bun test src/workflows/pieces-library/integration.test.ts
    ```
 
    Runs a real `bun install` of the gmail catalog entry into a temp pieces
@@ -236,7 +236,7 @@ crashes):
 
 - Pin tighter immediately: switch `^` to `~`, or pin exact. Document the
   reason in a comment next to the entry.
-- A future Zoya release widens it back once upstream fixes.
+- A future Jarvis release widens it back once upstream fixes.
 
 ## Removing a piece
 
@@ -251,7 +251,7 @@ A piece comes out of the catalog when:
 Removal from the catalog does NOT uninstall the piece from existing user
 installs. The reconciler keeps respecting `installed.json` and surfaces a
 warning when an installed piece is no longer in the catalog. Users can
-uninstall explicitly via the Library UI; future Zoya releases can ship a
+uninstall explicitly via the Library UI; future Jarvis releases can ship a
 forced migration path if the situation warrants it.
 
 ## Trust model
@@ -269,4 +269,3 @@ license, and prefer pieces with a known maintainer.
 We trust npm's tarball integrity (Bun verifies SHAs against the lockfile)
 but do not run additional supply-chain checks. A `npm audit`-style step
 would be a useful follow-up.
-

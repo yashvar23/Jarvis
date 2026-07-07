@@ -3,7 +3,7 @@
  * `POST /v1/step-files` and `GET /v1/step-files/:id`.
  *
  * `data` is stored as a BLOB (canonical source of truth); the route layer also
- * keeps a disk-side mirror under `~/.zoya/workflow-files/...` for inspection.
+ * keeps a disk-side mirror under `~/.jarvis/workflow-files/...` for inspection.
  */
 
 import type { Database } from "bun:sqlite";
@@ -101,4 +101,3 @@ export function getWorkflowFile(id: string): WorkflowFile | null {
 export function _clearWorkflowFilesForTests(): void {
   db().exec(`DELETE FROM workflow_file`);
 }
-

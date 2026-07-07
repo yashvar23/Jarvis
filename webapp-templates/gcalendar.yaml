@@ -214,7 +214,7 @@ instructions: |
   - **Event buttons**: `<button>` children of gridcells. Aria-label pattern:
     `"START a END, TITLE, CREATOR, STATUS, LOCATION, DATE"` (Italian — "a" is "to")
     `"START to END, TITLE, CREATOR, STATUS, LOCATION, DATE"` (English)
-    - Example: `"10AM a 11AM, Zoya guide and use cases, Yashvardhan Manghani, Invito accettato, Nessuna posizione, 7 aprile 2026"`
+    - Example: `"10AM a 11AM, Jarvis guide and use cases, Vieri Balboni, Invito accettato, Nessuna posizione, 7 aprile 2026"`
     - All-day events start with `"Tutto il giorno, "` / `"All day, "` instead of a time range.
     - Subscribed calendar events (holidays, birthdays) replace CREATOR/STATUS with `"Calendario: NAME"` / `"Calendar: NAME"`.
     - STATUS is one of: "Invito accettato"/"Accepted", "Richiede conferma"/"Awaiting", "Rifiutato"/"Declined", "Forse"/"Maybe", or absent for your own events.

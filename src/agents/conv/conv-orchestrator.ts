@@ -106,18 +106,9 @@ export class ConvOrchestrator {
     context: ConvSystemContext,
     onTaskEvent?: (event: ConvTaskEvent) => void,
   ): AsyncGenerator<ConvStreamEvent> {
-    // Two system messages split at the prompt-cache boundary: the static
-    // persona/instructions prefix is byte-stable across turns (marked
-    // `cache: true` so Anthropic can serve it from cache), while task state
-    // and user identity change every turn and follow unmarked. Note: at
-    // ~1500 tokens the static block may sit below some models' minimum
-    // cacheable prefix and silently not cache - harmless (no premium is
-    // charged); the provider's last-message breakpoint still caches
-    // system + dialogue as one growing prefix.
-    const dynamicPrompt = this.buildDynamicSystemPrompt(context);
+    const systemPrompt = this.buildSystemPrompt(context);
     const messages: LLMMessage[] = [
-      { role: 'system', content: this.buildStaticSystemPrompt(), cache: true },
-      ...(dynamicPrompt ? [{ role: 'system', content: dynamicPrompt } satisfies LLMMessage] : []),
+      { role: 'system', content: systemPrompt },
       ...(context.recentDialogue ?? []),
       { role: 'user', content: userMessage },
     ];
@@ -296,28 +287,33 @@ export class ConvOrchestrator {
   }
 
   /**
-   * Build the STATIC half of the conversation tier's tight system prompt:
-   * persona + role + delegation catalog + style. Byte-stable across turns
-   * (depends only on `this.persona`), so callers mark it as a prompt-cache
-   * boundary. Goal: keep static + dynamic together under ~1500 tokens.
+   * Build the conversation tier's tight system prompt. Goal: keep it under
+   * ~1500 tokens (persona + identity + delegation catalog + in-flight tasks
+   * + last result summaries). The task tiers see the heavy context separately.
    */
-  private buildStaticSystemPrompt(): string {
+  private buildSystemPrompt(context: ConvSystemContext): string {
     const parts: string[] = [];
 
     parts.push('# Persona');
     parts.push(this.persona);
     parts.push('');
 
+    if (context.userIdentity) {
+      parts.push('# User');
+      parts.push(context.userIdentity);
+      parts.push('');
+    }
+
     parts.push('# Your Role');
     parts.push(
       'You are the conversation layer. You own dialogue tone and routing decisions. ' +
       'You do NOT do real work yourself. For anything beyond small talk, you call the ' +
-      '`delegate` tool to send the work to a task tier that has access to all of Zoya\'s ' +
+      '`delegate` tool to send the work to a task tier that has access to all of Jarvis\'s ' +
       'real tools (workflows, browser, file ops, vault, calendar, commitments, goals, etc.).',
     );
     parts.push('');
 
-    parts.push('# CRITICAL: You have NO direct knowledge of Zoya state');
+    parts.push('# CRITICAL: You have NO direct knowledge of Jarvis state');
     parts.push(
       'You do not know what workflows exist, what files are in the vault, what commitments ' +
       'are scheduled, what goals are active, what was built earlier, what the user\'s ' +
@@ -344,7 +340,7 @@ export class ConvOrchestrator {
     parts.push('# Delegation Catalog');
     parts.push('Use the `delegate` tool when:');
     parts.push('- The user asks you to FIND or LOOK UP something - tier=medium, template=research');
-    parts.push('- The user asks about real Zoya state (workflows, files, vault, calendar) - tier=medium, template=general');
+    parts.push('- The user asks about real Jarvis state (workflows, files, vault, calendar) - tier=medium, template=general');
     parts.push('- The user asks you to WRITE or REFACTOR code - tier=medium, template=code');
     parts.push('- The user asks for a PLAN, schedule, or decomposition - tier=high, template=plan');
     parts.push('- The user asks to DRAFT prose (email, doc, summary) - tier=medium, template=write');
@@ -354,8 +350,42 @@ export class ConvOrchestrator {
     parts.push("Do NOT delegate when:");
     parts.push('- The user is making small talk (greeting, thanks, mood)');
     parts.push('- The user is clarifying or cancelling an in-flight task (use check_task / cancel_task)');
-    parts.push('- The user asks who you are / what you can do / how Zoya works (general capabilities, not specifics)');
+    parts.push('- The user asks who you are / what you can do / how Jarvis works (general capabilities, not specifics)');
     parts.push('');
+
+    // In-flight tasks
+    const inFlight = this.registry.inFlight();
+    if (inFlight.length > 0) {
+      parts.push('# In-flight Tasks');
+      for (const t of inFlight) {
+        const elapsed = Math.round((Date.now() - t.startedAt) / 1000);
+        parts.push(`- ${t.id} (${t.status}, ${elapsed}s, ${t.request.template}): ${t.request.intent}`);
+      }
+      parts.push('');
+    }
+
+    // Last task results - shown in full so the conv LLM has the IDs/names
+    // it needs to verbalize follow-ups. Even with the full summary, ANY
+    // request for specifics not already in the summary MUST be delegated
+    // (see "CRITICAL: You have NO direct knowledge" above).
+    const recent = this.registry.recentResults(5);
+    if (recent.length > 0) {
+      parts.push('# Recent Task Results');
+      for (const t of recent) {
+        if (!t.result) continue;
+        parts.push(`## Task ${t.id} - ${t.request.template} (${t.status})`);
+        parts.push(`User asked: ${t.request.intent}`);
+        parts.push(`Result:`);
+        parts.push(t.result.summary);
+        parts.push('');
+      }
+    }
+
+    if (context.ambientFacts) {
+      parts.push('# Ambient State');
+      parts.push(context.ambientFacts);
+      parts.push('');
+    }
 
     parts.push('# Handling paused tasks');
     parts.push(
@@ -389,66 +419,13 @@ export class ConvOrchestrator {
       'Your verbalization MUST be faithful to that summary - report what the ' +
       'task tier actually did/found, not what you think the answer should be. ' +
       'Do NOT substitute your own knowledge. Do NOT invent details that aren\'t ' +
-      'in the summary. If the summary mentions Zoya features (workflows, ' +
+      'in the summary. If the summary mentions Jarvis features (workflows, ' +
       'commitments, goals), say so - do not suggest generic alternatives like ' +
-      '"you could write a Python script" when the task already used a Zoya ' +
+      '"you could write a Python script" when the task already used a Jarvis ' +
       'tool. If the task failed or returned poor output, tell the user briefly ' +
       'and offer to retry rather than papering over it with your own guess.',
     );
 
     return parts.join('\n');
   }
-
-  /**
-   * Build the DYNAMIC half of the conversation tier's system prompt: user
-   * identity, in-flight task state, recent results, ambient facts. Changes
-   * every turn, so it must be rendered AFTER the static half and never be
-   * marked as a cache boundary.
-   */
-  private buildDynamicSystemPrompt(context: ConvSystemContext): string {
-    const parts: string[] = [];
-
-    if (context.userIdentity) {
-      parts.push('# User');
-      parts.push(context.userIdentity);
-      parts.push('');
-    }
-
-    // In-flight tasks
-    const inFlight = this.registry.inFlight();
-    if (inFlight.length > 0) {
-      parts.push('# In-flight Tasks');
-      for (const t of inFlight) {
-        const elapsed = Math.round((Date.now() - t.startedAt) / 1000);
-        parts.push(`- ${t.id} (${t.status}, ${elapsed}s, ${t.request.template}): ${t.request.intent}`);
-      }
-      parts.push('');
-    }
-
-    // Last task results - shown in full so the conv LLM has the IDs/names
-    // it needs to verbalize follow-ups. Even with the full summary, ANY
-    // request for specifics not already in the summary MUST be delegated
-    // (see "CRITICAL: You have NO direct knowledge" in the static half).
-    const recent = this.registry.recentResults(5);
-    if (recent.length > 0) {
-      parts.push('# Recent Task Results');
-      for (const t of recent) {
-        if (!t.result) continue;
-        parts.push(`## Task ${t.id} - ${t.request.template} (${t.status})`);
-        parts.push(`User asked: ${t.request.intent}`);
-        parts.push(`Result:`);
-        parts.push(t.result.summary);
-        parts.push('');
-      }
-    }
-
-    if (context.ambientFacts) {
-      parts.push('# Ambient State');
-      parts.push(context.ambientFacts);
-      parts.push('');
-    }
-
-    return parts.join('\n');
-  }
 }
-

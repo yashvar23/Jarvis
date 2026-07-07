@@ -4,17 +4,17 @@
  * Pieces ask the engine for credentials by `connectionId`/`externalId`. This
  * resolver decides where to fetch them from:
  *
- *   1. If the externalId starts with `zoya:`, dispatch to a registered
- *      `ZoyaConnectionSource` that pulls live from Zoya' existing stores
+ *   1. If the externalId starts with `jarvis:`, dispatch to a registered
+ *      `JarvisConnectionSource` that pulls live from Jarvis' existing stores
  *      (Google OAuth file, Telegram/Discord bot token in config, etc.). This
- *      means a user who already wired Gmail into Zoya sees a "Zoya Gmail"
+ *      means a user who already wired Gmail into Jarvis sees a "Jarvis Gmail"
  *      connection in the workflow builder without re-authenticating.
  *
  *   2. Otherwise, fall back to the `app_connection` repository -- the
  *      activepieces-native flow where the user adds a new connection per
  *      piece via OAuth/secret entry.
  *
- * The adapter does not import Zoya modules directly; sources are injected so
+ * The adapter does not import Jarvis modules directly; sources are injected so
  * this file stays testable in isolation. The wiring (which Source for what
  * config/store) lives in the daemon bootstrap.
  */
@@ -22,8 +22,8 @@
 import type { AppConnectionType } from "../db/repos/app-connection";
 import { getConnectionByExternalId } from "../db/repos/app-connection";
 
-/** Prefix that marks a connection as "managed by Zoya itself". */
-export const ZOYA_PREFIX = "zoya:";
+/** Prefix that marks a connection as "managed by Jarvis itself". */
+export const JARVIS_PREFIX = "jarvis:";
 
 /** Resolved connection value handed to the piece at execution time. */
 export interface ResolvedConnection {
@@ -32,10 +32,10 @@ export interface ResolvedConnection {
 }
 
 /**
- * A source of Zoya-managed credentials. One per backing store (Google file,
- * channel config, etc.). Sources only handle externalIds with the ZOYA_PREFIX.
+ * A source of Jarvis-managed credentials. One per backing store (Google file,
+ * channel config, etc.). Sources only handle externalIds with the JARVIS_PREFIX.
  */
-export interface ZoyaConnectionSource {
+export interface JarvisConnectionSource {
   /** Lower-cased externalId suffix this source claims, e.g. "google", "telegram". */
   readonly id: string;
   /** True if this source can resolve `externalId`. */
@@ -54,11 +54,11 @@ export interface ResolveInput {
   externalId: string;
 }
 
-/** Composite resolver: Zoya sources first, then the workflow DB. */
+/** Composite resolver: Jarvis sources first, then the workflow DB. */
 export class CredentialResolver {
-  private sources: ZoyaConnectionSource[] = [];
+  private sources: JarvisConnectionSource[] = [];
 
-  register(source: ZoyaConnectionSource): void {
+  register(source: JarvisConnectionSource): void {
     this.sources.push(source);
   }
 
@@ -66,12 +66,12 @@ export class CredentialResolver {
     this.sources = this.sources.filter((s) => s.id !== id);
   }
 
-  list(): readonly ZoyaConnectionSource[] {
+  list(): readonly JarvisConnectionSource[] {
     return this.sources;
   }
 
   async resolve(input: ResolveInput): Promise<ResolvedConnection | null> {
-    if (input.externalId.startsWith(ZOYA_PREFIX)) {
+    if (input.externalId.startsWith(JARVIS_PREFIX)) {
       for (const source of this.sources) {
         if (source.canResolve(input.externalId)) {
           return source.resolve(input.externalId);
@@ -85,8 +85,7 @@ export class CredentialResolver {
   }
 }
 
-// Live Zoya credential sources -- one per backing store -- live in their
+// Live Jarvis credential sources -- one per backing store -- live in their
 // own files (`google-source.ts`, `telegram-source.ts`). They're constructed
 // during daemon bootstrap and registered on this resolver. Keep new sources
 // in their own file too rather than growing this one.
-

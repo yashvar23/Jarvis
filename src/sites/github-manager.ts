@@ -17,7 +17,7 @@ export class GitHubManager {
   // ── Token Management ──
 
   getToken(): string | null {
-    return process.env.ZOYA_GITHUB_TOKEN ?? getSecret(TOKEN_KEY);
+    return process.env.JARVIS_GITHUB_TOKEN ?? getSecret(TOKEN_KEY);
   }
 
   setToken(token: string): void {
@@ -29,7 +29,7 @@ export class GitHubManager {
   }
 
   hasToken(): boolean {
-    return !!process.env.ZOYA_GITHUB_TOKEN || hasSecret(TOKEN_KEY);
+    return !!process.env.JARVIS_GITHUB_TOKEN || hasSecret(TOKEN_KEY);
   }
 
   /**
@@ -339,7 +339,7 @@ export class GitHubManager {
         'Authorization': `Bearer ${token}`,
         'Accept': 'application/vnd.github+json',
         'X-GitHub-Api-Version': '2022-11-28',
-        'User-Agent': 'ZOYA-SiteBuilder',
+        'User-Agent': 'JARVIS-SiteBuilder',
         ...(body ? { 'Content-Type': 'application/json' } : {}),
       },
       body: body ? JSON.stringify(body) : undefined,
@@ -353,4 +353,3 @@ export class GitHubManager {
     return res;
   }
 }
-

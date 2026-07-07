@@ -1471,7 +1471,7 @@ using browser_engine = detail::gtk_webkit_engine;
 #include <CoreGraphics/CoreGraphics.h>
 #include <objc/NSObjCRuntime.h>
 #include <objc/objc-runtime.h>
-#include <pthread.h> // PATCHED (zoya): for pthread_main_np() in set_up_window
+#include <pthread.h> // PATCHED (jarvis): for pthread_main_np() in set_up_window
 
 namespace webview {
 namespace detail {
@@ -1636,7 +1636,7 @@ public:
   void *widget_impl() override { return (void *)m_webview; }
   void *browser_controller_impl() override { return (void *)m_webview; };
   void terminate_impl() override {
-    // PATCHED (zoya): no-op on Cocoa. The sidecar runs every webview window
+    // PATCHED (jarvis): no-op on Cocoa. The sidecar runs every webview window
     // (panels, settings, logs) under the tray's single shared [NSApp run] loop.
     // on_window_destroyed() calls terminate() when the LAST webview window
     // closes; the upstream behavior here is stop_run_loop() -> [NSApp stop],
@@ -1644,7 +1644,7 @@ public:
     // main dispatch queue unserviced, so the next webview.New()'s dispatch_sync
     // to the main thread hangs forever (and the pebble's main-queue paint stalls
     // + tray quit can't post). The app must only ever quit via the tray's own
-    // zoyaTrayQuit ([NSApp stop] + gTrayShouldQuit), never on a window close.
+    // jarvisTrayQuit ([NSApp stop] + gTrayShouldQuit), never on a window close.
   }
   void run_impl() override {
     auto app = get_shared_application();
@@ -1906,7 +1906,7 @@ private:
     dispatch([this] { on_window_destroyed(); });
   }
   void set_up_window() {
-    // PATCHED (zoya): NSWindow / WKWebView must be created on the main thread.
+    // PATCHED (jarvis): NSWindow / WKWebView must be created on the main thread.
     // The host spawns panels on background goroutines, so when we're off the
     // main thread marshal this whole method synchronously onto the main queue
     // (the host's [NSApp run] loop pumps it). Without this AppKit aborts with
@@ -2046,7 +2046,7 @@ private:
 
   // Blocks while depleting the run loop of events.
   void deplete_run_loop_event_queue() {
-    // PATCHED (zoya): no-op on Cocoa. The host destroys panels by running
+    // PATCHED (jarvis): no-op on Cocoa. The host destroys panels by running
     // wv.Destroy() on the main queue (panels live under the tray's shared
     // [NSApp run] loop). The original pump dispatches a `done=true` sentinel
     // onto the SAME serial main queue and spins until it runs — but it can't
@@ -3194,7 +3194,7 @@ public:
                     nullptr, hInstance, this);
 
     if (m_owns_window) {
-      // PATCHED (zoya): create the window HIDDEN so the host can reveal it
+      // PATCHED (jarvis): create the window HIDDEN so the host can reveal it
       // once the page has loaded, avoiding the empty-window flash during
       // WebView2 init. The host calls ShowWindow(SW_SHOW) itself.
       ShowWindow(m_window, SW_HIDE);

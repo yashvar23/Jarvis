@@ -4,9 +4,9 @@
  * in the workflow DB as plaintext.
  *
  * Key sourcing:
- *   1. `ZOYA_WORKFLOW_ENCRYPTION_KEY` env var (64-char hex = 32 bytes).
+ *   1. `JARVIS_WORKFLOW_ENCRYPTION_KEY` env var (64-char hex = 32 bytes).
  *   2. Otherwise: generate a fresh random key on first call and persist it
- *      to `~/.zoya/cache/workflow-encryption.key` with 0600 perms. Same
+ *      to `~/.jarvis/cache/workflow-encryption.key` with 0600 perms. Same
  *      file is reused on subsequent boots so existing rows stay decryptable.
  *
  * Wire format (stored in `app_connection.value`):
@@ -40,7 +40,7 @@ const KEY_BYTES = 32;
 const IV_BYTES = 12;
 const PREFIX = "enc1:";
 
-const DEFAULT_KEY_FILE = resolve(homedir(), ".zoya", "cache", "workflow-encryption.key");
+const DEFAULT_KEY_FILE = resolve(homedir(), ".jarvis", "cache", "workflow-encryption.key");
 
 let cachedKey: Buffer | null = null;
 
@@ -50,17 +50,17 @@ let cachedKey: Buffer | null = null;
  */
 function getKey(): Buffer {
   if (cachedKey) return cachedKey;
-  const env = process.env["ZOYA_WORKFLOW_ENCRYPTION_KEY"];
+  const env = process.env["JARVIS_WORKFLOW_ENCRYPTION_KEY"];
   if (env) {
     if (!/^[0-9a-fA-F]{64}$/.test(env)) {
       throw new Error(
-        "ZOYA_WORKFLOW_ENCRYPTION_KEY must be 64 hex characters (32 bytes); got length " + env.length,
+        "JARVIS_WORKFLOW_ENCRYPTION_KEY must be 64 hex characters (32 bytes); got length " + env.length,
       );
     }
     cachedKey = Buffer.from(env, "hex");
     return cachedKey;
   }
-  const file = process.env["ZOYA_WORKFLOW_ENCRYPTION_KEY_FILE"] ?? DEFAULT_KEY_FILE;
+  const file = process.env["JARVIS_WORKFLOW_ENCRYPTION_KEY_FILE"] ?? DEFAULT_KEY_FILE;
   if (existsSync(file)) {
     const hex = readFileSync(file, "utf8").trim();
     if (!/^[0-9a-fA-F]{64}$/.test(hex)) {
@@ -173,4 +173,3 @@ export function decryptJson(stored: string, context = "stored value"): unknown {
 export function isEncrypted(stored: string): boolean {
   return stored.startsWith(PREFIX);
 }
-

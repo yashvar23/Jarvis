@@ -52,4 +52,3 @@ export function useApiData<T>(
 
   return { data, loading, error, refetch: fetch_ };
 }
-

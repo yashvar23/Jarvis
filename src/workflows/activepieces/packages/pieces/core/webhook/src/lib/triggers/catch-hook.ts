@@ -317,4 +317,3 @@ export function verifyHmacAuth(
     return false;
   }
 }
-

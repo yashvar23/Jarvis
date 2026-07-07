@@ -1,9 +1,9 @@
 /**
- * `ZoyaTelegramConnectionSource` -- bridges Zoya's existing Telegram
- * bot token (configured in `~/.zoya/config.yaml` under
+ * `JarvisTelegramConnectionSource` -- bridges Jarvis's existing Telegram
+ * bot token (configured in `~/.jarvis/config.yaml` under
  * `channels.telegram.bot_token`) into the workflow runtime's
- * `CredentialResolver`. When a piece asks for `zoya:telegram`, the source
- * returns the same token Zoya is using for the inbound bot.
+ * `CredentialResolver`. When a piece asks for `jarvis:telegram`, the source
+ * returns the same token Jarvis is using for the inbound bot.
  *
  * The piece sees a `SECRET_TEXT`-shaped value:
  *   { secret_text: <bot-token-string> }
@@ -20,13 +20,13 @@
  */
 
 import type {
-  ZoyaConnectionSource,
+  JarvisConnectionSource,
   ResolvedConnection,
 } from "./adapter";
 
-export const ZOYA_TELEGRAM_PREFIX = "zoya:telegram";
+export const JARVIS_TELEGRAM_PREFIX = "jarvis:telegram";
 
-export class ZoyaTelegramConnectionSource implements ZoyaConnectionSource {
+export class JarvisTelegramConnectionSource implements JarvisConnectionSource {
   readonly id = "telegram";
 
   /**
@@ -37,7 +37,7 @@ export class ZoyaTelegramConnectionSource implements ZoyaConnectionSource {
   constructor(private readonly getToken: () => string | null) {}
 
   canResolve(externalId: string): boolean {
-    return externalId === ZOYA_TELEGRAM_PREFIX || externalId.startsWith(`${ZOYA_TELEGRAM_PREFIX}:`);
+    return externalId === JARVIS_TELEGRAM_PREFIX || externalId.startsWith(`${JARVIS_TELEGRAM_PREFIX}:`);
   }
 
   async resolve(_externalId: string): Promise<ResolvedConnection | null> {
@@ -49,4 +49,3 @@ export class ZoyaTelegramConnectionSource implements ZoyaConnectionSource {
     };
   }
 }
-

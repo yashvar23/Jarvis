@@ -127,4 +127,3 @@ export function useRovingTabs<T extends string>(
 
   return { tablistRef, getTabProps, getPanelProps };
 }
-

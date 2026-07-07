@@ -115,8 +115,8 @@ export class OpenRouterProvider implements LLMProvider {
       headers: {
         'Authorization': `Bearer ${this.apiKey}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://github.com/zoya-assistant',
-        'X-Title': 'Zoya Assistant',
+        'HTTP-Referer': 'https://github.com/jarvis-assistant',
+        'X-Title': 'Jarvis Assistant',
       },
       body: JSON.stringify(body),
     });
@@ -155,8 +155,8 @@ export class OpenRouterProvider implements LLMProvider {
       headers: {
         'Authorization': `Bearer ${this.apiKey}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://github.com/zoya-assistant',
-        'X-Title': 'Zoya Assistant',
+        'HTTP-Referer': 'https://github.com/jarvis-assistant',
+        'X-Title': 'Jarvis Assistant',
       },
       body: JSON.stringify(body),
     });
@@ -393,4 +393,3 @@ export class OpenRouterProvider implements LLMProvider {
     }
   }
 }
-

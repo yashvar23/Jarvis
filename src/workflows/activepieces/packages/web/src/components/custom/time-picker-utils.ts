@@ -202,4 +202,3 @@ export function display12HourValue(hours: number) {
   if (hours % 12 > 9) return `${hours}`;
   return `0${hours % 12}`;
 }
-

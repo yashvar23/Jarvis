@@ -1,12 +1,12 @@
 /**
- * `ZoyaNotifierAdapter` covers the four channels the workflow notifier
+ * `JarvisNotifierAdapter` covers the four channels the workflow notifier
  * piece supports: dashboard, M8 (telegram/discord/...), voice, desktop.
  * Tests here stub each backend so the routing logic can be exercised
  * without spinning up real adapters.
  */
 
 import { describe, expect, test } from "bun:test";
-import { ZoyaNotifierAdapter, type NotifierDeps } from "./notifier";
+import { JarvisNotifierAdapter, type NotifierDeps } from "./notifier";
 
 function makeDeps(overrides: Partial<NotifierDeps> = {}): NotifierDeps {
   return {
@@ -19,10 +19,10 @@ function makeDeps(overrides: Partial<NotifierDeps> = {}): NotifierDeps {
   };
 }
 
-describe("ZoyaNotifierAdapter: voice channel", () => {
+describe("JarvisNotifierAdapter: voice channel", () => {
   test("delivers via sendVoice when wired", async () => {
     const spoken: string[] = [];
-    const adapter = new ZoyaNotifierAdapter(
+    const adapter = new JarvisNotifierAdapter(
       makeDeps({
         sendVoice: async (t) => {
           spoken.push(t);
@@ -36,7 +36,7 @@ describe("ZoyaNotifierAdapter: voice channel", () => {
   });
 
   test("reports failed when sendVoice isn't wired", async () => {
-    const adapter = new ZoyaNotifierAdapter(makeDeps());
+    const adapter = new JarvisNotifierAdapter(makeDeps());
     const r = await adapter.notify({ message: "x", channels: ["voice"] });
     expect(r.delivered).not.toContain("voice");
     expect(r.failed[0]?.channel).toBe("voice");
@@ -44,7 +44,7 @@ describe("ZoyaNotifierAdapter: voice channel", () => {
   });
 
   test("surfaces sendVoice errors as failures", async () => {
-    const adapter = new ZoyaNotifierAdapter(
+    const adapter = new JarvisNotifierAdapter(
       makeDeps({
         sendVoice: async () => {
           throw new Error("websocket closed");
@@ -56,13 +56,13 @@ describe("ZoyaNotifierAdapter: voice channel", () => {
   });
 });
 
-describe("ZoyaNotifierAdapter: channel expansion", () => {
+describe("JarvisNotifierAdapter: channel expansion", () => {
   test('"auto" without getConnectedExternalChannels falls back to dashboard + telegram + discord', async () => {
     const calls: { dashboard: boolean; channels: string[] } = {
       dashboard: false,
       channels: [],
     };
-    const adapter = new ZoyaNotifierAdapter(
+    const adapter = new JarvisNotifierAdapter(
       makeDeps({
         broadcastToDashboard: () => {
           calls.dashboard = true;
@@ -82,12 +82,12 @@ describe("ZoyaNotifierAdapter: channel expansion", () => {
   });
 
   test('"auto" only fans out to *connected* external channels when the dep is wired', async () => {
-    // Zoya with only telegram wired -> auto goes to dashboard + telegram,
+    // Jarvis with only telegram wired -> auto goes to dashboard + telegram,
     // discord is silently skipped (it's not a failure -- it's just not
     // configured). Previously this would have reported
     // failed:[{channel:"discord", error:"not configured"}] every time.
     const calls: { channels: string[] } = { channels: [] };
-    const adapter = new ZoyaNotifierAdapter(
+    const adapter = new JarvisNotifierAdapter(
       makeDeps({
         broadcastToChannels: async (channels) => {
           calls.channels = channels;
@@ -102,9 +102,9 @@ describe("ZoyaNotifierAdapter: channel expansion", () => {
     expect(r.failed).toEqual([]);
   });
 
-  test('"auto" on a Zoya with no external channels connected only delivers to dashboard', async () => {
+  test('"auto" on a Jarvis with no external channels connected only delivers to dashboard', async () => {
     let m8Called = false;
-    const adapter = new ZoyaNotifierAdapter(
+    const adapter = new JarvisNotifierAdapter(
       makeDeps({
         broadcastToChannels: async () => {
           m8Called = true;
@@ -124,7 +124,7 @@ describe("ZoyaNotifierAdapter: channel expansion", () => {
     // the user asked for that channel by name; report the underlying
     // adapter's failure verbatim if it isn't connected.
     const calls: { channels: string[] } = { channels: [] };
-    const adapter = new ZoyaNotifierAdapter(
+    const adapter = new JarvisNotifierAdapter(
       makeDeps({
         broadcastToChannels: async (channels) => {
           calls.channels = channels;
@@ -143,7 +143,7 @@ describe("ZoyaNotifierAdapter: channel expansion", () => {
 
   test("dashboard channel routes only to the dashboard, not to M8", async () => {
     let m8Called = false;
-    const adapter = new ZoyaNotifierAdapter(
+    const adapter = new JarvisNotifierAdapter(
       makeDeps({
         broadcastToChannels: async (channels) => {
           m8Called = true;
@@ -155,4 +155,3 @@ describe("ZoyaNotifierAdapter: channel expansion", () => {
     expect(m8Called).toBe(false);
   });
 });
-

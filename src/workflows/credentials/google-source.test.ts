@@ -1,5 +1,5 @@
 /**
- * Coverage for `ZoyaGoogleConnectionSource`. The refresh-token dance
+ * Coverage for `JarvisGoogleConnectionSource`. The refresh-token dance
  * itself lives in `GoogleAuth.refreshAccessToken` (and is hit through
  * `getAccessToken` when the token's within 5min of expiry); this file's
  * scope is the source's contract: it MUST call `getAccessToken` (not
@@ -13,7 +13,7 @@
  */
 
 import { describe, expect, test } from "bun:test";
-import { ZoyaGoogleConnectionSource, ZOYA_GOOGLE_PREFIX } from "./google-source";
+import { JarvisGoogleConnectionSource, JARVIS_GOOGLE_PREFIX } from "./google-source";
 import type { GoogleAuth } from "../../integrations/google-auth";
 
 interface FakeAuthState {
@@ -47,22 +47,22 @@ function makeFakeAuth(state: FakeAuthState): GoogleAuth {
   return stub as unknown as GoogleAuth;
 }
 
-describe("ZoyaGoogleConnectionSource", () => {
+describe("JarvisGoogleConnectionSource", () => {
   test("returns null when GoogleAuth is unauthenticated", async () => {
     const auth = makeFakeAuth({
       authed: false,
       freshAccessToken: "x",
       tokens: null,
     });
-    const src = new ZoyaGoogleConnectionSource(auth);
-    expect(await src.resolve(ZOYA_GOOGLE_PREFIX)).toBeNull();
+    const src = new JarvisGoogleConnectionSource(auth);
+    expect(await src.resolve(JARVIS_GOOGLE_PREFIX)).toBeNull();
   });
 
-  test("canResolve matches zoya:google + zoya:google:<sub>", () => {
-    const src = new ZoyaGoogleConnectionSource(makeFakeAuth({ authed: false, freshAccessToken: "x", tokens: null }));
-    expect(src.canResolve("zoya:google")).toBe(true);
-    expect(src.canResolve("zoya:google:gmail")).toBe(true);
-    expect(src.canResolve("zoya:telegram")).toBe(false);
+  test("canResolve matches jarvis:google + jarvis:google:<sub>", () => {
+    const src = new JarvisGoogleConnectionSource(makeFakeAuth({ authed: false, freshAccessToken: "x", tokens: null }));
+    expect(src.canResolve("jarvis:google")).toBe(true);
+    expect(src.canResolve("jarvis:google:gmail")).toBe(true);
+    expect(src.canResolve("jarvis:telegram")).toBe(false);
   });
 
   test("calls getAccessToken so an expired cache surfaces the refreshed token", async () => {
@@ -78,8 +78,8 @@ describe("ZoyaGoogleConnectionSource", () => {
         expiry_date: Date.now() - 1, // expired
       },
     };
-    const src = new ZoyaGoogleConnectionSource(makeFakeAuth(state));
-    const resolved = await src.resolve(ZOYA_GOOGLE_PREFIX);
+    const src = new JarvisGoogleConnectionSource(makeFakeAuth(state));
+    const resolved = await src.resolve(JARVIS_GOOGLE_PREFIX);
     expect(resolved?.type).toBe("OAUTH2");
     const value = resolved?.value as {
       access_token: string;
@@ -100,8 +100,8 @@ describe("ZoyaGoogleConnectionSource", () => {
       freshAccessToken: "live",
       tokens: { access_token: "live", refresh_token: "rt" },
     };
-    const src = new ZoyaGoogleConnectionSource(makeFakeAuth(state));
-    const resolved = await src.resolve(ZOYA_GOOGLE_PREFIX);
+    const src = new JarvisGoogleConnectionSource(makeFakeAuth(state));
+    const resolved = await src.resolve(JARVIS_GOOGLE_PREFIX);
     const value = resolved?.value as { token_type?: string; expiry_date?: number };
     // token_type defaults to "Bearer" per the source's normalization.
     expect(value.token_type).toBe("Bearer");
@@ -117,11 +117,10 @@ describe("ZoyaGoogleConnectionSource", () => {
       freshAccessToken: "only-access-token",
       tokens: null,
     };
-    const src = new ZoyaGoogleConnectionSource(makeFakeAuth(state));
-    const resolved = await src.resolve(ZOYA_GOOGLE_PREFIX);
+    const src = new JarvisGoogleConnectionSource(makeFakeAuth(state));
+    const resolved = await src.resolve(JARVIS_GOOGLE_PREFIX);
     const value = resolved?.value as { access_token: string; refresh_token: string };
     expect(value.access_token).toBe("only-access-token");
     expect(value.refresh_token).toBe("");
   });
 });
-

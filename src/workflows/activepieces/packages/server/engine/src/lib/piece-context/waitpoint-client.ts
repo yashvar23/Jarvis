@@ -21,4 +21,3 @@ type CreateWaitpointClientRequest = CreateWaitpointRequest & {
     apiUrl: string
     engineToken: string
 }
-

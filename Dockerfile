@@ -1,11 +1,11 @@
-# ─── ZOYA Docker Image ──────────────────────────────────────
+# ─── J.A.R.V.I.S. Docker Image ──────────────────────────────────────
 #
-# Multi-stage build for the ZOYA daemon.
+# Multi-stage build for the JARVIS daemon.
 # Uses Debian-based Bun images (not Alpine) for sharp glibc compatibility.
 #
-# Build:   docker build -t zoya .
-# Build with version: docker build --build-arg VERSION=0.3.1 -t zoya .
-# Run:     docker run -p 3142:3142 -v zoya-data:/data -e ZOYA_API_KEY=sk-... zoya
+# Build:   docker build -t jarvis .
+# Build with version: docker build --build-arg VERSION=0.3.1 -t jarvis .
+# Run:     docker run -p 3142:3142 -v jarvis-data:/data -e JARVIS_API_KEY=sk-... jarvis
 #
 # ─────────────────────────────────────────────────────────────────────
 
@@ -45,7 +45,17 @@ RUN if [ -n "$VERSION" ]; then \
     fi
 
 # Copy ONNX wake-word models and WASM runtime from node_modules into ui/public/
-RUN bun run copy:models
+RUN mkdir -p ui/public/openwakeword/models ui/public/ort && \
+    cp node_modules/openwakeword-wasm-browser/models/melspectrogram.onnx \
+       node_modules/openwakeword-wasm-browser/models/embedding_model.onnx \
+       node_modules/openwakeword-wasm-browser/models/silero_vad.onnx \
+       node_modules/openwakeword-wasm-browser/models/hey_jarvis_v0.1.onnx \
+       ui/public/openwakeword/models/ && \
+    cp node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.jsep.wasm \
+       node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.wasm \
+       node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.jsep.mjs \
+       node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.mjs \
+       ui/public/ort/
 
 # Build the dashboard UI bundle
 RUN bun build ui/index.html --outdir ui/dist
@@ -74,34 +84,34 @@ COPY --from=build /app/ui/public ./ui/public
 COPY --from=build /app/package.json ./
 COPY tsconfig.json ./
 
-# Install zoya as a global command
+# Install jarvis as a global command
 # Note: `bun link` can't be used here — it symlinks through /root/.bun/ which
-# is inaccessible to the non-root zoya user. Direct symlink works because
+# is inaccessible to the non-root jarvis user. Direct symlink works because
 # Bun resolves import.meta.dir through symlinks to the real path (/app/bin).
-RUN ln -s /app/bin/zoya.ts /usr/local/bin/zoya
+RUN ln -s /app/bin/jarvis.ts /usr/local/bin/jarvis
 
 # Create non-root user and data directory
-RUN groupadd -r zoya && useradd -r -g zoya -d /data -s /bin/bash zoya && \
-    mkdir -p /data && chown zoya:zoya /data
+RUN groupadd -r jarvis && useradd -r -g jarvis -d /data -s /bin/bash jarvis && \
+    mkdir -p /data && chown jarvis:jarvis /data
 
-ENV ZOYA_HOME=/data
+ENV JARVIS_HOME=/data
 ENV NODE_ENV=production
-# Signal to `zoya update` / `zoya uninstall` that this is a container
+# Signal to `jarvis update` / `jarvis uninstall` that this is a container
 # install. Both commands refuse to run here and point the user at the
 # correct host-side docker commands.
-ENV ZOYA_INSTALL_METHOD=docker
+ENV JARVIS_INSTALL_METHOD=docker
 # Durable on-disk marker as a belt-and-suspenders fallback if the env var
-# is ever unset (e.g. someone runs `docker exec -e ZOYA_INSTALL_METHOD= ...`).
+# is ever unset (e.g. someone runs `docker exec -e JARVIS_INSTALL_METHOD= ...`).
 RUN echo '{"method":"docker","installedAt":"image-build"}' > /app/.install-method
 
 EXPOSE 3142
 
 VOLUME ["/data"]
 
-USER zoya
+USER jarvis
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
     CMD bun -e "fetch('http://localhost:3142/api/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"
 
-ENTRYPOINT ["zoya"]
+ENTRYPOINT ["jarvis"]
 CMD ["start", "--no-open", "--data-dir", "/data", "--no-local-tools"]

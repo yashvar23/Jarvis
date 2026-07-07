@@ -18,4 +18,3 @@ export {
   getChannelPersonality,
   personalityToPrompt,
 } from './adapter.ts';
-

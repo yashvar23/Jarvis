@@ -132,4 +132,3 @@ export async function listUpcomingEvents(
     htmlLink: event.htmlLink,
   }));
 }
-

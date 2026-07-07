@@ -6,4 +6,3 @@ export const GetFlowTemplateRequestQuery = z.object({
 })
 
 export type GetFlowTemplateRequestQuery = z.infer<typeof GetFlowTemplateRequestQuery>
-

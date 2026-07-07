@@ -157,4 +157,3 @@ export const ProjectSyncPlan = z.object({
 })
 export type ProjectSyncPlan = z.infer<typeof ProjectSyncPlan>
 
-

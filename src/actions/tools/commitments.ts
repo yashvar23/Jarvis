@@ -65,7 +65,7 @@ export const commitmentsTool: ToolDefinition = {
     },
     assigned_to: {
       type: 'string',
-      description: 'Who the task is assigned to (e.g., "zoya", "user")',
+      description: 'Who the task is assigned to (e.g., "jarvis", "user")',
       required: false,
     },
     status: {
@@ -146,7 +146,7 @@ export const commitmentsTool: ToolDefinition = {
           priority: (params.priority as CommitmentPriority) || undefined,
           context: params.context as string | undefined,
           assigned_to: params.assigned_to as string | undefined,
-          created_from: 'zoya',
+          created_from: 'jarvis',
         });
 
         const due = item.when_due ? ` — due: ${new Date(item.when_due).toLocaleString()}` : '';
@@ -190,4 +190,3 @@ export const commitmentsTool: ToolDefinition = {
     }
   },
 };
-

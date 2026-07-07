@@ -53,4 +53,3 @@ function usePresence({ resourceId }: { resourceId: string }): PresenceUser[] {
 }
 
 export { usePresence };
-

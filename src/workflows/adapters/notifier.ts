@@ -1,5 +1,5 @@
 /**
- * Adapter: PieceNotifier over Zoya' ChannelService + WebSocketService +
+ * Adapter: PieceNotifier over Jarvis' ChannelService + WebSocketService +
  * desktop notifications.
  *
  * Channel routing rules:
@@ -7,7 +7,7 @@
  *   "auto"      -> dashboard, plus the *configured + connected* subset of
  *                  external channels (telegram/discord) the daemon is
  *                  currently wired to. Unconfigured channels are silently
- *                  dropped here so a vanilla Zoya without telegram doesn't
+ *                  dropped here so a vanilla Jarvis without telegram doesn't
  *                  surface a "telegram failed: not configured" entry on
  *                  every auto notification. Explicit `["telegram"]` still
  *                  reports the failure -- the user asked for it by name.
@@ -27,7 +27,7 @@ import type {
   PieceNotifyInput,
   PieceNotifyPriority,
   PieceNotifyResult,
-} from "../zoya-pieces/types";
+} from "../jarvis-pieces/types";
 
 export interface NotifierDeps {
   /** Sends to every connected channel via M8. Returns void; errors are caught. */
@@ -37,7 +37,7 @@ export interface NotifierDeps {
   /** Optional desktop notification surface (D-Bus / native). Optional means "platform may not have it". */
   sendDesktop?: (title: string, body: string) => Promise<void>;
   /**
-   * Optional voice / TTS surface. When provided, `zoya-notify` calls with
+   * Optional voice / TTS surface. When provided, `jarvis-notify` calls with
    * `channels: ["voice"]` synthesize speech and broadcast the audio to
    * connected dashboard websockets. The daemon's `WebSocketService` exposes
    * `broadcastProactiveVoice` for this. Missing means "TTS not configured"
@@ -46,7 +46,7 @@ export interface NotifierDeps {
   sendVoice?: (text: string) => Promise<void>;
   /**
    * Returns the set of *external* channel names currently configured AND
-   * connected (e.g. `{"telegram"}` on a Zoya with only telegram wired).
+   * connected (e.g. `{"telegram"}` on a Jarvis with only telegram wired).
    * Consulted exclusively by `auto`-channel expansion so unconfigured
    * channels don't surface as failures on every auto notification.
    *
@@ -62,7 +62,7 @@ export interface NotifierBroadcastReport {
   failed: { channel: string; error: string }[];
 }
 
-export class ZoyaNotifierAdapter implements PieceNotifier {
+export class JarvisNotifierAdapter implements PieceNotifier {
   constructor(private readonly deps: NotifierDeps) {}
 
   async notify(input: PieceNotifyInput): Promise<PieceNotifyResult> {
@@ -138,7 +138,7 @@ function expandChannels(requested: PieceNotifyChannel[], deps: NotifierDeps): Se
       // an open dashboard WS; if none is open the broadcast is a silent
       // no-op). For external channels we consult the dep, when wired, to
       // skip unconfigured ones -- otherwise every auto notification on a
-      // Zoya without telegram/discord would report two failures the
+      // Jarvis without telegram/discord would report two failures the
       // user can't act on.
       out.add("dashboard");
       const live = deps.getConnectedExternalChannels?.();
@@ -169,11 +169,10 @@ function mapPriority(p: PieceNotifyPriority): "urgent" | "normal" | "low" {
 }
 
 function titleForPriority(p: "urgent" | "normal" | "low"): string {
-  if (p === "urgent") return "Zoya (urgent)";
-  return "Zoya";
+  if (p === "urgent") return "Jarvis (urgent)";
+  return "Jarvis";
 }
 
 function errorMessage(e: unknown): string {
   return e instanceof Error ? e.message : String(e);
 }
-

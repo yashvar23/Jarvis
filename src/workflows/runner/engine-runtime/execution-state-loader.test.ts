@@ -23,7 +23,7 @@ describe("loadExecutionStateFromLog", () => {
   let tempRoot: string;
 
   beforeEach(() => {
-    tempRoot = mkdtempSync(join(tmpdir(), "zoya-exec-state-"));
+    tempRoot = mkdtempSync(join(tmpdir(), "jarvis-exec-state-"));
   });
 
   afterEach(() => {
@@ -116,4 +116,3 @@ describe("loadExecutionStateFromLog", () => {
     ).rejects.toThrow(/JSON parse failed/);
   });
 });
-

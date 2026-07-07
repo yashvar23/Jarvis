@@ -229,4 +229,3 @@ describe('validateVoicePatch', () => {
     expect(validateVoicePatch({ realtime: 'nope' }).ok).toBe(false);
   });
 });
-

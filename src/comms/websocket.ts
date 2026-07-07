@@ -5,6 +5,11 @@ import { isWithin } from '../util/path.ts';
 import type { SidecarManager } from '../sidecar/manager.ts';
 
 /** Constant-time string comparison to prevent timing attacks */
+function safeCompare(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(Buffer.from(a), Buffer.from(b));
+}
+
 export type WSMessage = {
   type: 'chat' | 'command' | 'status' | 'stream' | 'error' | 'notification'
       | 'tts_start' | 'tts_text' | 'tts_end' | 'voice_start' | 'voice_end' | 'voice_text'
@@ -124,41 +129,22 @@ export class WebSocketServer {
   private clients: Set<ServerWebSocket<unknown>> = new Set();
   private handler: WSClientHandler | null = null;
   private port: number;
-  /** When set, bind a unix-domain socket instead of the TCP port (hosted mode). */
-  private unixPath: string | null = null;
-  /**
-   * Synchronous `process.on('exit')` cleanup for the unix socket, registered
-   * at bind. Guarantees the socket file is removed on ANY graceful process
-   * exit regardless of shutdown-ordering (the daemon stops several slow
-   * services before it reaches this one, and `zoya stop`'s grace window can
-   * SIGKILL mid-shutdown before an ordered stop() runs). Removed by stop() to
-   * avoid stale handlers across restart-in-place. (SIGKILL is uncatchable; the
-   * next start's pre-bind unlink covers that abnormal case.)
-   */
-  private exitCleanup: (() => void) | null = null;
   private startTime: number = 0;
   private apiRoutes: Map<string, MethodRoutes> = new Map();
   private staticDir: string | null = null;
   private publicDir: string | null = null;
   private sidecarManager: SidecarManager | null = null;
-  /**
-   * JWT-only by default: every non-public route requires a valid short-lived
-   * sidecar access token (minted from an enrollment JWT). The ONLY way to
-   * open the dashboard without one is the explicit config escape hatch
-   * `auth.insecure_open_access: true` (pre-enrollment setup; see docs).
-   */
-  private insecureOpenAccess = false;
+  private authToken: string | null = null;
   private corsOrigin: string | null = null;
   private proxyLimiter = new ProxyRateLimiter();
 
-  constructor(port: number = 3142, unixPath?: string) {
+  constructor(port: number = 3142) {
     this.port = port;
-    this.unixPath = unixPath ?? null;
     this.corsOrigin = `http://localhost:${port}`;
   }
 
-  setInsecureOpenAccess(enabled: boolean): void {
-    this.insecureOpenAccess = enabled;
+  setAuthToken(token: string): void {
+    this.authToken = token;
   }
 
   setHandler(handler: WSClientHandler): void {
@@ -209,24 +195,8 @@ export class WebSocketServer {
     this.startTime = Date.now();
     const self = this;
 
-    // Unix mode: remove a stale socket file from a previous run first, or
-    // bind fails with EADDRINUSE even though nothing is listening. The socket
-    // must also be BORN 0660 (umask), not chmod'd after the fact - between
-    // bind and a post-hoc chmod the file briefly carries the process umask,
-    // and on a shared host that window is the tenant boundary.
-    let restoreUmask: number | null = null;
-    if (this.unixPath) {
-      try { require('node:fs').unlinkSync(this.unixPath); } catch { /* absent */ }
-      restoreUmask = process.umask(0o117); // 0666 & ~0117 = 0660
-    }
-
-    // Bun accepts either { port } or { unix } (mutually exclusive variants of
-    // a discriminated union). TypeScript can't narrow a conditional spread to
-    // one variant, so the pair is cast to the port variant; at runtime Bun
-    // receives exactly one of the two keys.
-    const listenOpts = (this.unixPath ? { unix: this.unixPath } : { port: this.port }) as { port: number };
     this.server = Bun.serve<{ sidecar_id?: string; proxy_target?: string; _proxyUpstream?: WebSocket }>({
-      ...listenOpts,
+      port: this.port,
       idleTimeout: 30, // seconds — prevent timeout during heavy processing (OCR, PowerShell)
 
       async fetch(req, server) {
@@ -273,17 +243,18 @@ export class WebSocketServer {
           return Response.json({ access_token: minted.token, expires_in: minted.expiresIn });
         }
 
-        // 1. Auth check. JWT-only by default: a request is authorized by a
-        // valid short-lived sidecar ACCESS token (minted from the enrollment
-        // JWT via /sidecar/token) - the sidecar's panel webviews carry one.
-        // The long-lived enrollment JWT is deliberately NOT accepted here —
-        // only on /sidecar/connect and the mint endpoint — so a leaked panel
-        // credential is bounded to the access-token TTL instead of forever.
-        // There is NO shared dashboard token: enroll a device or (setup only)
-        // set auth.insecure_open_access.
-        if (!self.insecureOpenAccess && !isPublicRoute(pathname, req.method)) {
+        // 1. Auth check (if configured)
+        if (self.authToken && !isPublicRoute(pathname, req.method)) {
+          // A request is authorized by EITHER the dashboard token OR a valid
+          // short-lived sidecar ACCESS token. The sidecar's panel webviews carry
+          // an access token (minted from the enrollment JWT via /sidecar/token)
+          // so their content fetches authenticate without the dashboard token.
+          // The long-lived enrollment JWT is deliberately NOT accepted here —
+          // only on /sidecar/connect and the mint endpoint — so a leaked panel
+          // credential is bounded to the access-token TTL instead of forever.
           const accepts = async (tok: string | null): Promise<boolean> => {
             if (!tok) return false;
+            if (safeCompare(tok, self.authToken!)) return true;
             if (self.sidecarManager && (await self.sidecarManager.verifyAccessToken(tok))) return true;
             return false;
           };
@@ -325,7 +296,7 @@ export class WebSocketServer {
         // 2. WebSocket upgrade — validate Origin to block cross-origin connections
         //    (e.g., dev server iframes on different ports attempting ws://localhost:3142/ws).
         //    Allow when Origin's host matches the request Host header, which covers
-        //    reverse-proxy deployments (Cloudflare tunnel, ngrok, etc.).
+        //    reverse-proxy deployments (Opencove, Cloudflare tunnel, ngrok, etc.).
         if (pathname === '/ws') {
           const origin = req.headers.get('origin');
           if (origin) {
@@ -431,7 +402,7 @@ export class WebSocketServer {
           const overlayPath = path.join(self.staticDir, '..', 'overlay.html');
           const overlayFile = Bun.file(overlayPath);
           if (await overlayFile.exists()) {
-            if (!self.insecureOpenAccess) {
+            if (self.authToken) {
               const html = await overlayFile.text();
               return new Response(injectTokenStrip(html), { headers: { 'Content-Type': 'text/html' } });
             }
@@ -457,7 +428,7 @@ export class WebSocketServer {
 
           const file = Bun.file(filePath);
           if (await file.exists()) {
-            if (!self.insecureOpenAccess && filePath.endsWith('.html')) {
+            if (self.authToken && filePath.endsWith('.html')) {
               const html = await file.text();
               return new Response(injectTokenStrip(html), { headers: { 'Content-Type': 'text/html' } });
             }
@@ -481,7 +452,7 @@ export class WebSocketServer {
         // 7. Site builder catch-all — proxy unmatched paths to the active
         //    dev server using the __proj cookie set by the explicit proxy route.
         //    This handles absolute paths (/src/main.tsx, /node_modules/...) that
-        //    frameworks emit and that don't match any ZOYA route.
+        //    frameworks emit and that don't match any JARVIS route.
         if (self.siteProxy) {
           // WebSocket upgrade (e.g. Vite HMR)
           if (req.headers.get('upgrade')?.toLowerCase() === 'websocket') {
@@ -614,33 +585,8 @@ export class WebSocketServer {
       },
     });
 
-    if (restoreUmask !== null) process.umask(restoreUmask);
-    if (this.unixPath) {
-      // Caddy (same group) must be able to connect; the socket dir itself is
-      // the per-tenant boundary. The umask above made the socket 0660 at
-      // birth; verify rather than trust, and fail CLOSED if it is wrong.
-      const fs = require('node:fs');
-      const mode = fs.statSync(this.unixPath).mode & 0o777;
-      if (mode !== 0o660) {
-        try { fs.chmodSync(this.unixPath, 0o660); } catch { /* verified below */ }
-        if ((fs.statSync(this.unixPath).mode & 0o777) !== 0o660) {
-          this.stop();
-          throw new Error(`[WebSocketServer] Socket ${this.unixPath} has mode ${mode.toString(8)}, expected 660 - refusing to serve`);
-        }
-      }
-      // Guarantee the socket is gone on any graceful process exit, whatever
-      // the shutdown ordering. Capture the path so the handler can't race a
-      // later reassignment of this.unixPath.
-      const socketPath = this.unixPath;
-      this.exitCleanup = () => {
-        try { require('node:fs').unlinkSync(socketPath); } catch { /* already gone */ }
-      };
-      process.once('exit', this.exitCleanup);
-      console.log(`[WebSocketServer] Started on unix:${this.unixPath} (no TCP port bound)`);
-    } else {
-      console.log(`[WebSocketServer] Started on ws://localhost:${this.port}/ws`);
-      console.log(`[WebSocketServer] Health endpoint: http://localhost:${this.port}/health`);
-    }
+    console.log(`[WebSocketServer] Started on ws://localhost:${this.port}/ws`);
+    console.log(`[WebSocketServer] Health endpoint: http://localhost:${this.port}/health`);
     if (this.staticDir) {
       console.log(`[WebSocketServer] Dashboard: http://localhost:${this.port}/`);
     }
@@ -651,18 +597,6 @@ export class WebSocketServer {
       this.server.stop();
       this.server = null;
       this.clients.clear();
-      // Remove the socket file so ops probes don't see a dead-but-present
-      // socket (the pre-bind unlink only covers the NEXT start).
-      if (this.unixPath) {
-        try { require('node:fs').unlinkSync(this.unixPath); } catch { /* absent */ }
-      }
-      // Drop the exit-time cleanup: an explicit stop already removed the
-      // socket, and leaving it registered would let a restart-in-place on a
-      // new path be unlinked by this old instance's handler at process exit.
-      if (this.exitCleanup) {
-        process.removeListener('exit', this.exitCleanup);
-        this.exitCleanup = null;
-      }
       console.log('[WebSocketServer] Stopped');
     }
   }
@@ -776,4 +710,3 @@ function matchRoute(pattern: string, pathname: string): Record<string, string> |
 
   return Object.keys(params).length > 0 ? params : null;
 }
-

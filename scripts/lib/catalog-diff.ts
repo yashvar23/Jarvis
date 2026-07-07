@@ -338,6 +338,3 @@ function reviewReasons(diff: CatalogDiff): string {
   }
   return parts.join(", ");
 }
-
-
-

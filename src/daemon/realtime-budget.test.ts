@@ -84,7 +84,7 @@ describe('RealtimeBudgetTracker file persistence', () => {
   const NOW = new Date('2026-06-04T12:00:00Z');
   const dirs: string[] = [];
   function tmpFile(): string {
-    const dir = mkdtempSync(join(tmpdir(), 'zoya-budget-'));
+    const dir = mkdtempSync(join(tmpdir(), 'jarvis-budget-'));
     dirs.push(dir);
     return join(dir, 'nested', 'realtime-budget.json');
   }
@@ -118,4 +118,3 @@ describe('RealtimeBudgetTracker file persistence', () => {
     expect(RealtimeBudgetTracker.fromFile(path).getMonthSpend(NOW)).toBe(0);
   });
 });
-

@@ -5,7 +5,7 @@
  * via `Content-Encoding` and persist verbatim. Decompression happens lazily on
  * read.
  *
- * Path: `~/.zoya/workflow-logs/<runId>.bin`. Future versions may stream
+ * Path: `~/.jarvis/workflow-logs/<runId>.bin`. Future versions may stream
  * incrementally; today we overwrite each PUT.
  */
 
@@ -24,4 +24,3 @@ export const logsUploadRoute: RouteHandler = async (ctx: RouteContext) => {
   writeFileSync(resolve(dir, `${runId}.bin`), buf);
   return json({ ok: true, bytes: buf.byteLength });
 };
-

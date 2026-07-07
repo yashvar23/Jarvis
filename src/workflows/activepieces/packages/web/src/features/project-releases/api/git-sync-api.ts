@@ -27,4 +27,3 @@ export const gitSyncApi = {
     return api.post<void>(`/v1/git-repos/${repoId}/push`, request);
   },
 };
-

@@ -6,4 +6,3 @@ export const flagsApi = {
     return api.get<FlagsMap>(`/v1/flags`);
   },
 };
-

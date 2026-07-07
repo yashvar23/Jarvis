@@ -1,5 +1,5 @@
 /**
- * Tests for `ZoyaWorkflowRunnerAdapter`.
+ * Tests for `JarvisWorkflowRunnerAdapter`.
  *
  * Focus is on the new typed-error surface (FLOW_NOT_FOUND,
  * SELF_RECURSION, VERSION_MISSING, MISSING_REF) and the
@@ -10,7 +10,7 @@
  */
 
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { ZoyaWorkflowRunnerAdapter, WorkflowRunnerError } from "./workflow-runner";
+import { JarvisWorkflowRunnerAdapter, WorkflowRunnerError } from "./workflow-runner";
 import { closeWorkflowDb, initWorkflowDb } from "../db";
 import { createFlow } from "../db/repos/flow";
 import { createDraftVersion } from "../db/repos/flow-version";
@@ -18,12 +18,12 @@ import { createFlowRun, getFlowRun } from "../db/repos/flow-run";
 
 const PROJECT_ID = "proj_x";
 
-describe("ZoyaWorkflowRunnerAdapter", () => {
-  let adapter: ZoyaWorkflowRunnerAdapter;
+describe("JarvisWorkflowRunnerAdapter", () => {
+  let adapter: JarvisWorkflowRunnerAdapter;
 
   beforeEach(() => {
     initWorkflowDb(":memory:");
-    adapter = new ZoyaWorkflowRunnerAdapter();
+    adapter = new JarvisWorkflowRunnerAdapter();
   });
 
   afterEach(() => {
@@ -256,4 +256,3 @@ describe("ZoyaWorkflowRunnerAdapter", () => {
     expect(out.runId.length).toBeGreaterThan(0);
   });
 });
-

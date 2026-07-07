@@ -465,4 +465,3 @@ export class GoalService implements Service {
     return vault.getGoalMetrics();
   }
 }
-

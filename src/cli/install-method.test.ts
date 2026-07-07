@@ -9,7 +9,7 @@ let fakeHome: string;
 let noDockerEnv: string;
 
 beforeEach(() => {
-  workDir = mkdtempSync(join(tmpdir(), 'zoya-install-method-'));
+  workDir = mkdtempSync(join(tmpdir(), 'jarvis-install-method-'));
   fakeHome = join(workDir, 'home');
   mkdirSync(fakeHome, { recursive: true });
   // Point dockerEnvPath at a path guaranteed not to exist so no ambient
@@ -27,16 +27,16 @@ function writeMarker(root: string, body: unknown): void {
 }
 
 describe('detectInstallMethod — docker signals', () => {
-  test('ZOYA_INSTALL_METHOD=docker wins even when marker says otherwise', () => {
+  test('JARVIS_INSTALL_METHOD=docker wins even when marker says otherwise', () => {
     const root = join(workDir, 'app');
     writeMarker(root, { method: 'bun-global' });
     const info = detectInstallMethod(root, {
-      env: { ZOYA_INSTALL_METHOD: 'docker' },
+      env: { JARVIS_INSTALL_METHOD: 'docker' },
       dockerEnvPath: noDockerEnv,
       homeDir: fakeHome,
     });
     expect(info.method).toBe('docker');
-    expect(info.reason).toContain('ZOYA_INSTALL_METHOD');
+    expect(info.reason).toContain('JARVIS_INSTALL_METHOD');
   });
 
   test('/.dockerenv presence implies docker', () => {
@@ -92,7 +92,7 @@ describe('detectInstallMethod — marker file', () => {
 
 describe('detectInstallMethod — path inference', () => {
   test('package root under ~/.bun/install/global is bun-global', () => {
-    const root = join(fakeHome, '.bun', 'install', 'global', 'node_modules', '@zoya', 'brain');
+    const root = join(fakeHome, '.bun', 'install', 'global', 'node_modules', '@usejarvis', 'brain');
     mkdirSync(root, { recursive: true });
     const info = detectInstallMethod(root, {
       env: {},
@@ -102,8 +102,8 @@ describe('detectInstallMethod — path inference', () => {
     expect(info.method).toBe('bun-global');
   });
 
-  test('~/.zoya/daemon with .git is script install', () => {
-    const root = join(fakeHome, '.zoya', 'daemon');
+  test('~/.jarvis/daemon with .git is script install', () => {
+    const root = join(fakeHome, '.jarvis', 'daemon');
     mkdirSync(join(root, '.git'), { recursive: true });
     const info = detectInstallMethod(root, {
       env: {},
@@ -113,8 +113,8 @@ describe('detectInstallMethod — path inference', () => {
     expect(info.method).toBe('script');
   });
 
-  test('~/.zoya/daemon without .git is unknown (half-installed)', () => {
-    const root = join(fakeHome, '.zoya', 'daemon');
+  test('~/.jarvis/daemon without .git is unknown (half-installed)', () => {
+    const root = join(fakeHome, '.jarvis', 'daemon');
     mkdirSync(root, { recursive: true });
     const info = detectInstallMethod(root, {
       env: {},
@@ -125,7 +125,7 @@ describe('detectInstallMethod — path inference', () => {
   });
 
   test('arbitrary git checkout is dev', () => {
-    const root = join(workDir, 'work', 'zoya');
+    const root = join(workDir, 'work', 'jarvis');
     mkdirSync(join(root, '.git'), { recursive: true });
     const info = detectInstallMethod(root, {
       env: {},
@@ -146,4 +146,3 @@ describe('detectInstallMethod — path inference', () => {
     expect(info.method).toBe('unknown');
   });
 });
-

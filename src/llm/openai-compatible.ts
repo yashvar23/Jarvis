@@ -21,4 +21,3 @@ export class OpenAICompatibleProvider extends OpenAIProvider {
     return 'OpenAI-compatible';
   }
 }
-

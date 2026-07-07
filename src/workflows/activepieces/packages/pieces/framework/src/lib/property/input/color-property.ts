@@ -10,4 +10,3 @@ export const ColorProperty = z.object({
 
 export type ColorProperty<R extends boolean> = BasePropertySchema &
     TPropertyValue<string, PropertyType.COLOR, R>;
-

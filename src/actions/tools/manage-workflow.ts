@@ -35,7 +35,7 @@ export interface ComposerToolRegistry {
   /**
    * Optional richer listing: each tool with its parameter schema. When present
    * the composer surfaces required params to the LLM and validates them, so a
-   * `zoya-tool:invoke` step can't omit a tool's required param (e.g. `action`)
+   * `jarvis-tool:invoke` step can't omit a tool's required param (e.g. `action`)
    * and 500 at runtime. Falls back to `listNames` when not provided.
    */
   listDetailed?(category?: string): ComposerToolSpec[];
@@ -75,13 +75,13 @@ export interface ManageWorkflowDeps {
   pieceRegistry?: PieceLookup;
   /**
    * Optional. When provided, the composer surfaces the names of registered
-   * Zoya tools so the LLM can wire `zoya-tool { toolName: '...' }` correctly
+   * Jarvis tools so the LLM can wire `jarvis-tool { toolName: '...' }` correctly
    * for asks like "send a Gmail" or "search the vault".
    */
   toolRegistry?: ComposerToolRegistry;
   /**
    * Optional. When provided, the composer lists the valid specialist sub-agent
-   * roles in its prompt and rejects a `zoya-agent:delegate` step whose `role`
+   * roles in its prompt and rejects a `jarvis-agent:delegate` step whose `role`
    * isn't one of them. A thunk (not a snapshot) so it reflects specialists
    * discovered after this tool is constructed. See ComposeDeps.specialistRoles.
    */
@@ -92,7 +92,7 @@ export function createManageWorkflowTool(deps: ManageWorkflowDeps = {}): ToolDef
   return {
     name: "manage_workflow",
     description: [
-      "Create, run, and manage the user's Zoya workflows (automations).",
+      "Create, run, and manage the user's Jarvis workflows (automations).",
       "",
       "When the user says things like \"make a workflow that ...\", \"automate X\",",
       "\"create a flow that does Y every morning\", \"set up an automation for Z\", call",
@@ -496,4 +496,3 @@ function summarizeRun(run: FlowRun, includeSteps = false): Record<string, unknow
     ...(includeSteps ? { steps: run.steps } : {}),
   };
 }
-

@@ -28,4 +28,3 @@ export type CustomPropertyCodeFunctionParams =
     property: Pick<CustomProperty<boolean>, 'displayName' | 'description' | 'required'>,
     disabled: boolean
   }
-

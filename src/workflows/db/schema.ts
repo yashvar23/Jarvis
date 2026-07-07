@@ -1,5 +1,5 @@
 /**
- * SQLite schema for the Zoya workflow runtime.
+ * SQLite schema for the Jarvis workflow runtime.
  *
  * Mirrors the activepieces domain model (see
  * src/workflows/activepieces/packages/shared/src/lib/automation/) but flattened
@@ -256,4 +256,3 @@ function applyAdditiveColumnMigrations(db: Database): void {
     db.exec(m.ddl);
   }
 }
-

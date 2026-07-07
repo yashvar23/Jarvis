@@ -12,7 +12,7 @@
  * esbuild with explicit aliases pointing the workspace deps at the vendored
  * source we already shipped in `src/workflows/activepieces/`.
  *
- * Staging lives outside the repo (under `~/.zoya/cache/engine-build`) so
+ * Staging lives outside the repo (under `~/.jarvis/cache/engine-build`) so
  * `node_modules` from the engine build never pollutes the project tree.
  *
  * Bundle output is content-addressed: hash of the synthesized package.json +
@@ -40,7 +40,7 @@ const REPO_ROOT = resolve(__dirname, "../../../..");
 const VENDOR_PACKAGES = resolve(REPO_ROOT, "src/workflows/activepieces/packages");
 const ENGINE_DIR = resolve(VENDOR_PACKAGES, "server/engine");
 
-const CACHE_ROOT = resolve(homedir(), ".zoya/cache");
+const CACHE_ROOT = resolve(homedir(), ".jarvis/cache");
 const STAGING_DIR = resolve(CACHE_ROOT, "engine-build");
 const BUNDLE_ROOT = resolve(CACHE_ROOT, "engine");
 
@@ -70,7 +70,7 @@ const WORKSPACE_PKG_RELS = [
 /**
  * Security floor for transitive deps the staging install resolves. When a
  * vendored manifest pins a dep at a version with a known advisory reachable
- * from ZOYA (e.g. axios in pieces/common feeds the HTTP node, which webhook
+ * from JARVIS (e.g. axios in pieces/common feeds the HTTP node, which webhook
  * triggers can drive with untrusted internet payloads), pin it here. The floor
  * is injected into the synthesized staging package.json as a bun `overrides`
  * entry, which wins over the manifest pin during `bun install`.
@@ -168,7 +168,7 @@ function buildStagingPackageJson(): string {
 
   return JSON.stringify(
     {
-      name: "zoya-engine-build-staging",
+      name: "jarvis-engine-build-staging",
       private: true,
       type: "commonjs",
       dependencies: deps,
@@ -188,7 +188,7 @@ function buildStagingPackageJson(): string {
  */
 const PATCHED_VENDOR_SOURCES = [
   "server/engine/src/lib/helper/piece-loader.ts",
-  // Zoya-only `outputSample` extension on actions + the matching
+  // Jarvis-only `outputSample` extension on actions + the matching
   // ActionBase change. Hand-edits to these files (or a sync that
   // re-applies the patch in a different shape) must invalidate the
   // engine bundle and, transitively, every piece's compiled output --
@@ -196,13 +196,13 @@ const PATCHED_VENDOR_SOURCES = [
   // though the source on disk has changed.
   "pieces/framework/src/lib/action/action.ts",
   "pieces/framework/src/lib/piece-metadata.ts",
-  // Zoya-only BranchOperator additions (TEXT_MATCHES_REGEX +
+  // Jarvis-only BranchOperator additions (TEXT_MATCHES_REGEX +
   // negation) and the matching router-executor cases. Hand-edits or
   // sync re-applications change the bundle hash so the cached engine
   // doesn't ship the OLD operator list / executor.
   "shared/src/lib/automation/flows/actions/action.ts",
   "server/engine/src/lib/handler/router-executor.ts",
-  // Zoya: upstream sets process.env.NODE_TLS_REJECT_UNAUTHORIZED='0'
+  // Jarvis: upstream sets process.env.NODE_TLS_REJECT_UNAUTHORIZED='0'
   // on every HTTP-node request, which disables TLS verification for the
   // entire Node process (not just the one request). We strip that line
   // via STRIP_LINES in sync-activepieces.ts; if a sync ever re-introduces
@@ -346,4 +346,3 @@ export function findCachedBundle(): { bundlePath: string; hash: string } | null 
   const bundlePath = resolve(BUNDLE_ROOT, hash, "main.js");
   return existsSync(bundlePath) ? { bundlePath, hash } : null;
 }
-

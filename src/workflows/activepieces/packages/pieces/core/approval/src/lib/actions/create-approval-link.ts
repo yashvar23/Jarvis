@@ -35,4 +35,3 @@ export const createApprovalLink = createAction({
     };
   },
 });
-

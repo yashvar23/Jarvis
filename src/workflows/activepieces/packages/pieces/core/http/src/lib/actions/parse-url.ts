@@ -47,4 +47,3 @@ export const parseUrl = createAction({
     }
   },
 });
-

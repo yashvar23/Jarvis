@@ -18,4 +18,3 @@ export type SecretTextProperty<R extends boolean> =
         PropertyType.SECRET_TEXT,
         R
     >;
-

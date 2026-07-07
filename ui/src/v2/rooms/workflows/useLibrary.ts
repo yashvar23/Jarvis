@@ -1,6 +1,6 @@
 /**
  * Hook for the Library tab. Fetches the catalog (curated community pieces
- * Zoya users can install), tracks per-piece "installing" / "uninstalling"
+ * Jarvis users can install), tracks per-piece "installing" / "uninstalling"
  * state, exposes install + uninstall mutations.
  *
  * Secrets stay server-side; this layer only models metadata + transitions.
@@ -26,7 +26,7 @@ export interface LibraryEntry {
   estimatedSizeMb: number | null;
   /**
    * Trust tier:
-   *   "verified"  -- hand-reviewed + smoke-tested by a Zoya maintainer.
+   *   "verified"  -- hand-reviewed + smoke-tested by a Jarvis maintainer.
    *   "community" -- pulled from npm under the @activepieces/piece-* prefix
    *                  but not individually reviewed. Runs in the engine
    *                  sandbox; user opts in with explicit eyes.
@@ -141,4 +141,3 @@ export function useLibrary(): LibraryState {
 
   return { loading, error, entries, actionState, refresh, install, uninstall };
 }
-

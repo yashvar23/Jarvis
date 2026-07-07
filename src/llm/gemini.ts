@@ -380,5 +380,3 @@ export class GeminiProvider implements LLMProvider {
 function tool_calls_present(_reason: string | null): boolean {
   return false;
 }
-
-

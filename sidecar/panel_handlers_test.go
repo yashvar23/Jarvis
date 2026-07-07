@@ -173,7 +173,7 @@ func TestPanelSpawnHandler_HappyPath(t *testing.T) {
 	res, err := h(map[string]any{
 		"id":            "pebble",
 		"url":           "http://localhost:3142/pebble.html",
-		"title":         "ZOYA",
+		"title":         "JARVIS",
 		"frameless":     true,
 		"transparent":   true,
 		"always_on_top": true,

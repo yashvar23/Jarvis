@@ -1,5 +1,5 @@
 /**
- * CLI Utilities for ZOYA
+ * CLI Utilities for J.A.R.V.I.S.
  *
  * Shared helpers for the interactive CLI: prompts, colors, spinners.
  * Zero external dependencies — uses built-in readline and ANSI codes.
@@ -300,17 +300,17 @@ export function printStep(current: number, total: number, title: string): void {
 }
 
 /**
- * Print the ZOYA ASCII banner.
+ * Print the JARVIS ASCII banner.
  */
 export function printBanner(): void {
   console.log(c.cyan(`
-███████╗ ██████╗ ██╗   ██╗ █████╗ 
-╚══███╔╝██╔═══██╗╚██╗ ██╔╝██╔══██╗
-  ███╔╝ ██║   ██║ ╚████╔╝ ███████║
- ███╔╝  ██║   ██║  ╚██╔╝  ██╔══██║
-███████╗╚██████╔╝   ██║   ██║  ██║
-╚══════╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝`));
-  console.log(c.dim('  An always-on autonomous AI daemon\n'));
+     ██╗ █████╗ ██████╗ ██╗   ██╗██╗███████╗
+     ██║██╔══██╗██╔══██╗██║   ██║██║██╔════╝
+     ██║███████║██████╔╝██║   ██║██║███████╗
+██   ██║██╔══██║██╔══██╗╚██╗ ██╔╝██║╚════██║
+╚█████╔╝██║  ██║██║  ██║ ╚████╔╝ ██║███████║
+ ╚════╝ ╚═╝  ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚═╝╚══════╝`));
+  console.log(c.dim('  Just A Rather Very Intelligent System\n'));
 }
 
 /**
@@ -399,4 +399,3 @@ export function detectPlatform(): 'macos' | 'linux' | 'wsl' {
 
   return 'linux';
 }
-

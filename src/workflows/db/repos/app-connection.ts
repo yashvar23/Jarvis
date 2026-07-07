@@ -1,10 +1,10 @@
 /**
  * `app_connection` repository: per-piece credentials (OAuth tokens, API keys,
  * etc.). The raw `value` is stored as JSON for now; encryption-at-rest via
- * Zoya' keychain will be layered in step 15 by wrapping serialize/deserialize
+ * Jarvis' keychain will be layered in step 15 by wrapping serialize/deserialize
  * here. The credential adapter (also step 15) will compose this repo with
- * Zoya' existing OAuth stores so that pieces like Gmail/Telegram see the
- * tokens Zoya already manages, without users connecting twice.
+ * Jarvis' existing OAuth stores so that pieces like Gmail/Telegram see the
+ * tokens Jarvis already manages, without users connecting twice.
  */
 
 import type { Database } from "bun:sqlite";
@@ -214,4 +214,3 @@ export function listConnections(
 export function deleteConnection(id: string): void {
   db().run(`DELETE FROM app_connection WHERE id = ?`, [id]);
 }
-

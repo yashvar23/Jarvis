@@ -336,4 +336,3 @@ describe("extractToolCallsTrace", () => {
     expect(trace[0]?.error).toBeUndefined();
   });
 });
-

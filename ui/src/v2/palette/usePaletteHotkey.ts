@@ -16,4 +16,3 @@ export function usePaletteHotkey(onOpen: () => void): void {
     return () => window.removeEventListener("keydown", handler);
   }, [onOpen]);
 }
-

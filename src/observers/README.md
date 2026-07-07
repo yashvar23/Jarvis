@@ -276,4 +276,3 @@ test('FileWatcher starts and stops', async () => {
   expect(watcher.isRunning()).toBe(false);
 });
 ```
-

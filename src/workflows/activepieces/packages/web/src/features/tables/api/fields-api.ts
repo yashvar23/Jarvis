@@ -28,4 +28,3 @@ export const fieldsApi = {
     return api.post<Field>(`/v1/fields/${id}`, request);
   },
 };
-

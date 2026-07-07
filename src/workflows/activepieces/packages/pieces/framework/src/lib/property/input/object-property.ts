@@ -16,4 +16,3 @@ export type ObjectProperty<R extends boolean> = BasePropertySchema &
         PropertyType.OBJECT,
         R
     >;
-

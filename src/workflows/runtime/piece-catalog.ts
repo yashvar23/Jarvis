@@ -1,5 +1,5 @@
 /**
- * `PieceCatalog` -- canonical view of installed pieces (Zoya-native + future
+ * `PieceCatalog` -- canonical view of installed pieces (Jarvis-native + future
  * community vendored). Built once at daemon startup by spawning the engine
  * subprocess, sending EXTRACT_PIECE_METADATA for each discovered piece, and
  * caching the result keyed by the engine bundle's content hash + each piece
@@ -7,7 +7,7 @@
  * cache even if the engine bundle is unchanged).
  *
  * The catalog presents a structural shape compatible with the legacy
- * `ZoyaPieceRegistry` (`{name, displayName, description, actions, triggers}`
+ * `JarvisPieceRegistry` (`{name, displayName, description, actions, triggers}`
  * with `inputSchema` per action/trigger) so the dashboard editor and the
  * NL-composer prompt builder can consume either source without surface-level
  * branching. Both sources satisfy the `PieceLookup` interface declared
@@ -42,11 +42,11 @@ import { WORKFLOW_EVENT_TYPES } from "./event-types";
 export type { PieceInputField, PieceInputSchema, PieceInputType } from "./piece-input";
 
 /**
- * Piece-name + trigger-name pair for zoya-trigger:on_event. Hoisted so
+ * Piece-name + trigger-name pair for jarvis-trigger:on_event. Hoisted so
  * the dynamic-sample injector and the composer prompt agree on the key.
  */
-export const ZOYA_ON_EVENT_TRIGGER = {
-  piece: "@zoyapieces/piece-zoya-trigger",
+export const JARVIS_ON_EVENT_TRIGGER = {
+  piece: "@jarvispieces/piece-jarvis-trigger",
   trigger: "on_event",
 } as const;
 
@@ -58,7 +58,7 @@ export interface PieceCatalogAction {
   /**
    * Optional declared output sample: the same JSON shape the action returns
    * on a successful run. Surfaced by the piece author via
-   * `createAction({ outputSample: ... })` (Zoya extension to upstream AP).
+   * `createAction({ outputSample: ... })` (Jarvis extension to upstream AP).
    * The visual editor's variable picker falls back to this when no captured
    * sample data exists for the step. Leave undefined for dynamic-output
    * actions (HTTP request, SQL, LLM with parseJson).
@@ -77,7 +77,7 @@ export interface PieceCatalogTrigger extends PieceCatalogAction {
   /**
    * Output sample varies with a single input property. Some triggers
    * have an envelope whose effective shape depends on a config value:
-   * zoya-trigger `on_event` is the canonical case (the `payload`
+   * jarvis-trigger `on_event` is the canonical case (the `payload`
    * sub-object changes structure with the `eventType` prop). The picker
    * and the composer prompt read this to surface the right shape per
    * configured value instead of a single static example.
@@ -111,7 +111,7 @@ export interface PieceCatalogTrigger extends PieceCatalogAction {
  * Piece-level auth declaration, surfaced through the catalog so the
  * editor can render a connection picker. Activepieces declares this at
  * the top of `createPiece({ auth: ... })`; pieces without it (CODE,
- * zoya-ask, schedule) leave it undefined and the editor renders no
+ * jarvis-ask, schedule) leave it undefined and the editor renders no
  * picker. We collapse the upstream `PieceAuthProperty` variants into
  * the small surface the editor actually needs: the auth type (so the
  * editor can label the field, e.g. "OAuth connection" vs "API token")
@@ -138,7 +138,7 @@ export interface PieceCatalogAuth {
 }
 
 export interface PieceCatalogEntry {
-  /** Upstream package name -- e.g. `@zoyapieces/piece-zoya-ask`. */
+  /** Upstream package name -- e.g. `@jarvispieces/piece-jarvis-ask`. */
   name: string;
   displayName: string;
   description: string;
@@ -148,13 +148,13 @@ export interface PieceCatalogEntry {
    * Piece-level auth declaration. Present when the piece requires a
    * connection (most third-party integrations -- gmail, slack,
    * telegram-bot, github). Absent for pieces that don't need auth
-   * (zoya-ask, schedule, webhook, code).
+   * (jarvis-ask, schedule, webhook, code).
    */
   auth?: PieceCatalogAuth;
 }
 
 /**
- * Structural interface that both `PieceCatalog` and `ZoyaPieceRegistry`
+ * Structural interface that both `PieceCatalog` and `JarvisPieceRegistry`
  * satisfy. Consumers (composer, workflow routes) take this so either source
  * works without further branching.
  */
@@ -292,14 +292,14 @@ export function discoverPieces(rootDirs: string[]): {
  *   v1 -- initial projection.
  *   v2 -- added `auth` to PieceCatalogEntry.
  *   v3 -- added `dynamicSampleData` to PieceCatalogTrigger (envelope
- *         resolution for zoya-trigger:on_event).
- *   v4 -- promoted zoya-trigger:on_event's `eventType` input field
+ *         resolution for jarvis-trigger:on_event).
+ *   v4 -- promoted jarvis-trigger:on_event's `eventType` input field
  *         from free-text string to enum (options sourced from
  *         WORKFLOW_EVENT_TYPES at projection time).
  *   v5 -- added `group` to enum options (used by the editor's <select>
  *         to render <optgroup> sections for the on_event eventType
  *         dropdown).
- *   v6 -- promoted zoya-trigger:run_workflow's `flow` input from
+ *   v6 -- promoted jarvis-trigger:run_workflow's `flow` input from
  *         `string` to `flow_ref`. Replaces the old flowId+flowName
  *         pair on the piece source. Editor renders flow_ref as a
  *         searchable workflow picker.
@@ -321,7 +321,7 @@ export function computeCatalogCacheKey(opts: {
   }
   // Mix in the event-type registry so adding/removing an entry in
   // `WORKFLOW_EVENT_TYPES` invalidates caches automatically. The
-  // zoya-trigger:on_event projection synthesizes its
+  // jarvis-trigger:on_event projection synthesizes its
   // `dynamicSampleData` from this registry, so a registry edit IS a
   // projected-shape edit even though no piece source changed.
   //
@@ -582,7 +582,7 @@ export interface RawProp {
   options?: { options?: Array<{ value: unknown; label?: string; description?: string }> };
 }
 
-/** Convert an upstream `PieceMetadata` blob into the legacy `ZoyaPiece`-style entry. */
+/** Convert an upstream `PieceMetadata` blob into the legacy `JarvisPiece`-style entry. */
 export function metadataToCatalogEntry(meta: RawPieceMetadata | unknown): PieceCatalogEntry {
   const m = (meta ?? {}) as RawPieceMetadata;
   const name = typeof m.name === "string" ? m.name : "";
@@ -602,13 +602,13 @@ export function metadataToCatalogEntry(meta: RawPieceMetadata | unknown): PieceC
     }
     out.triggers = triggers;
   }
-  // Apply any Zoya-specific catalog enrichments after the generic
+  // Apply any Jarvis-specific catalog enrichments after the generic
   // projection finishes. Today this covers two upgrades on the
-  // zoya-trigger piece (on_event eventType -> enum, run_workflow
+  // jarvis-trigger piece (on_event eventType -> enum, run_workflow
   // flow -> flow_ref). Centralising the gating keeps the generic
-  // projection above piece-agnostic and gives the next "Zoya tweak"
+  // projection above piece-agnostic and gives the next "Jarvis tweak"
   // a single named home.
-  enrichZoyaCatalogEntry(out);
+  enrichJarvisCatalogEntry(out);
   // Project piece.auth into the catalog's auth shape. We only forward
   // it when the upstream type is one of AppConnectionType's variants;
   // anything else (NO_AUTH, malformed) is treated as "no auth needed."
@@ -629,25 +629,25 @@ export function metadataToCatalogEntry(meta: RawPieceMetadata | unknown): PieceC
 }
 
 /**
- * Apply Zoya-specific catalog enrichments AFTER the generic
+ * Apply Jarvis-specific catalog enrichments AFTER the generic
  * projection in `metadataToCatalogEntry`. Each enrichment is gated by
  * piece identity and a defensive presence check on the target action /
- * trigger, so an upstream rename (or a Zoya-piece source edit that
+ * trigger, so an upstream rename (or a Jarvis-piece source edit that
  * drops a sub-action) silently no-ops rather than crashing the catalog
  * build.
  *
  * The set of enrichments here is small and well-known:
- *   - zoya-trigger:on_event   -- attach `dynamicSampleData` and
+ *   - jarvis-trigger:on_event   -- attach `dynamicSampleData` and
  *                                  promote `eventType` to enum.
- *   - zoya-trigger:run_workflow -- promote `flow` to flow_ref.
+ *   - jarvis-trigger:run_workflow -- promote `flow` to flow_ref.
  *
  * To add a new enrichment: add a guarded block here, document the
  * (piece, target) pair, and bump CATALOG_SCHEMA_VERSION so existing
  * on-disk caches re-project.
  */
-export function enrichZoyaCatalogEntry(entry: PieceCatalogEntry): void {
-  if (entry.name !== ZOYA_ON_EVENT_TRIGGER.piece) return;
-  const onEvent = entry.triggers?.[ZOYA_ON_EVENT_TRIGGER.trigger];
+export function enrichJarvisCatalogEntry(entry: PieceCatalogEntry): void {
+  if (entry.name !== JARVIS_ON_EVENT_TRIGGER.piece) return;
+  const onEvent = entry.triggers?.[JARVIS_ON_EVENT_TRIGGER.trigger];
   if (onEvent) {
     onEvent.dynamicSampleData = buildOnEventDynamicSampleData();
     upgradeOnEventEventTypeFieldToEnum(onEvent);
@@ -659,7 +659,7 @@ export function enrichZoyaCatalogEntry(entry: PieceCatalogEntry): void {
 }
 
 /**
- * Build the `dynamicSampleData` map for zoya-trigger:on_event. Each
+ * Build the `dynamicSampleData` map for jarvis-trigger:on_event. Each
  * entry surfaces the full envelope the trigger emits when configured for
  * that event type -- not just the payload -- so consumers (variable
  * picker, composer prompt) get an output sample they can wire from
@@ -720,7 +720,7 @@ function upgradeOnEventEventTypeFieldToEnum(trigger: PieceCatalogTrigger): void 
 }
 
 /**
- * Rewrite the `flow` input field on zoya-trigger's `run_workflow`
+ * Rewrite the `flow` input field on jarvis-trigger's `run_workflow`
  * action from a plain string to `flow_ref`. The editor renders
  * `flow_ref` as a searchable popover backed by `/api/workflows`, so the
  * user picks from a list of their workflows by display name instead of
@@ -770,7 +770,7 @@ function rawActionToCatalogAction(
     out.inputSchema = propsToInputSchema(raw.props);
   }
   // Carry through declared output samples. Actions use `outputSample`
-  // (Zoya extension); triggers use upstream `sampleData`. Both can be
+  // (Jarvis extension); triggers use upstream `sampleData`. Both can be
   // any JSON value -- we don't validate the shape here. Editor consumers
   // skip non-object samples (the variable picker needs top-level keys).
   if (raw.outputSample !== undefined) {
@@ -881,4 +881,3 @@ function mapPropType(t: string | undefined): PieceInputType | null {
       return "json";
   }
 }
-

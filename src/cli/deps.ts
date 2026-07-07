@@ -134,7 +134,7 @@ export function getCoreToolSpecs(platform: ReturnType<typeof detectPlatform>): C
 }
 
 /**
- * Check for core CLI tools ZOYA relies on for common workflows.
+ * Check for core CLI tools JARVIS relies on for common workflows.
  */
 export function checkCoreTools(): DepStatus[] {
   const platform = detectPlatform();
@@ -182,7 +182,7 @@ export function checkLinuxTools(): DepStatus[] {
  * Check if Google OAuth tokens exist.
  */
 export function checkGoogleAuth(): DepStatus {
-  const tokensPath = join(homedir(), '.zoya', 'google-tokens.json');
+  const tokensPath = join(homedir(), '.jarvis', 'google-tokens.json');
   const found = existsSync(tokensPath);
 
   return {
@@ -460,7 +460,7 @@ export async function setupGoogleOAuth(config: any): Promise<boolean> {
               printOk('Google OAuth configured! Tokens saved.');
               setTimeout(() => { server.stop(); resolve(true); }, 300);
               return new Response(
-                '<html><body><h1>ZOYA Google Authorization Complete!</h1><p>You can close this tab.</p></body></html>',
+                '<html><body><h1>JARVIS Google Authorization Complete!</h1><p>You can close this tab.</p></body></html>',
                 { headers: { 'Content-Type': 'text/html' } }
               );
             } catch (err) {
@@ -479,7 +479,7 @@ export async function setupGoogleOAuth(config: any): Promise<boolean> {
       });
     } catch (err) {
       printErr(`Could not start OAuth callback server on port 3142 (port in use?)`);
-      printInfo('Stop the ZOYA daemon first, or run later with: bun run setup:google');
+      printInfo('Stop the JARVIS daemon first, or run later with: bun run setup:google');
       resolve(false);
       return;
     }
@@ -587,4 +587,3 @@ export async function runDependencyCheck(config: any): Promise<void> {
     }
   }
 }
-

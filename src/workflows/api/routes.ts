@@ -8,7 +8,7 @@
  * so it can be spread into `createApiRoutes()` without touching its internals.
  *
  * Notes on what these routes do NOT do:
- *   - No handler-side authn/authz: Zoya is single-tenant, the dashboard is
+ *   - No handler-side authn/authz: Jarvis is single-tenant, the dashboard is
  *     CORS-bound to localhost, and the existing daemon routes have the same
  *     posture. Adding auth here would diverge from the rest.
  *   - The `run` endpoint enqueues a job; it does not block on the engine.
@@ -133,7 +133,7 @@ export interface CreateWorkflowRoutesOptions {
    */
   triggerManager?: TriggerManager;
   /**
-   * Optional piece catalog. Either the legacy `ZoyaPieceRegistry` (during
+   * Optional piece catalog. Either the legacy `JarvisPieceRegistry` (during
    * the F-K transition) or an engine-extracted `PieceCatalog`. When
    * provided, `GET /api/workflows/pieces` returns the list of pieces (and
    * their actions and triggers) so the dashboard editor can render a piece
@@ -142,9 +142,9 @@ export interface CreateWorkflowRoutesOptions {
   pieceRegistry?: PieceLookup;
   /**
    * Optional credential resolver. When provided, the connections route can
-   * report which `ZoyaConnectionSource` adapters are registered (e.g.
-   * `zoya:google` is wired) so the dashboard's piece-side auth picker
-   * can highlight reusable Zoya-managed credentials. The repo-backed
+   * report which `JarvisConnectionSource` adapters are registered (e.g.
+   * `jarvis:google` is wired) so the dashboard's piece-side auth picker
+   * can highlight reusable Jarvis-managed credentials. The repo-backed
    * `app_connection` rows work without it.
    */
   credentialResolver?: CredentialResolver;
@@ -154,7 +154,7 @@ export interface CreateWorkflowRoutesOptions {
    * the engine and upsert it into the running `PieceCatalog`, so the flow
    * editor sees the piece immediately without a daemon restart.
    *
-   * When omitted, install/uninstall still mutate `~/.zoya/pieces/` and the
+   * When omitted, install/uninstall still mutate `~/.jarvis/pieces/` and the
    * manifest, but the in-memory catalog won't reflect the change until next
    * daemon start (the reconciler picks it up at bootstrap).
    */
@@ -177,7 +177,7 @@ export interface CreateWorkflowRoutesOptions {
 
 /**
  * In-process mutex for the Library routes. Two concurrent installs would
- * race on the shared `~/.zoya/pieces/package.json` + bun-install
+ * race on the shared `~/.jarvis/pieces/package.json` + bun-install
  * invocation; we serialize them at the route boundary. One daemon, one
  * writer.
  */
@@ -223,7 +223,7 @@ export function createWorkflowRoutes(opts: CreateWorkflowRoutesOptions = {}): Wo
               displayName: a.displayName,
               description: a.description,
               inputSchema: a.inputSchema ?? null,
-              // Optional declared output sample (Zoya extension to AP).
+              // Optional declared output sample (Jarvis extension to AP).
               // Surfaced to the dashboard so the variable picker can show
               // field-level rows for actions that have never been run yet.
               ...(a.outputSample !== undefined ? { outputSample: a.outputSample } : {}),
@@ -239,7 +239,7 @@ export function createWorkflowRoutes(opts: CreateWorkflowRoutesOptions = {}): Wo
                   // And, for symmetry / future-proofing, the action-side
                   // `outputSample` if a trigger author chose to declare both.
                   ...(t.outputSample !== undefined ? { outputSample: t.outputSample } : {}),
-                  // Dynamic-output triggers (zoya-trigger:on_event):
+                  // Dynamic-output triggers (jarvis-trigger:on_event):
                   // forward the per-input-value sample map so the editor's
                   // variable picker can resolve the right shape for the
                   // configured value (e.g. payload.content for clipboard,
@@ -256,12 +256,12 @@ export function createWorkflowRoutes(opts: CreateWorkflowRoutesOptions = {}): Wo
 
     // ------------------------------------------------------------- pieces library
     // The Library tab in the dashboard renders this list. Each entry is a
-    // *curated* (Zoya-vetted) community piece the user can opt into
+    // *curated* (Jarvis-vetted) community piece the user can opt into
     // installing. Installed pieces are merged in with their resolved
     // version + install timestamp so the UI can show "Installed" /
     // "Update available" badges.
     //
-    // Install / uninstall mutate `~/.zoya/pieces/` (manifest + bun
+    // Install / uninstall mutate `~/.jarvis/pieces/` (manifest + bun
     // install). They block until bun finishes -- typical first install of a
     // single piece is 3-8s end to end. The UI shows a spinner during the
     // wait. A `withLibraryLock` mutex serializes concurrent requests so a
@@ -387,7 +387,7 @@ export function createWorkflowRoutes(opts: CreateWorkflowRoutesOptions = {}): Wo
         }),
     },
 
-    // Event-buffer overflow signal for the `zoya-trigger:on_event`
+    // Event-buffer overflow signal for the `jarvis-trigger:on_event`
     // polling path. Returns the buffer's running drop counter so operators
     // can see when events may have been evicted past the capacity/age
     // window between two polls. `count > 0` is a warning condition; the
@@ -404,7 +404,7 @@ export function createWorkflowRoutes(opts: CreateWorkflowRoutesOptions = {}): Wo
     },
 
     // ------------------------------------------------------------- connections
-    // CRUD over `app_connection` rows + a list of registered Zoya
+    // CRUD over `app_connection` rows + a list of registered Jarvis
     // connection sources. Connection `value` is encrypted at rest
     // (AES-256-GCM via `app-connection` repo) and never returned to the
     // client -- only the metadata (id, externalId, type, displayName,
@@ -430,7 +430,7 @@ export function createWorkflowRoutes(opts: CreateWorkflowRoutesOptions = {}): Wo
           const sources = (opts.credentialResolver?.list() ?? []).map((s) => ({
             id: s.id,
           }));
-          return ok({ connections: list, zoyaSources: sources });
+          return ok({ connections: list, jarvisSources: sources });
         }),
       POST: (req) =>
         trapErrors(async () => {
@@ -1113,4 +1113,3 @@ function validateConnectionValueShape(
       return null;
   }
 }
-

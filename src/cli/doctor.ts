@@ -1,5 +1,5 @@
 /**
- * ZOYA Doctor — Environment Diagnostics
+ * J.A.R.V.I.S. Doctor — Environment Diagnostics
  *
  * Checks system requirements, configuration, and connectivity.
  */
@@ -12,8 +12,8 @@ import {
 } from './helpers.ts';
 import { detectInstallMethod, describeInstallMethod, getMethodCommands } from './install-method.ts';
 
-const ZOYA_DIR = join(homedir(), '.zoya');
-const CONFIG_PATH = join(ZOYA_DIR, 'config.yaml');
+const JARVIS_DIR = join(homedir(), '.jarvis');
+const CONFIG_PATH = join(JARVIS_DIR, 'config.yaml');
 const PACKAGE_ROOT = join(import.meta.dir, '..', '..');
 
 interface CheckResult {
@@ -50,10 +50,10 @@ export async function runDoctor(): Promise<void> {
 
   // ── Check 3: Data Directory ───────────────────────────────────────
 
-  if (existsSync(ZOYA_DIR)) {
-    results.push({ name: 'Data Directory', status: 'ok', message: ZOYA_DIR });
+  if (existsSync(JARVIS_DIR)) {
+    results.push({ name: 'Data Directory', status: 'ok', message: JARVIS_DIR });
   } else {
-    results.push({ name: 'Data Directory', status: 'warn', message: `${ZOYA_DIR} not found. Run: zoya start (then finish setup at http://localhost:3142)` });
+    results.push({ name: 'Data Directory', status: 'warn', message: `${JARVIS_DIR} not found. Run: jarvis start (then finish setup at http://localhost:3142)` });
   }
 
   // ── Check 3: Config File ──────────────────────────────────────────
@@ -69,7 +69,7 @@ export async function runDoctor(): Promise<void> {
       results.push({ name: 'Config File', status: 'fail', message: `Invalid YAML: ${err}` });
     }
   } else {
-    results.push({ name: 'Config File', status: 'fail', message: 'Not found. Run: zoya start (then finish setup at http://localhost:3142)' });
+    results.push({ name: 'Config File', status: 'fail', message: 'Not found. Run: jarvis start (then finish setup at http://localhost:3142)' });
   }
 
   // ── Check 4: LLM API Key ─────────────────────────────────────────
@@ -232,11 +232,11 @@ export async function runDoctor(): Promise<void> {
   console.log(`  ${c.green(`${okCount} passed`)}  ${c.yellow(`${warnCount} warnings`)}  ${c.red(`${failCount} failed`)}`);
 
   if (failCount > 0) {
-    console.log(c.red('\nSome checks failed. Run "zoya start" and finish setup at http://localhost:3142 to fix configuration.\n'));
+    console.log(c.red('\nSome checks failed. Run "jarvis start" and finish setup at http://localhost:3142 to fix configuration.\n'));
   } else if (warnCount > 0) {
     console.log(c.yellow('\nAll critical checks passed, but some optional features need setup.\n'));
   } else {
-    console.log(c.green('\nAll checks passed! ZOYA is ready.\n'));
+    console.log(c.green('\nAll checks passed! JARVIS is ready.\n'));
   }
 
   const commands = getMethodCommands(installInfo.method);
@@ -247,5 +247,3 @@ export async function runDoctor(): Promise<void> {
 
   closeRL();
 }
-
-

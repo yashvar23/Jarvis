@@ -176,4 +176,3 @@ export function deleteRelationship(id: string): boolean {
   const result = stmt.run(id);
   return result.changes > 0;
 }
-

@@ -321,4 +321,3 @@ function rowToRecord(row: TaskRow): TaskRecord {
   }
   return record;
 }
-

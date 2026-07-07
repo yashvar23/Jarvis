@@ -1,9 +1,9 @@
 /**
- * `zoya update` — install-method-aware updater.
+ * `jarvis update` — install-method-aware updater.
  *
- * Dispatches based on how ZOYA was installed:
+ * Dispatches based on how JARVIS was installed:
  *   docker      refuse, point user at host-side `docker pull`
- *   bun-global  `bun update -g zoya`
+ *   bun-global  `bun update -g @usejarvis/brain`
  *   script      checkout the latest release tag + bun install
  *   dev         refuse, tell user to `git pull` themselves
  *   unknown     refuse with guidance
@@ -80,14 +80,14 @@ function defaultSpawn(cmd: string[], options: { cwd?: string } = {}): SpawnResul
 }
 
 /**
- * Spawn the daemon in a detached process, same pattern as `zoya start -d`.
+ * Spawn the daemon in a detached process, same pattern as `jarvis start -d`.
  * Not in daemon-control.ts because it's update-specific: we only need to
  * restart after a successful update.
  */
 function restartDaemonDetached(packageRoot: string): void {
   const logPath = getLogPath();
   const logFd = openSync(logPath, 'a');
-  const child = spawn('bun', [join(packageRoot, 'bin/zoya.ts'), 'start', '--no-open'], {
+  const child = spawn('bun', [join(packageRoot, 'bin/jarvis.ts'), 'start', '--no-open'], {
     detached: true,
     stdio: ['ignore', logFd, logFd],
     env: { ...process.env },
@@ -98,12 +98,12 @@ function restartDaemonDetached(packageRoot: string): void {
 // ── Per-method handlers ─────────────────────────────────────────────
 
 function updateDocker(info: InstallMethodInfo): UpdateResult {
-  console.log(c.yellow('ZOYA is running inside a Docker container.'));
+  console.log(c.yellow('JARVIS is running inside a Docker container.'));
   console.log('');
-  console.log('  `zoya update` does not apply to container installs — the container is the unit of update.');
+  console.log('  `jarvis update` does not apply to container installs — the container is the unit of update.');
   console.log('  From your host, run:');
-  console.log(c.dim('    docker pull <your-zoya-image>'));
-  console.log(c.dim('    docker rm -f zoya && docker run -d ... <your-zoya-image>'));
+  console.log(c.dim('    docker pull <your-jarvis-image>'));
+  console.log(c.dim('    docker rm -f jarvis && docker run -d ... <your-jarvis-image>'));
   console.log('');
   console.log(c.dim(`  (detected: ${info.reason})`));
   return {
@@ -115,9 +115,9 @@ function updateDocker(info: InstallMethodInfo): UpdateResult {
 }
 
 function updateDev(info: InstallMethodInfo, packageRoot: string): UpdateResult {
-  console.log(c.yellow('ZOYA is running from a developer checkout.'));
+  console.log(c.yellow('JARVIS is running from a developer checkout.'));
   console.log('');
-  console.log('  `zoya update` does not manage dev checkouts — updating your working tree');
+  console.log('  `jarvis update` does not manage dev checkouts — updating your working tree');
   console.log('  would risk clobbering uncommitted work. Update manually:');
   console.log(c.dim(`    git -C ${packageRoot} pull`));
   console.log(c.dim(`    bun install`));
@@ -132,13 +132,13 @@ function updateDev(info: InstallMethodInfo, packageRoot: string): UpdateResult {
 }
 
 function updateUnknown(info: InstallMethodInfo): UpdateResult {
-  console.log(c.red('Could not determine how ZOYA was installed.'));
+  console.log(c.red('Could not determine how JARVIS was installed.'));
   console.log('');
-  console.log('  `zoya update` needs to know whether to run `bun update -g`, `git pull`,');
-  console.log('  or redirect you to `docker pull`. Run `zoya doctor` to see what was detected.');
+  console.log('  `jarvis update` needs to know whether to run `bun update -g`, `git pull`,');
+  console.log('  or redirect you to `docker pull`. Run `jarvis doctor` to see what was detected.');
   console.log('');
   console.log('  Update manually with one of:');
-  console.log(c.dim('    bun update -g zoya              # if installed via bun'));
+  console.log(c.dim('    bun update -g @usejarvis/brain              # if installed via bun'));
   console.log(c.dim('    curl -fsSL .../install.sh | bash             # if installed via the script'));
   console.log(c.dim('    docker pull <image>                          # if installed via docker'));
   console.log('');
@@ -155,9 +155,9 @@ function updateBunGlobal(
   currentVersion: string,
   spawn: Spawner,
 ): UpdateResult {
-  console.log(c.dim('Running `bun update -g zoya`...\n'));
+  console.log(c.dim('Running `bun update -g @usejarvis/brain`...\n'));
 
-  const result = spawn(['bun', 'update', '-g', 'zoya']);
+  const result = spawn(['bun', 'update', '-g', '@usejarvis/brain']);
 
   if (result.exitCode !== 0) {
     console.log(c.red('✗ Update failed:'));
@@ -340,4 +340,3 @@ export async function runUpdate(deps: UpdateDeps): Promise<UpdateResult> {
 
   return result;
 }
-

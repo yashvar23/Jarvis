@@ -215,7 +215,7 @@ func (s *panelService) Spawn(spec PanelSpec) (PanelID, error) {
 				}
 			} else if spec.Bounds.X >= 0 && spec.Bounds.Y >= 0 {
 				// W3-T3 — daemon passed an explicit top-left (restored from
-				// ~/.zoya/window-state.json, or palette positioning). The
+				// ~/.jarvis/window-state.json, or palette positioning). The
 				// sentinel for "let the sidecar pick" is x<0/y<0; treat
 				// 0,0 and positive coords as authoritative and move there.
 				// Use the keep-z-order variant so a non-always-on-top panel

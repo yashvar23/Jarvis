@@ -59,17 +59,17 @@ export function UserTextItem({
   );
 }
 
-export function ZoyaSpeechItem({
+export function JarvisSpeechItem({
   item,
 }: {
-  item: Extract<ThreadItem, { kind: "zoya-speech" }>;
+  item: Extract<ThreadItem, { kind: "jarvis-speech" }>;
 }) {
   const isSpeaking = item.status === "speaking";
   return (
     <article className="v2-item v2-item--speech">
       <Meta
-        who="Zoya"
-        whoClass="v2-item__who--zoya"
+        who="Jarvis"
+        whoClass="v2-item__who--jarvis"
         tag={isSpeaking ? "speaking" : undefined}
         time={item.t}
         accentDot
@@ -84,16 +84,16 @@ export function ZoyaSpeechItem({
   );
 }
 
-export function ZoyaThoughtItem({
+export function JarvisThoughtItem({
   item,
 }: {
-  item: Extract<ThreadItem, { kind: "zoya-thought" }>;
+  item: Extract<ThreadItem, { kind: "jarvis-thought" }>;
 }) {
   return (
-    <article className="v2-item v2-item--thought" aria-label="Zoya thought">
+    <article className="v2-item v2-item--thought" aria-label="Jarvis thought">
       <Meta
-        who="Zoya"
-        whoClass="v2-item__who--zoya"
+        who="Jarvis"
+        whoClass="v2-item__who--jarvis"
         tag="thinking"
         time={item.t}
         accentDot

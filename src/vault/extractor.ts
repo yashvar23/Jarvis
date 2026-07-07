@@ -344,4 +344,3 @@ export function extractGoalCompletion(goal: {
     console.error('[Extractor] Failed to extract goal completion:', err);
   }
 }
-

@@ -1,4 +1,4 @@
-# ZOYA LLM Provider System
+# J.A.R.V.I.S. LLM Provider System
 
 A unified abstraction layer for multiple LLM providers with automatic fallback support.
 
@@ -130,7 +130,7 @@ const response = await manager.chat(messages, {
 
 ## Configuration
 
-Load from `~/.zoya/config.yaml`:
+Load from `~/.jarvis/config.yaml`:
 
 ```typescript
 import { loadConfig } from './config/index.ts';
@@ -225,7 +225,7 @@ Run the test file:
 bun run src/llm/test.ts
 ```
 
-Make sure you have a valid config at `~/.zoya/config.yaml` with API keys set.
+Make sure you have a valid config at `~/.jarvis/config.yaml` with API keys set.
 
 ## Implementation Details
 
@@ -289,4 +289,3 @@ Each provider:
 - [ ] Retry with exponential backoff
 - [ ] Cost estimation per request
 - [ ] Multi-turn conversation helpers
-

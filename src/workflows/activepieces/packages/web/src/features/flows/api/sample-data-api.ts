@@ -7,4 +7,3 @@ export const sampleDataApi = {
     return api.get<unknown>(`/v1/sample-data`, request);
   },
 };
-

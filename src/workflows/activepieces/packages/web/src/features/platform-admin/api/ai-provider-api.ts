@@ -24,4 +24,3 @@ export const aiProviderApi = {
     return api.delete(`/v1/ai-providers/${provider}`);
   },
 };
-

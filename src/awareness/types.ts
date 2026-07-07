@@ -186,4 +186,3 @@ export type SuggestionRow = {
   acted_on: number;
   created_at: number;
 };
-

@@ -40,7 +40,7 @@ func TestAwarenessOCRDefault(t *testing.T) {
 
 func TestAwarenessCaptureDirDefault(t *testing.T) {
 	cfg := defaultConfig()
-	want := filepath.Join(homeDir(), ".zoya", "captures")
+	want := filepath.Join(homeDir(), ".jarvis", "captures")
 	if cfg.Awareness.CaptureDir != want {
 		t.Fatalf("CaptureDir = %q, want %q", cfg.Awareness.CaptureDir, want)
 	}
@@ -54,7 +54,7 @@ func TestSaveConfigRestrictsPermissions(t *testing.T) {
 		configFile = originalConfigFile
 	})
 
-	configDir = filepath.Join(t.TempDir(), ".zoya")
+	configDir = filepath.Join(t.TempDir(), ".jarvis")
 	configFile = filepath.Join(configDir, "sidecar.yaml")
 
 	cfg := defaultConfig()
@@ -93,7 +93,7 @@ func TestSaveConfigRefusesSymlink(t *testing.T) {
 	})
 
 	tmp := t.TempDir()
-	configDir = filepath.Join(tmp, ".zoya")
+	configDir = filepath.Join(tmp, ".jarvis")
 	configFile = filepath.Join(configDir, "sidecar.yaml")
 
 	if err := os.MkdirAll(configDir, 0700); err != nil {

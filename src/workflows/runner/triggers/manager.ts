@@ -19,7 +19,7 @@
  *         fires enqueue RUN_FLOW with `executeTrigger=true` so the engine's
  *         trigger.run() produces the actual payload(s).
  *       * If `engineRuntime` is not set, fall back to the legacy
- *         direct-subscribe path for `zoya-trigger:on_event` (kept until
+ *         direct-subscribe path for `jarvis-trigger:on_event` (kept until
  *         Phase K wires the engine into daemon bootstrap proper). Other
  *         engine-only triggers (vendored polling pieces, gmail webhook,
  *         etc.) are skipped and logged.
@@ -79,7 +79,7 @@ type ActiveSub = {
 
 export interface TriggerManagerDeps {
   /**
-   * In-process event bus. Used by the legacy `zoya-trigger:on_event`
+   * In-process event bus. Used by the legacy `jarvis-trigger:on_event`
    * direct-subscribe path -- only exercised when `engineRuntime` is unset.
    * With an engine runtime in scope, the engine-managed polling trigger
    * handles event delivery via the daemon's event buffer.
@@ -91,7 +91,7 @@ export interface TriggerManagerDeps {
    * When set, non-schedule/non-webhook PIECE_TRIGGER nodes are activated via
    * EXECUTE_TRIGGER_HOOK(ON_ENABLE) on the engine and the returned schedule
    * is persisted + drives the cron loop. When unset, the only such trigger
-   * supported is `zoya-trigger:on_event`, which falls back to direct
+   * supported is `jarvis-trigger:on_event`, which falls back to direct
    * event-bus subscription.
    */
   engineRuntime?: EngineRuntime;
@@ -241,20 +241,20 @@ export class TriggerManager {
       if (this.engineRuntime) {
         return this.registerEngineTrigger(flow, version, trigger);
       }
-      // Engine-less fallback for zoya-trigger:on_event. In
+      // Engine-less fallback for jarvis-trigger:on_event. In
       // production the daemon always boots with an engineRuntime
       // (set during bootstrap), so the branch above short-circuits
       // every PIECE_TRIGGER flow. The fallback exists ONLY to keep
       // the event-bus subscription wiring testable without spinning
       // up a real engine subprocess -- see
-      // `manager.test.ts:"TriggerManager: zoya-trigger on_event"`.
+      // `manager.test.ts:"TriggerManager: jarvis-trigger on_event"`.
       // The piece-name string here is the legacy unscoped alias the
       // test fixtures use; the editor and the projection layer both
       // commit to the scoped npm name. Don't add new fallbacks
       // through this path; new pieces should be tested through the
       // engine.
-      if (pieceName === "zoya-trigger") {
-        return this.registerZoyaEvent(flow.id, versionId, trigger);
+      if (pieceName === "jarvis-trigger") {
+        return this.registerJarvisEvent(flow.id, versionId, trigger);
       }
       this.log(
         `flow ${flow.id}: PIECE_TRIGGER pieceName="${pieceName}" requires engine runtime; skipping`,
@@ -314,10 +314,10 @@ export class TriggerManager {
     });
   }
 
-  private registerZoyaEvent(flowId: string, versionId: string, trigger: TriggerNode): void {
+  private registerJarvisEvent(flowId: string, versionId: string, trigger: TriggerNode): void {
     if (trigger.settings?.triggerName !== "on_event") {
       this.log(
-        `flow ${flowId}: zoya-trigger has triggerName="${trigger.settings?.triggerName}"; only "on_event" is supported`,
+        `flow ${flowId}: jarvis-trigger has triggerName="${trigger.settings?.triggerName}"; only "on_event" is supported`,
       );
       return;
     }
@@ -521,7 +521,7 @@ export class TriggerManager {
   }
 
   /**
-   * Engine-managed trigger fire (polling sources, e.g. zoya-trigger
+   * Engine-managed trigger fire (polling sources, e.g. jarvis-trigger
    * on_event). On each cron tick we run the trigger's RUN hook to POLL for new
    * events, then enqueue exactly one flow run per returned event.
    *
@@ -653,4 +653,3 @@ function makeFilter(filter?: Record<string, unknown>): (payload: Record<string, 
     return true;
   };
 }
-

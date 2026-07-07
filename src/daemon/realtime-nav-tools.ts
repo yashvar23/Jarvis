@@ -46,7 +46,7 @@ export const REALTIME_NAV_TOOLS: LLMTool[] = [
   {
     name: 'open_dashboard_room',
     description:
-      'Open a room/page in the ZOYA dashboard (navigate the UI). Use when the user asks to open, show, or go to a section.',
+      'Open a room/page in the JARVIS dashboard (navigate the UI). Use when the user asks to open, show, or go to a section.',
     parameters: {
       type: 'object',
       properties: {
@@ -97,4 +97,3 @@ export const REALTIME_NAV_TOOLS: LLMTool[] = [
     },
   },
 ];
-

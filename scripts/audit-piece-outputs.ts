@@ -35,7 +35,7 @@ interface PieceEntry {
   triggers?: Record<string, ActionLike>;
 }
 
-const CACHE_FILE = resolve(homedir(), ".zoya", "cache", "piece-metadata.json");
+const CACHE_FILE = resolve(homedir(), ".jarvis", "cache", "piece-metadata.json");
 
 if (!existsSync(CACHE_FILE)) {
   console.error(
@@ -178,4 +178,3 @@ if (fullyBlind.length === 0) {
     console.log(`- **${p.pieceDisplay}** (${p.pieceName}) -- ${counts.join(", ")}`);
   }
 }
-

@@ -1,10 +1,10 @@
 import { describe, expect, test } from 'bun:test';
 import { TelemetryService, type Sender } from './service.ts';
-import type { ZoyaConfig } from '../config/types.ts';
+import type { JarvisConfig } from '../config/types.ts';
 import type { SendOutcome } from './client.ts';
 
 // Minimal config stand-in; the service only reads `telemetry`.
-const cfg = (enabled: boolean): ZoyaConfig => ({ telemetry: { enabled } }) as unknown as ZoyaConfig;
+const cfg = (enabled: boolean): JarvisConfig => ({ telemetry: { enabled } }) as unknown as JarvisConfig;
 
 // A sender that records calls; never touches the network.
 function recordingSender() {
@@ -55,4 +55,3 @@ describe('TelemetryService lifecycle', () => {
     await expect(svc.stop()).resolves.toBeUndefined();
   });
 });
-

@@ -268,4 +268,3 @@ export function deleteAttachment(id: string): boolean {
   const result = db.prepare('DELETE FROM content_attachments WHERE id = ?').run(id);
   return result.changes > 0;
 }
-

@@ -233,4 +233,3 @@ function extractAliases(text: string): string[] {
 
   return [...aliases];
 }
-

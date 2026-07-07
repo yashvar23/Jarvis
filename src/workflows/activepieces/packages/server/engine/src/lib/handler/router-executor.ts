@@ -167,7 +167,7 @@ export function evaluateConditions(conditionGroups: BranchCondition[][]): boolea
                     andGroup = andGroup && firstValueDoesNotEndWith
                     break
                 }
-                // === ZOYA PATCH: regex operators ===
+                // === JARVIS PATCH: regex operators ===
                 // firstValue is the input string; secondValue is the JS
                 // regex pattern (no slashes, no flags suffix). Use inline
                 // (?i) for case-insensitive etc. -- the condition-level
@@ -195,7 +195,7 @@ export function evaluateConditions(conditionGroups: BranchCondition[][]): boolea
                     andGroup = andGroup && !re.test(String(castedCondition.firstValue ?? ''))
                     break
                 }
-                // === END ZOYA PATCH ===
+                // === END JARVIS PATCH ===
                 case BranchOperator.LIST_CONTAINS: {
                     const list = parseAndCoerceListAsArray(castedCondition.firstValue)
                     andGroup = andGroup && list.some((item) =>

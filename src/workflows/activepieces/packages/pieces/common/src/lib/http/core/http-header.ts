@@ -4,4 +4,3 @@ export enum HttpHeader {
   API_KEY = 'x-api-key',
   CONTENT_TYPE = 'Content-Type',
 }
-

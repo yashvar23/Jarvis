@@ -48,4 +48,3 @@ export type ArrayProperty<R extends boolean> = BasePropertySchema &
 {
     properties?: ArraySubProps<R>;
 } & TPropertyValue<unknown[], PropertyType.ARRAY, R>;
-

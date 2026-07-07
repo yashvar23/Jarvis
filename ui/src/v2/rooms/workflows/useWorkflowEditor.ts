@@ -166,7 +166,7 @@ export interface PieceCatalogActionOrTrigger {
   /**
    * Optional declared output for the action or trigger. Used by the
    * variable picker to surface field-level rows even before the step has
-   * been run. Actions populate `outputSample` (Zoya extension to AP);
+   * been run. Actions populate `outputSample` (Jarvis extension to AP);
    * triggers populate the upstream-native `sampleData`. The picker reads
    * either -- both carry the same kind of JSON shape.
    */
@@ -174,7 +174,7 @@ export interface PieceCatalogActionOrTrigger {
   sampleData?: unknown;
   /**
    * Output sample varies with a single input property. Used by triggers
-   * whose envelope shape depends on a config value (zoya-trigger
+   * whose envelope shape depends on a config value (jarvis-trigger
    * `on_event`: payload depends on `eventType`). Picker uses this when
    * present to resolve the right sample for the step's current settings.
    */
@@ -187,7 +187,7 @@ export interface PieceCatalogActionOrTrigger {
 /**
  * Piece-level auth declaration. Present on integrations that need a
  * connection (gmail, slack, telegram-bot, github); absent on
- * connection-less pieces (zoya-ask, schedule, code, webhook). The
+ * connection-less pieces (jarvis-ask, schedule, code, webhook). The
  * editor renders a connection picker when this is set.
  */
 export interface PieceCatalogAuth {
@@ -937,7 +937,7 @@ export function useWorkflowEditor(flowId: string | null) {
    *   manual   -> EMPTY trigger (POST /run only)
    *   schedule -> built-in cron primitive
    *   webhook  -> built-in HTTP primitive
-   *   event    -> @zoyapieces/piece-zoya-trigger:on_event
+   *   event    -> @jarvispieces/piece-jarvis-trigger:on_event
    *
    * If the current trigger is a non-canonical PIECE_TRIGGER
    * (community piece, imported flow, etc.), the picker still routes
@@ -1604,4 +1604,3 @@ async function safeJson(res: Response): Promise<{ error?: string } | null> {
     return null;
   }
 }
-

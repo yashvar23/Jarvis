@@ -99,7 +99,7 @@ export function OnboardingGate({ children }: { children: React.ReactNode }) {
           // from here without prop-drilling — instead, the tutorial
           // dispatches `injectSampleCard` / `injectSampleRoomWindow`
           // events that AppShell subscribes to. To keep this gate
-          // dumb, we use window CustomEvents — Zoya-internal,
+          // dumb, we use window CustomEvents — Jarvis-internal,
           // never crosses the WS boundary.
           injectSampleCard={() =>
             window.dispatchEvent(new CustomEvent("v2-tutorial:inject-card"))

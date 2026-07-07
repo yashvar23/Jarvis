@@ -204,7 +204,7 @@ func (c *SidecarClient) Start(ctx context.Context) {
 			// restarts after fixing the config.
 			log.Printf("[sidecar] Token rejected by the brain (HTTP %d). Not reconnecting until reconfigured.", tokErr.status)
 			c.alertOnce.Do(func() {
-				platformShowAlert("ZOYA Sidecar",
+				platformShowAlert("JARVIS Sidecar",
 					"This machine's enrollment token is not valid — the brain rejected it.\n\n"+
 						"Re-enroll the sidecar from the dashboard, update the token in the config, then restart.")
 			})
@@ -508,7 +508,7 @@ func (c *SidecarClient) connectAndServe(ctx context.Context) error {
 		// pebble is — no separate config gate, since the pebble is the
 		// whole reason wake-word matters. Emits one `audio.wake_segment`
 		// per VAD-detected utterance to the daemon, which transcribes +
-		// regex-matches "zoya". Pauses around Ctrl+Space session
+		// regex-matches "jarvis". Pauses around Ctrl+Space session
 		// captures so it doesn't fight for the mic device.
 		wakeListener := NewWakeListenerService(audioSvc, sendFn, DefaultWakeListenerOpts())
 		if err := wakeListener.Start(ctx); err != nil {
@@ -525,7 +525,7 @@ func (c *SidecarClient) connectAndServe(ctx context.Context) error {
 			defer wakeListener.Stop()
 		}
 
-		// Suppress wake captures while TTS is playing so ZOYA's own
+		// Suppress wake captures while TTS is playing so JARVIS's own
 		// voice through the speakers doesn't trigger a self-wake. Hooked
 		// via the playback service's state-change callback.
 		if wakeListener != nil && c.playback != nil {
@@ -847,9 +847,8 @@ func (c *SidecarClient) sendRegistration(ctx context.Context) error {
 		Version:                 sidecarVersion,
 		Capabilities:            c.availableCaps,
 		UnavailableCapabilities: c.unavailableCaps,
-		Timezone:                DetectIANATimezone(),
 	}
-	log.Printf("[sidecar] Identified as %s (%s/%s) v%s tz=%s", msg.Hostname, msg.OS, msg.Platform, msg.Version, msg.Timezone)
+	log.Printf("[sidecar] Identified as %s (%s/%s) v%s", msg.Hostname, msg.OS, msg.Platform, msg.Version)
 	return c.sendJSON(ctx, msg)
 }
 
@@ -867,7 +866,7 @@ func (c *SidecarClient) handleRegisterRejected(data []byte) {
 	c.incompatible = true
 	log.Printf("[sidecar] ====================================================================")
 	log.Printf("[sidecar] INCOMPATIBLE: this brain requires sidecar >= %s, but this is %s.", msg.Min, msg.YourVersion)
-	log.Printf("[sidecar] Update the sidecar (e.g. `bun install -g @zoya/sidecar` or")
+	log.Printf("[sidecar] Update the sidecar (e.g. `bun install -g @yashvar23/sidecar` or")
 	log.Printf("[sidecar] grab the latest from GitHub Releases) and restart it.")
 	log.Printf("[sidecar] ====================================================================")
 }

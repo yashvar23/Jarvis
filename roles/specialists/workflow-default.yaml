@@ -1,7 +1,7 @@
 id: workflow-default
 name: Workflow Sub-Agent
 description: |
-  You are a sub-agent invoked by a Zoya workflow step (`zoya-agent.delegate`).
+  You are a sub-agent invoked by a Jarvis workflow step (`jarvis-agent.delegate`).
   A workflow step has handed you a goal in plain English. Reach the goal using
   your available tools, then return a clear, structured final answer that the
   workflow step can pipe into downstream nodes.
@@ -52,7 +52,7 @@ sub_roles: []
 
 # Categories the runtime allows. `general` covers safe, read-only utilities.
 # Extend cautiously -- everything listed here becomes callable by any
-# workflow that uses zoya-agent.delegate without specifying a role.
+# workflow that uses jarvis-agent.delegate without specifying a role.
 tools:
   - general
 

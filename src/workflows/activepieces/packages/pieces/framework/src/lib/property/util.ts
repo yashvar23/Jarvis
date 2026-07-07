@@ -113,4 +113,3 @@ function buildSchema(props: PiecePropertyMap, auth: PieceAuthProperty | PieceAut
   export const piecePropertiesUtils = {
     buildSchema
   }
-

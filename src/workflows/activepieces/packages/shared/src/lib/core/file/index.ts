@@ -76,4 +76,3 @@ export const File = z.object({
 export type File = z.infer<typeof File> & {
     data: Buffer
 }
-

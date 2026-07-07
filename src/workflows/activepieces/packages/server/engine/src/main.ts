@@ -22,4 +22,3 @@ process.on('unhandledRejection', (reason) => {
     workerSocket.sendError(reason)
     process.exit(4)
 })
-

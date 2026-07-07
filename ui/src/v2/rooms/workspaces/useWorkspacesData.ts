@@ -80,7 +80,7 @@ export function useWorkspacesData() {
 
       // Normalize both sides: lowercase, replace any non-alphanumeric run
       // (dash, underscore, apostrophe, space, period) with a single space,
-      // collapse, trim. Lets "zoya landing" find "zoya-landing" and
+      // collapse, trim. Lets "jarvis landing" find "jarvis-landing" and
       // "jarv's landing" find the same.
       const norm = (s: string) =>
         s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
@@ -93,7 +93,7 @@ export function useWorkspacesData() {
       if (exact) return exact;
 
       // 2. substring either direction (handles partials like "landing"
-      //    matching "zoya-landing" and full query matching a longer name)
+      //    matching "jarvis-landing" and full query matching a longer name)
       const sub = projects.find((p) => {
         const n = norm(p.name);
         return n.includes(qNorm) || qNorm.includes(n);
@@ -216,4 +216,3 @@ export function useWorkspacesData() {
     deleteProject,
   };
 }
-

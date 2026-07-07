@@ -2,7 +2,7 @@
  * In-process worker that polls the SQLite job queue and dispatches each
  * claimed job to a registered handler.
  *
- * Replaces BullMQ's worker pattern. One Worker instance per Zoya daemon is
+ * Replaces BullMQ's worker pattern. One Worker instance per Jarvis daemon is
  * enough for the personal-AI scale we're targeting; if we ever need more
  * parallelism, increasing `concurrency` in start() lets us run several claim
  * loops in parallel within the same process.
@@ -142,4 +142,3 @@ export class Worker {
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
-

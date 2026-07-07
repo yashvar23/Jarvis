@@ -50,7 +50,7 @@ export function AppShellV2() {
   if (route.kind === "panel") {
     const Body = getRoomBody(route.key);
     return (
-      <div className="zoya-v2-root zoya-v2-panel-mode">
+      <div className="jarvis-v2-root jarvis-v2-panel-mode">
         <RoomActionBusProvider>
           <PanelRoomActionBridge />
           <Body mode="expanded" />
@@ -65,7 +65,7 @@ export function AppShellV2() {
   // hash.
   if (route.kind === "task") {
     return (
-      <div className="zoya-v2-root zoya-v2-task-mode">
+      <div className="jarvis-v2-root jarvis-v2-task-mode">
         <TaskResultRoom taskId={route.id} />
       </div>
     );
@@ -76,7 +76,7 @@ export function AppShellV2() {
   // so long answers stay readable without TTS.
   if (route.kind === "answer") {
     return (
-      <div className="zoya-v2-root zoya-v2-task-mode">
+      <div className="jarvis-v2-root jarvis-v2-task-mode">
         <AnswerRoom answerId={route.id} />
       </div>
     );
@@ -87,14 +87,14 @@ export function AppShellV2() {
   // with no AppShell chrome.
   if (route.kind === "palette") {
     return (
-      <div className="zoya-v2-root zoya-v2-palette-mode">
+      <div className="jarvis-v2-root jarvis-v2-palette-mode">
         <PalettePage />
       </div>
     );
   }
 
   return (
-    <div className="zoya-v2-root">
+    <div className="jarvis-v2-root">
       {/* Panel mode body sits above this guard. */}
       {route.kind === "primitives" ? (
         <PrimitivesPage />

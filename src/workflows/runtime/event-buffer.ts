@@ -1,8 +1,8 @@
 /**
- * In-memory recent-events buffer that backs the `/v1/zoya/events/poll`
- * route used by the `zoya-trigger:on_event` polling trigger.
+ * In-memory recent-events buffer that backs the `/v1/jarvis/events/poll`
+ * route used by the `jarvis-trigger:on_event` polling trigger.
  *
- * The daemon's existing `ZoyaEventBusAdapter` is publish/subscribe; this
+ * The daemon's existing `JarvisEventBusAdapter` is publish/subscribe; this
  * buffer is a side-track that captures every published event with a
  * monotonic id. The trigger persists its `since` cursor (the highest id
  * delivered) and asks for events newer than that, optionally narrowed by
@@ -161,4 +161,3 @@ function makeShallowEq(filter?: Record<string, unknown>): (payload: Record<strin
     return true;
   };
 }
-

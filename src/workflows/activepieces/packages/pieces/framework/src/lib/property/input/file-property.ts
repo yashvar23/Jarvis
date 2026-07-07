@@ -21,4 +21,3 @@ export const FileProperty = z.object({
 
 export type FileProperty<R extends boolean> = BasePropertySchema &
     TPropertyValue<ApFile, PropertyType.FILE, R>;
-

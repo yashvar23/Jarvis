@@ -88,6 +88,5 @@ export * from './lib/automation/project-release/project-release.request'
 export * from './lib/automation/project-release/project-state'
 export * from './lib/automation/websocket'
 
-// ee re-exports stripped by sync-activepieces.ts (Zoya vendor filter)
+// ee re-exports stripped by sync-activepieces.ts (Jarvis vendor filter)
 export * from './lib/management/project/project-requests'
-

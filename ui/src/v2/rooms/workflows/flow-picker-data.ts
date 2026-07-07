@@ -49,4 +49,3 @@ export function normalizeFlowsResponse(body: unknown): FlowPickerEntry[] {
   }
   return out;
 }
-

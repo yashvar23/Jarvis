@@ -57,5 +57,3 @@ describe("normalizeFlowsResponse", () => {
     ]);
   });
 });
-
-

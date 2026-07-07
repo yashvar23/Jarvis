@@ -175,7 +175,7 @@ const ROOM_META: Record<RoomKey, RoomMeta> = {
     subtitle: "entities · facts · relationships",
     phaseTag: "Phase 6.5 — Memory Room",
     description:
-      "What Zoya knows. Browse entities, facts, and relationships, or look at the knowledge constellation as a whole.",
+      "What Jarvis knows. Browse entities, facts, and relationships, or look at the knowledge constellation as a whole.",
   },
   authority: {
     title: "Authority",
@@ -188,7 +188,7 @@ const ROOM_META: Record<RoomKey, RoomMeta> = {
     title: "Calendar",
     subtitle: "this week · commitments",
     phaseTag: "Phase 6.7 — Calendar Room",
-    description: "Your upcoming week alongside commitments Zoya is tracking.",
+    description: "Your upcoming week alongside commitments Jarvis is tracking.",
   },
   goals: {
     title: "Goals",

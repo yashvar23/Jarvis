@@ -9,7 +9,7 @@ let workDir: string;
 let fakeHome: string;
 
 beforeEach(() => {
-  workDir = mkdtempSync(join(tmpdir(), 'zoya-uninstall-test-'));
+  workDir = mkdtempSync(join(tmpdir(), 'jarvis-uninstall-test-'));
   fakeHome = join(workDir, 'home');
   mkdirSync(fakeHome, { recursive: true });
 });
@@ -24,38 +24,38 @@ function fakeDetect(method: InstallMethod) {
 
 describe('createCleanupPlan — method-specific paths', () => {
   test('script install schedules dataDir for removal', () => {
-    const plan = createCleanupPlan(join(fakeHome, '.zoya', 'daemon'), {
+    const plan = createCleanupPlan(join(fakeHome, '.jarvis', 'daemon'), {
       env: {},
       homeDir: fakeHome,
       detect: fakeDetect('script'),
     });
     expect(plan.method).toBe('script');
-    expect(plan.removablePaths).toContain(join(fakeHome, '.zoya'));
+    expect(plan.removablePaths).toContain(join(fakeHome, '.jarvis'));
     expect(plan.runBunUninstall).toBe(false);
   });
 
   test('bun-global install schedules dataDir only; package handled by bun', () => {
-    const packageRoot = join(fakeHome, '.bun', 'install', 'global', 'node_modules', '@zoya', 'brain');
+    const packageRoot = join(fakeHome, '.bun', 'install', 'global', 'node_modules', '@usejarvis', 'brain');
     const plan = createCleanupPlan(packageRoot, {
       env: {},
       homeDir: fakeHome,
       detect: fakeDetect('bun-global'),
     });
     expect(plan.runBunUninstall).toBe(true);
-    expect(plan.removablePaths).toContain(join(fakeHome, '.zoya'));
+    expect(plan.removablePaths).toContain(join(fakeHome, '.jarvis'));
     // Must NOT remove the package dir directly — that's what bun uninstall is for.
     expect(plan.removablePaths).not.toContain(packageRoot);
   });
 
   test('dev checkout is never added to removablePaths', () => {
-    const devPath = join(workDir, 'work', 'zoya');
+    const devPath = join(workDir, 'work', 'jarvis');
     const plan = createCleanupPlan(devPath, {
       env: {},
       homeDir: fakeHome,
       detect: fakeDetect('dev'),
     });
     expect(plan.removablePaths).not.toContain(devPath);
-    expect(plan.removablePaths).toContain(join(fakeHome, '.zoya'));
+    expect(plan.removablePaths).toContain(join(fakeHome, '.jarvis'));
   });
 
   test('docker method produces a plan with no removable paths', () => {
@@ -70,25 +70,25 @@ describe('createCleanupPlan — method-specific paths', () => {
 });
 
 describe('createCleanupPlan — env overrides', () => {
-  test('honors ZOYA_HOME for data dir', () => {
-    const customDataDir = join(workDir, 'custom-zoya');
-    const plan = createCleanupPlan(join(fakeHome, '.bun', 'install', 'global', 'node_modules', '@zoya', 'brain'), {
-      env: { ZOYA_HOME: customDataDir },
+  test('honors JARVIS_HOME for data dir', () => {
+    const customDataDir = join(workDir, 'custom-jarvis');
+    const plan = createCleanupPlan(join(fakeHome, '.bun', 'install', 'global', 'node_modules', '@usejarvis', 'brain'), {
+      env: { JARVIS_HOME: customDataDir },
       homeDir: fakeHome,
       detect: fakeDetect('bun-global'),
     });
     expect(plan.dataDir).toBe(customDataDir);
     expect(plan.removablePaths).toContain(customDataDir);
-    // Must not include the default ~/.zoya when ZOYA_HOME is set.
-    expect(plan.removablePaths).not.toContain(join(fakeHome, '.zoya'));
+    // Must not include the default ~/.jarvis when JARVIS_HOME is set.
+    expect(plan.removablePaths).not.toContain(join(fakeHome, '.jarvis'));
   });
 
   test('honors BUN_INSTALL for wrapper candidates', () => {
     const customBun = join(workDir, 'custom-bun');
-    const wrapperPath = join(customBun, 'bin', 'zoya');
+    const wrapperPath = join(customBun, 'bin', 'jarvis');
     mkdirSync(join(customBun, 'bin'), { recursive: true });
     writeFileSync(wrapperPath, '#!/bin/sh\n');
-    const plan = createCleanupPlan(join(fakeHome, '.zoya', 'daemon'), {
+    const plan = createCleanupPlan(join(fakeHome, '.jarvis', 'daemon'), {
       env: { BUN_INSTALL: customBun },
       homeDir: fakeHome,
       detect: fakeDetect('script'),
@@ -97,10 +97,10 @@ describe('createCleanupPlan — env overrides', () => {
   });
 
   test('default wrapper candidates live under ~/.bun/bin', () => {
-    const defaultWrapper = join(fakeHome, '.bun', 'bin', 'zoya');
+    const defaultWrapper = join(fakeHome, '.bun', 'bin', 'jarvis');
     mkdirSync(join(fakeHome, '.bun', 'bin'), { recursive: true });
     writeFileSync(defaultWrapper, '#!/bin/sh\n');
-    const plan = createCleanupPlan(join(fakeHome, '.zoya', 'daemon'), {
+    const plan = createCleanupPlan(join(fakeHome, '.jarvis', 'daemon'), {
       env: {},
       homeDir: fakeHome,
       detect: fakeDetect('script'),
@@ -116,7 +116,7 @@ describe('createCleanupPlan — Windows path handling', () => {
     // Simulate a package root at different casing than the parent — on
     // Windows this is a real concern. On other platforms this is just a
     // regression guard against future platform-specific branches.
-    const packageRoot = join(fakeHome, '.bun', 'install', 'global', 'node_modules', '@zoya', 'brain');
+    const packageRoot = join(fakeHome, '.bun', 'install', 'global', 'node_modules', '@usejarvis', 'brain');
     const plan = createCleanupPlan(packageRoot, {
       env: {},
       homeDir: fakeHome,
@@ -128,8 +128,8 @@ describe('createCleanupPlan — Windows path handling', () => {
 
 describe('buildCleanupScript — executes correctly against a fixture tree', () => {
   test('unlinks wrappers, removes dataDir, skips package dir when flag off', async () => {
-    const dataDir = join(workDir, 'fake-home', '.zoya');
-    const wrapperPath = join(workDir, 'fake-bun', 'bin', 'zoya');
+    const dataDir = join(workDir, 'fake-home', '.jarvis');
+    const wrapperPath = join(workDir, 'fake-bun', 'bin', 'jarvis');
     const canaryPath = join(workDir, 'canary-keep-me.txt');
 
     mkdirSync(dataDir, { recursive: true });
@@ -139,7 +139,7 @@ describe('buildCleanupScript — executes correctly against a fixture tree', () 
     writeFileSync(canaryPath, 'I should survive');
 
     const logPath = join(workDir, 'uninstall.log');
-    const tempDir = mkdtempSync(join(tmpdir(), 'zoya-uninstall-exec-'));
+    const tempDir = mkdtempSync(join(tmpdir(), 'jarvis-uninstall-exec-'));
     const scriptPath = join(tempDir, 'cleanup.mjs');
 
     const plan = {
@@ -182,12 +182,12 @@ describe('buildCleanupScript — executes correctly against a fixture tree', () 
   }, 10000);
 
   test('missing wrapper is a soft no-op, not a failure', async () => {
-    const dataDir = join(workDir, 'fake-home-2', '.zoya');
-    const missingWrapper = join(workDir, 'does-not-exist', 'zoya');
+    const dataDir = join(workDir, 'fake-home-2', '.jarvis');
+    const missingWrapper = join(workDir, 'does-not-exist', 'jarvis');
     mkdirSync(dataDir, { recursive: true });
 
     const logPath = join(workDir, 'uninstall-2.log');
-    const tempDir = mkdtempSync(join(tmpdir(), 'zoya-uninstall-exec-'));
+    const tempDir = mkdtempSync(join(tmpdir(), 'jarvis-uninstall-exec-'));
     const scriptPath = join(tempDir, 'cleanup.mjs');
 
     const plan = {
@@ -215,4 +215,3 @@ describe('buildCleanupScript — executes correctly against a fixture tree', () 
     expect(log).toContain('unlinked wrapper ' + missingWrapper);
   }, 10000);
 });
-

@@ -18,7 +18,7 @@
 
 import type {
   FlowTriggerNode,
-  FlowVersion as ZoyaFlowVersion,
+  FlowVersion as JarvisFlowVersion,
 } from "../../db/repos/flow-version";
 
 interface UpstreamCommonNode {
@@ -242,7 +242,7 @@ function adaptAction(
   throw new Error(`unsupported action type: ${node.type}`);
 }
 
-export function toUpstreamFlowVersion(version: ZoyaFlowVersion): UpstreamFlowVersion {
+export function toUpstreamFlowVersion(version: JarvisFlowVersion): UpstreamFlowVersion {
   const created = toIso(version.created, new Date().toISOString());
   const updated = toIso(version.updated, created);
   return {
@@ -288,4 +288,3 @@ export function collectCodeActions(version: UpstreamFlowVersion): Array<{
   visit(version.trigger.nextAction);
   return result;
 }
-

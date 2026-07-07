@@ -13,7 +13,7 @@ import { join } from 'node:path';
 import { homedir } from 'node:os';
 import type { Service, ServiceStatus } from './services.ts';
 import type { IAgentService } from './agent-service-interface.ts';
-import type { ZoyaConfig } from '../config/types.ts';
+import type { JarvisConfig } from '../config/types.ts';
 import type { RoleDefinition } from '../roles/types.ts';
 import type { LLMManager } from '../llm/manager.ts';
 import type { ResearchQueue } from './research-queue.ts';
@@ -26,18 +26,18 @@ import { BrowserController } from '../actions/browser/session.ts';
 import { DESKTOP_TOOLS } from '../actions/tools/desktop.ts';
 import { commitmentsTool } from '../actions/tools/commitments.ts';
 import { researchQueueTool } from '../actions/tools/research.ts';
-import { buildSystemPromptParts, type PromptContext, type SystemPromptParts } from '../roles/prompt-builder.ts';
+import { buildSystemPrompt, type PromptContext } from '../roles/prompt-builder.ts';
 import { getDueCommitments, getUpcoming } from '../vault/commitments.ts';
 import { getRecentObservations } from '../vault/observations.ts';
 import { findContent } from '../vault/content-pipeline.ts';
 
 const BG_CDP_PORT = 9223;
-const BG_PROFILE_DIR = join(homedir(), '.zoya', 'browser', 'bg-profile');
+const BG_PROFILE_DIR = join(homedir(), '.jarvis', 'browser', 'bg-profile');
 
 export class BackgroundAgentService implements Service, IAgentService {
   name = 'background-agent';
   private _status: ServiceStatus = 'stopped';
-  private config: ZoyaConfig;
+  private config: JarvisConfig;
   private llmManager: LLMManager;
   private orchestrator: AgentOrchestrator;
   private bgBrowser: BrowserController;
@@ -45,7 +45,7 @@ export class BackgroundAgentService implements Service, IAgentService {
   private researchQueue: ResearchQueue | null = null;
   private busy = false;
 
-  constructor(config: ZoyaConfig, llmManager: LLMManager) {
+  constructor(config: JarvisConfig, llmManager: LLMManager) {
     this.config = config;
     this.llmManager = llmManager;
     this.orchestrator = new AgentOrchestrator();
@@ -134,7 +134,7 @@ export class BackgroundAgentService implements Service, IAgentService {
 
     this.busy = true;
     try {
-      const systemPrompt = this.buildSystemPromptParts(channel);
+      const systemPrompt = this.buildSystemPrompt(channel);
       return await this.orchestrator.processMessage(systemPrompt, text);
     } catch (err) {
       console.error('[BackgroundAgent] Message error:', err);
@@ -146,12 +146,10 @@ export class BackgroundAgentService implements Service, IAgentService {
 
   // --- Private methods ---
 
-  private buildSystemPromptParts(_channel: string): SystemPromptParts {
-    if (!this.role) return { static: '', dynamic: '' };
+  private buildSystemPrompt(channel: string): string {
+    if (!this.role) return '';
     const context = this.buildPromptContext();
-    // Static role prefix is cache-marked downstream; the per-event context
-    // (current time, due commitments) rides on the dynamic half.
-    return buildSystemPromptParts(this.role, context);
+    return buildSystemPrompt(this.role, context);
   }
 
   private buildPromptContext(): PromptContext {
@@ -238,4 +236,3 @@ export class BackgroundAgentService implements Service, IAgentService {
     );
   }
 }
-

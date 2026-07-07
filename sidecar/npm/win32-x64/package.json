@@ -1,14 +1,13 @@
 {
-  "name": "@zoya/sidecar-win32-x64",
+  "name": "@yashvar23/sidecar-win32-x64",
   "version": "0.1.0",
-  "description": "Zoya sidecar binary for Windows x64",
+  "description": "Jarvis sidecar binary for Windows x64",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yashvar23/zoya.git",
+    "url": "git+https://github.com/vierisid/jarvis.git",
     "directory": "sidecar/npm/win32-x64"
   },
   "os": ["win32"],
   "cpu": ["x64"],
   "files": ["bin"]
 }
-

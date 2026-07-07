@@ -25,4 +25,3 @@ export const schedule = createPiece({
     cronExpressionTrigger,
   ],
 });
-

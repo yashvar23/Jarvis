@@ -90,4 +90,3 @@ export type OAuth2Property<
     PropertyType.OAUTH2,
     true
   >;
-

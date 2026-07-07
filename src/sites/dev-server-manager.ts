@@ -264,7 +264,7 @@ export class DevServerManager {
       const pids = JSON.parse(await file.text()) as Record<string, { pid: number; port: number }>;
       for (const [id, { pid }] of Object.entries(pids)) {
         try {
-          // Verify PID belongs to a Zoya-spawned process before killing
+          // Verify PID belongs to a Jarvis-spawned process before killing
           const cmdline = readFileSync(`/proc/${pid}/cmdline`, 'utf-8');
           const isMakeDev = cmdline.includes('make') && cmdline.includes('dev');
           const isBunHot = cmdline.includes('bun') && cmdline.includes('--hot');
@@ -284,4 +284,3 @@ export class DevServerManager {
     } catch { /* no PID file or parse error */ }
   }
 }
-

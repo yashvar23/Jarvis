@@ -6,4 +6,3 @@ export const WebhookUrlParams = z.object({
 })
 
 export type WebhookUrlParams = z.infer<typeof WebhookUrlParams>
-

@@ -162,7 +162,7 @@ export class HealthMonitor {
     const health = this.getHealth();
     const lines: string[] = [];
 
-    lines.push('=== ZOYA Health Status ===');
+    lines.push('=== JARVIS Health Status ===');
     lines.push(`Uptime: ${this.formatUptime(health.uptime)}`);
     lines.push(`Started: ${new Date(health.startedAt).toISOString()}`);
     lines.push('');
@@ -218,4 +218,3 @@ export class HealthMonitor {
     return `${size.toFixed(2)} ${sizes[i]}`;
   }
 }
-

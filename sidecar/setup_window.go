@@ -13,6 +13,14 @@ package main
 // The token is validated only as a well-formed JWT here — the brain still does
 // the real cryptographic verification on connect.
 
+import (
+	"fmt"
+	"runtime"
+	"strings"
+
+	webview "github.com/webview/webview_go"
+)
+
 // setupWindowHTML is the (intentionally minimal, unbranded) first-run form.
 // `window.submitToken(value)` is the Go binding installed below; it rejects with
 // a message when the token is empty/malformed so the form can show it inline.
@@ -52,13 +60,13 @@ const setupWindowHTML = `<!doctype html>
 </style>
 </head>
 <body>
-  <h1>Connect this machine to ZOYA</h1>
+  <h1>Connect this machine to JARVIS</h1>
   <p class="sub">Paste the enrollment token from the dashboard
     (<b>Settings &rarr; Sidecar &rarr; Enroll</b>). It connects this sidecar to
     your brain and authenticates it.</p>
   <label for="tok">Enrollment token</label>
   <textarea id="tok" placeholder="eyJhbGciOiJFUzI1NiIs..." spellcheck="false" autofocus></textarea>
-  <p class="hint">The token is stored locally at ~/.zoya/sidecar.yaml. Press Cmd/Ctrl+Enter to connect.</p>
+  <p class="hint">The token is stored locally at ~/.jarvis/sidecar.yaml. Press Cmd/Ctrl+Enter to connect.</p>
   <div class="row">
     <span id="err"></span>
     <button id="go" onclick="submit()">Connect</button>
@@ -87,7 +95,46 @@ const setupWindowHTML = `<!doctype html>
 </body>
 </html>`
 
-// NOTE: the standalone runSetupWindow function was removed when the
-// hosted-first connect window (hosted_window.go) took over the no-token
-// first run; the HTML above is its self-host form, reached via the
-// "Paste your enrollment token" link (gated submitToken binding).
+// runSetupWindow shows the first-run token prompt and returns the entered token
+// (validated as a well-formed JWT). Returns "" if the user closed the window
+// without submitting. Blocks until the window closes and must run on the main OS
+// thread (webview/Cocoa requirement), so call it from main() before spawning
+// other goroutines.
+func runSetupWindow() (string, error) {
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
+	w := webview.New(false)
+	if w == nil {
+		return "", fmt.Errorf("could not open the setup window (no display, or the system webview runtime is missing)")
+	}
+	defer w.Destroy()
+
+	w.SetTitle("JARVIS Sidecar - Setup")
+	w.SetSize(560, 380, webview.HintFixed)
+
+	var token string
+	// window.submitToken(raw) -> resolves on success (and closes the window),
+	// rejects with a message the form displays inline.
+	if err := w.Bind("submitToken", func(raw string) error {
+		raw = strings.TrimSpace(raw)
+		if raw == "" {
+			return fmt.Errorf("Paste your enrollment token to continue.")
+		}
+		if _, err := DecodeJWTPayload(raw); err != nil {
+			return fmt.Errorf("That doesn't look like a valid token. Copy the full token from the dashboard.")
+		}
+		token = raw
+		w.Terminate()
+		return nil
+	}); err != nil {
+		return "", fmt.Errorf("bind setup handler: %w", err)
+	}
+
+	// The vendored webview creates the window hidden (no flash); reveal it once
+	// the form has loaded.
+	revealWebviewOnLoad(w)
+	w.SetHtml(setupWindowHTML)
+	w.Run() // blocks until Terminate() (submit) or the window is closed
+	return token, nil
+}

@@ -6,4 +6,3 @@ export type HttpResponse<RequestBody extends HttpMessageBody = any> = {
   headers?: HttpHeaders | undefined;
   body: RequestBody;
 };
-

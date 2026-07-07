@@ -14,4 +14,3 @@ Bun.serve({
 });
 
 console.log(`Security test site running on http://localhost:${port}`);
-

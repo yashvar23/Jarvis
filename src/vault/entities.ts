@@ -183,4 +183,3 @@ export function searchEntitiesByName(query: string): Entity[] {
   const rows = stmt.all(`%${escapeLike(query)}%`) as EntityRow[];
   return rows.map(parseEntity);
 }
-

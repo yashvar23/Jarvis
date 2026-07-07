@@ -241,5 +241,3 @@ export function useGoalsData() {
     updateHealth,
   };
 }
-
-

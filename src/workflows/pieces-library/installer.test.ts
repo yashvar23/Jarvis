@@ -25,7 +25,7 @@ import { findCatalogEntry } from "./catalog";
 let base: string;
 
 beforeEach(() => {
-  base = mkdtempSync(join(tmpdir(), "zoya-pieces-installer-"));
+  base = mkdtempSync(join(tmpdir(), "jarvis-pieces-installer-"));
 });
 
 afterEach(() => {
@@ -251,4 +251,3 @@ describe("uninstallPiece", () => {
     expect(existsSync(resolve(base, "package.json"))).toBe(false);
   });
 });
-

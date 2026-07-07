@@ -128,4 +128,3 @@ export const flowCanvasConsts = {
   DEFAULT_NOTE_COLOR: NoteColorVariant.BLUE,
   BUILDER_HEADER_HEIGHT: 60,
 };
-

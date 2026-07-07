@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 #
 # Re-vendor github.com/webview/webview_go into sidecar/third_party/webview_go at
-# a given version and re-apply the zoya SW_HIDE patch (zoya.patch).
+# a given version and re-apply the jarvis SW_HIDE patch (jarvis.patch).
 #
 # We vendor + patch webview_go because upstream's Win32 engine constructor shows
 # the window before WebView2 finishes initializing, producing a black flash. The
 # patch creates the window hidden so the host reveals it on load. See
-# sidecar/third_party/webview_go/ZOYA_PATCH.md.
+# sidecar/third_party/webview_go/JARVIS_PATCH.md.
 #
 # Usage:
 #   scripts/vendor-webview.sh                # pin to the latest proxy version
@@ -20,10 +20,10 @@ MODULE="github.com/webview/webview_go"
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SIDECAR_DIR="$REPO_ROOT/sidecar"
 VENDOR_DIR="$SIDECAR_DIR/third_party/webview_go"
-PATCH_FILE="$VENDOR_DIR/zoya.patch"
+PATCH_FILE="$VENDOR_DIR/jarvis.patch"
 
 # Files we add on top of pristine upstream; preserved across the re-copy.
-KEEP_FILES=(ZOYA_PATCH.md zoya.patch .gitattributes)
+KEEP_FILES=(JARVIS_PATCH.md jarvis.patch .gitattributes)
 
 VERSION="${1:-}"
 if [ -z "$VERSION" ]; then
@@ -74,13 +74,13 @@ rm -rf "$STASH"
 # Re-apply our patch with GNU patch (no git-index awareness, unlike `git apply`,
 # which would see the committed header as already-patched and skip). Strict on
 # purpose: if upstream moved the win32 constructor this fails loudly and a human
-# must regenerate zoya.patch (the SW_HIDE edit).
-echo "Applying zoya.patch..."
+# must regenerate jarvis.patch (the SW_HIDE edit).
+echo "Applying jarvis.patch..."
 ( cd "$VENDOR_DIR" && patch -p1 --no-backup-if-mismatch -i "$PATCH_FILE" )
 
 # Sanity-check the patch actually landed.
 HEADER="$VENDOR_DIR/libs/webview/include/webview.h"
-grep -q "PATCHED (zoya)" "$HEADER"
+grep -q "PATCHED (jarvis)" "$HEADER"
 grep -q "ShowWindow(m_window, SW_HIDE)" "$HEADER"
 
 # Record the pinned version (single source of truth for the update workflow).
@@ -89,4 +89,4 @@ printf '%s\n' "$VERSION" > "$VENDOR_DIR/UPSTREAM_VERSION"
 # Refresh go.sum / indirect requirements against the replaced module.
 ( cd "$SIDECAR_DIR" && go mod tidy )
 
-echo "Done: vendored $MODULE@$VERSION with zoya.patch applied."
+echo "Done: vendored $MODULE@$VERSION with jarvis.patch applied."

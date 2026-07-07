@@ -1,6 +1,6 @@
 # Personality Engine
 
-An adaptive personality system for ZOYA that learns user preferences and adapts communication style over time.
+An adaptive personality system for J.A.R.V.I.S. that learns user preferences and adapts communication style over time.
 
 ## Quick Start
 
@@ -16,7 +16,7 @@ import {
 } from '@/personality';
 
 // Initialize database
-initDatabase('./data/zoya.db');
+initDatabase('./data/jarvis.db');
 
 // Process a user interaction
 let personality = getPersonality();
@@ -46,7 +46,7 @@ const prompt = personalityToPrompt(personality);
 
 ## Documentation
 
-See [docs/PERSONALITY_ENGINE.md](~/zoya/docs/PERSONALITY_ENGINE.md) for full documentation.
+See [docs/PERSONALITY_ENGINE.md](~/jarvis/docs/PERSONALITY_ENGINE.md) for full documentation.
 
 ## Testing
 
@@ -59,4 +59,3 @@ bun test src/personality/personality.test.ts
 ```bash
 bun run examples/personality-demo.ts
 ```
-

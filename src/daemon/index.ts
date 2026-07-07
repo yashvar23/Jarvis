@@ -1,7 +1,7 @@
 /**
- * ZOYA Daemon
+ * J.A.R.V.I.S. Daemon
  *
- * Main entry point for the ZOYA daemon process.
+ * Main entry point for the JARVIS daemon process.
  * Initializes database, registers real services (Agent, Observer, WebSocket),
  * starts health monitoring, and handles graceful shutdown.
  */
@@ -59,8 +59,8 @@ import { buildSandboxServiceBackends } from "../workflows/runtime/service-backen
 import { EngineFlowExecutor } from "../workflows/runner/engine-runtime/engine-flow-executor.ts";
 
 // Constants
-const DEFAULT_PORT = 3142;  // ZOYA port
-const DEFAULT_DATA_DIR = path.join(os.homedir(), '.zoya');
+const DEFAULT_PORT = 3142;  // JARVIS port
+const DEFAULT_DATA_DIR = path.join(os.homedir(), '.jarvis');
 
 export interface DaemonConfig {
   port: number;
@@ -110,22 +110,22 @@ function parseArgs(): Partial<DaemonConfig> {
       case '--help':
       case '-h':
         console.log(`
-ZOYA Daemon
+J.A.R.V.I.S. Daemon
 
 Usage:
   bun run src/daemon/index.ts [options]
 
 Options:
   --port <number>          WebSocket server port (default: ${DEFAULT_PORT})
-  --db-path <path>         Database file path (default: ~/.zoya/zoya.db)
-  --data-dir <path>        Data directory (default: ~/.zoya)
+  --db-path <path>         Database file path (default: ~/.jarvis/jarvis.db)
+  --data-dir <path>        Data directory (default: ~/.jarvis)
   --health-interval <ms>   Health check interval in ms (default: 30000)
   --no-local-tools         Disable local tool execution (run_command, read_file, etc).
                            Tools will only work when routed to a sidecar via target param.
   --help, -h               Show this help message
 
 Example:
-  bun run src/daemon/index.ts --port 3142 --data-dir ~/.zoya
+  bun run src/daemon/index.ts --port 3142 --data-dir ~/.jarvis
         `);
         process.exit(0);
     }
@@ -250,14 +250,14 @@ async function handleShutdown(signal: string): Promise<void> {
  */
 function printBanner(config: DaemonConfig): void {
   console.log(`
-███████╗ ██████╗ ██╗   ██╗ █████╗ 
-╚══███╔╝██╔═══██╗╚██╗ ██╔╝██╔══██╗
-  ███╔╝ ██║   ██║ ╚████╔╝ ███████║
- ███╔╝  ██║   ██║  ╚██╔╝  ██╔══██║
-███████╗╚██████╔╝   ██║   ██║  ██║
-╚══════╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝
+     ██╗ █████╗ ██████╗ ██╗   ██╗██╗███████╗
+     ██║██╔══██╗██╔══██╗██║   ██║██║██╔════╝
+     ██║███████║██████╔╝██║   ██║██║███████╗
+██   ██║██╔══██║██╔══██╗╚██╗ ██╔╝██║╚════██║
+╚█████╔╝██║  ██║██║  ██║ ╚████╔╝ ██║███████║
+ ╚════╝ ╚═╝  ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚═╝╚══════╝
 
-An always-on autonomous AI daemon
+Just A Rather Very Intelligent System
   `);
   console.log('[Daemon] Configuration:');
   console.log(`  Port:      ${config.port}`);
@@ -267,28 +267,28 @@ An always-on autonomous AI daemon
 }
 
 /**
- * Start the ZOYA daemon
+ * Start the JARVIS daemon
  */
 export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<void> {
   // Load config from YAML (with defaults)
-  let zoyaConfig;
+  let jarvisConfig;
   try {
-    zoyaConfig = await loadConfig();
+    jarvisConfig = await loadConfig();
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error(`\n[Daemon] Failed to parse config file: ${message}`);
-    console.error('[Daemon] Fix the YAML syntax in ~/.zoya/config.yaml or delete it to use defaults.\n');
+    console.error('[Daemon] Fix the YAML syntax in ~/.jarvis/config.yaml or delete it to use defaults.\n');
     process.exit(1);
   }
 
   // Determine data directory: CLI args > config file > default
-  const dataDir = userConfig?.dataDir ?? zoyaConfig.daemon.data_dir ?? DEFAULT_DATA_DIR;
+  const dataDir = userConfig?.dataDir ?? jarvisConfig.daemon.data_dir ?? DEFAULT_DATA_DIR;
 
-  // If user specified a custom data dir but no db path, use zoya.db in that dir
-  const dbPath = userConfig?.dbPath ?? zoyaConfig.daemon.db_path ?? path.join(dataDir, 'zoya.db');
+  // If user specified a custom data dir but no db path, use jarvis.db in that dir
+  const dbPath = userConfig?.dbPath ?? jarvisConfig.daemon.db_path ?? path.join(dataDir, 'jarvis.db');
 
   // Merge configuration
-  const port = userConfig?.port ?? zoyaConfig.daemon.port ?? DEFAULT_PORT;
+  const port = userConfig?.port ?? jarvisConfig.daemon.port ?? DEFAULT_PORT;
   const config: DaemonConfig = {
     port,
     dataDir,
@@ -297,26 +297,10 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
     noLocalTools: userConfig?.noLocalTools ?? false,
   };
 
-  // Resolve the listen spec ONCE, before anything is persisted: a malformed
-  // `daemon.listen` must fail fast here, not after the lockfile write (a
-  // stale TCP lockfile from a mid-boot crash would mislead `zoya stop`).
-  const { resolveListen } = await import('../config/loader.ts');
-  let listen: import('../config/loader.ts').ListenSpec;
-  try {
-    listen = resolveListen({ port, listen: zoyaConfig.daemon.listen });
-  } catch (err) {
-    console.error(`\n[Daemon] ${err instanceof Error ? err.message : String(err)}`);
-    process.exit(1);
-  }
-
-  // Record the actual bound port in the lockfile so `zoya stop` knows which
-  // port to verify even when the daemon was started with --port, ZOYA_PORT,
+  // Record the actual bound port in the lockfile so `jarvis stop` knows which
+  // port to verify even when the daemon was started with --port, JARVIS_PORT,
   // or a mid-run config change. No-op if we don't hold the lock (e.g. tests).
-  // In unix-socket mode no TCP port exists to verify, so nothing is recorded
-  // and `zoya stop` is pid-only (resolveStopPort returns port null).
-  if (listen.kind === 'tcp') {
-    writeLockedPort(port);
-  }
+  writeLockedPort(port);
 
   // If dbPath is relative, make it absolute within dataDir
   if (!path.isAbsolute(config.dbPath)) {
@@ -345,7 +329,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
 
     // 2.1. Add workflow tables (flow / flow_run / flow_version /
     // app_connection / waitpoint / store_entry / workflow_file /
-    // workflow_job / trigger_event) to the shared Zoya DB. Idempotent.
+    // workflow_job / trigger_event) to the shared Jarvis DB. Idempotent.
     // Single file => single backup unit.
     ensureWorkflowSchema();
     logWithTimestamp('Workflow schema ready');
@@ -358,36 +342,8 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
     // tiers) from the DB + encrypted keychain. This is the sole source of LLM
     // config - config.yaml and env vars contribute nothing.
     const { mergeLLMSettingsIntoConfig } = await import('./llm-settings.ts');
-    mergeLLMSettingsIntoConfig(zoyaConfig);
+    mergeLLMSettingsIntoConfig(jarvisConfig);
     logWithTimestamp('LLM settings loaded from database');
-
-    // 2c. User-owned settings (personality, voice, authority, channels,
-    // onboarding, ...) follow the same rule: the DB is the sole authority,
-    // config.yaml is read-only system config the brain never writes. A
-    // legacy file that still carries user sections seeds the DB exactly
-    // once, then env overrides are re-applied so ZOYA_* still wins.
-    const { importLegacyUserSettings, mergeUserSettingsIntoConfig } = await import('./user-settings.ts');
-    const { readRawConfigFile, applyEnvOverrides } = await import('../config/loader.ts');
-    const rawConfigFile = await readRawConfigFile().catch(() => null);
-    const importedSections = importLegacyUserSettings(rawConfigFile);
-    if (importedSections.length > 0) {
-      logWithTimestamp(`Imported legacy config.yaml sections into the DB: ${importedSections.join(', ')}`);
-    }
-    mergeUserSettingsIntoConfig(zoyaConfig);
-    applyEnvOverrides(zoyaConfig);
-    logWithTimestamp('User settings loaded from database');
-
-    // 2d. Cron timezone: hosted brains run on UTC VPSs, so every cron in the
-    // process evaluates in the user's IANA timezone from the system config.
-    if (zoyaConfig.timezone) {
-      try {
-        const { setCronTimezone } = await import('../lib/cron-scheduler.ts');
-        setCronTimezone(zoyaConfig.timezone);
-        logWithTimestamp(`Cron timezone: ${zoyaConfig.timezone}`);
-      } catch {
-        console.warn(`[Daemon] Invalid timezone "${zoyaConfig.timezone}" in config - using machine local time`);
-      }
-    }
 
     // 3. Create service registry
     registry = new ServiceRegistry();
@@ -397,19 +353,19 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
     //     even while the daemon is still in onboarding/setup mode.
     const { TelemetryService } = await import('../telemetry/index.ts');
     const telemetryService = new TelemetryService({
-      config: zoyaConfig,
+      config: jarvisConfig,
       packageRoot: path.join(import.meta.dir, '..', '..'),
     });
 
     // 4. Create proactive modules
-    const heartbeatConfig = zoyaConfig.heartbeat;
+    const heartbeatConfig = jarvisConfig.heartbeat;
     const reactor = new EventReactor();
     const coalescer = new EventCoalescer();
 
     // 4b. Create GoogleAuth if configured
     let googleAuth: GoogleAuth | null = null;
-    if (zoyaConfig.google?.client_id && zoyaConfig.google?.client_secret) {
-      googleAuth = new GoogleAuth(zoyaConfig.google.client_id, zoyaConfig.google.client_secret);
+    if (jarvisConfig.google?.client_id && jarvisConfig.google?.client_secret) {
+      googleAuth = new GoogleAuth(jarvisConfig.google.client_id, jarvisConfig.google.client_secret);
       if (googleAuth.isAuthenticated()) {
         console.log('[Daemon] Google OAuth: authenticated (Gmail + Calendar observers enabled)');
       } else {
@@ -423,22 +379,15 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
     setResearchQueueRef(researchQueue);
 
     // 5. Create real services
-    const agentService = new AgentService(zoyaConfig);
+    const agentService = new AgentService(jarvisConfig);
     agentService.setResearchQueue(researchQueue);
     const observerService = config.noLocalTools
       ? null
       : new ObserverService(reactor, coalescer, googleAuth ?? undefined, config.dataDir);
-    // Hosted mode: daemon.listen = unix:/run/zoya/u_<id>.sock binds a unix
-    // socket and no TCP port at all (Caddy is the only way in). `listen` was
-    // resolved (and validated) once, before the lockfile write above.
-    const wsService = new WebSocketService(
-      config.port,
-      agentService,
-      listen.kind === 'unix' ? listen.path : undefined,
-    );
+    const wsService = new WebSocketService(config.port, agentService);
 
     // 5b. Create channel service for external comms (Telegram, Discord)
-    const channelService = new ChannelService(zoyaConfig, agentService);
+    const channelService = new ChannelService(jarvisConfig, agentService);
 
     // 5c. Create commitment executor (notify-then-execute)
     const aggressiveness = heartbeatConfig?.aggressiveness ?? 'moderate';
@@ -480,17 +429,17 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
     });
 
     // 6c. Create sidecar manager
-    const sidecarManager = new SidecarManager(zoyaConfig.daemon.data_dir.replace('~', os.homedir()));
+    const sidecarManager = new SidecarManager(jarvisConfig.daemon.data_dir.replace('~', os.homedir()));
     // Brain URL precedence: env > config.yaml > default fallback. The loader
     // already collapses env into config.daemon.brain_domain, so we re-check
     // the env var here only to attribute the source in the startup log —
     // the operator needs to see which knob is active when debugging.
-    const brainSource: 'env' | 'config' | 'default' = process.env.ZOYA_BRAIN_DOMAIN
+    const brainSource: 'env' | 'config' | 'default' = process.env.JARVIS_BRAIN_DOMAIN
       ? 'env'
-      : zoyaConfig.daemon.brain_domain
+      : jarvisConfig.daemon.brain_domain
         ? 'config'
         : 'default';
-    const brainDomain = zoyaConfig.daemon.brain_domain ?? `localhost:${config.port}`;
+    const brainDomain = jarvisConfig.daemon.brain_domain ?? `localhost:${config.port}`;
     sidecarManager.setBrainUrl(brainDomain, brainSource);
 
     // Panel webviews must render the same brain origin the JWT pins: the sidecar
@@ -517,9 +466,9 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
     // integration replaces the timer logic in a follow-up ticket.
     // Ambient UI (pebble + sub-pebbles + voice-driven panels) is the
     // default daily-driver experience as of Phase 2. Set
-    // `ZOYA_AMBIENT_UI=0` to fall back to dashboard-only mode (useful
+    // `JARVIS_AMBIENT_UI=0` to fall back to dashboard-only mode (useful
     // for headless servers, CI, or users who only want the web UI).
-    if (process.env.ZOYA_AMBIENT_UI !== '0') {
+    if (process.env.JARVIS_AMBIENT_UI !== '0') {
       const spawnedOn = new Set<string>();
 
       // Per-sidecar in-flight summon control. Tracks whether a summon is
@@ -527,7 +476,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
       // a second hotkey press.
       const pendingSummons = new Map<string, { cancelled: boolean }>();
 
-      // Fallback timers for the bare-"Zoya" listening state. If the sidecar's
+      // Fallback timers for the bare-"Jarvis" listening state. If the sidecar's
       // session capture never produces an `audio.session_end` (dropped event,
       // VAD wedged, user walked away), the pebble would stay `listening` forever
       // with wake-word suppressed. These recover it. Cleared the moment a session
@@ -564,28 +513,28 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
       };
 
       // STT + TTS providers for the pebble's voice loop. Both built from
-      // the same zoyaConfig.* the dashboard uses so API keys / provider
+      // the same jarvisConfig.* the dashboard uses so API keys / provider
       // choice (OpenAI Whisper / Groq / Local / Sarvam for STT;
       // edge-tts / ElevenLabs / Sarvam for TTS) carry over.
       let pebbleSTT: import('../comms/voice.ts').STTProvider | null = null;
       let pebbleTTS: import('../comms/voice.ts').TTSProvider | null = null;
-      if (zoyaConfig.stt) {
+      if (jarvisConfig.stt) {
         try {
           const { createSTTProvider } = await import('../comms/voice.ts');
-          pebbleSTT = createSTTProvider(zoyaConfig.stt);
+          pebbleSTT = createSTTProvider(jarvisConfig.stt);
           if (pebbleSTT) {
-            console.log(`[ambient-ui] STT provider for pebble: ${zoyaConfig.stt.provider}`);
+            console.log(`[ambient-ui] STT provider for pebble: ${jarvisConfig.stt.provider}`);
           }
         } catch (err) {
           console.warn('[ambient-ui] failed to init STT provider:', err);
         }
       }
-      if (zoyaConfig.tts?.enabled) {
+      if (jarvisConfig.tts?.enabled) {
         try {
           const { createTTSProvider } = await import('../comms/voice.ts');
-          pebbleTTS = createTTSProvider(zoyaConfig.tts);
+          pebbleTTS = createTTSProvider(jarvisConfig.tts);
           if (pebbleTTS) {
-            console.log(`[ambient-ui] TTS provider for pebble: ${zoyaConfig.tts.provider ?? 'edge-tts'}`);
+            console.log(`[ambient-ui] TTS provider for pebble: ${jarvisConfig.tts.provider ?? 'edge-tts'}`);
           }
         } catch (err) {
           console.warn('[ambient-ui] failed to init TTS provider:', err);
@@ -595,7 +544,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
       // ttsMimeType maps the configured TTS provider to a MIME hint the
       // sidecar uses when sniffing audio bytes. (The sidecar primarily
       // uses magic-byte detection; this is just the fallback hint.)
-      const ttsMimeType = (cfg: typeof zoyaConfig.tts): string => {
+      const ttsMimeType = (cfg: typeof jarvisConfig.tts): string => {
         if (!cfg) return 'audio/mp3';
         switch (cfg.provider) {
           case 'sarvam':
@@ -726,7 +675,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
           console.log(`[ambient-ui] Native pebble spawned on ${sidecar.id}:`, result);
           // W6 — push initial blinded state so the eye-strike glyph
           // matches awareness.enabled across daemon restarts.
-          const awarenessEnabled = (zoyaConfig.awareness as { enabled?: boolean })?.enabled ?? true;
+          const awarenessEnabled = (jarvisConfig.awareness as { enabled?: boolean })?.enabled ?? true;
           sidecarManager.dispatchRPC(sidecar.id, 'pebble.set_blinded', { blinded: !awarenessEnabled })
             .catch(() => { /* sidecar might not have the cap yet */ });
         } catch (err) {
@@ -776,8 +725,8 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
         return ids;
       };
       // The machine currently in use — set at the start of each pebble response
-      // cycle. The same ZOYA brain is shared across a user's machines, but
-      // each machine has its own pebble showing what ZOYA does there, so a
+      // cycle. The same JARVIS brain is shared across a user's machines, but
+      // each machine has its own pebble showing what JARVIS does there, so a
       // background task's sub-pebble belongs to ONE machine (the one it was
       // launched from) rather than being mirrored onto every connected sidecar.
       let activePebbleSidecar: string | null = null;
@@ -876,7 +825,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
         try {
           const result = await sidecarManager.dispatchRPC(sidecarId, 'panel.spawn', {
             url,
-            title: 'ZOYA answer',
+            title: 'JARVIS answer',
             bounds: { x: -1, y: -1, w: 540, h: 640 },
             resizable: true,
             always_on_top: false,
@@ -885,7 +834,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
           const id = (result && typeof result === 'object' && 'id' in (result as object))
             ? String((result as { id?: unknown }).id ?? '')
             : '';
-          if (id) trackPanel(sidecarId, { id, key: 'answer_full', title: 'ZOYA answer' });
+          if (id) trackPanel(sidecarId, { id, key: 'answer_full', title: 'JARVIS answer' });
           console.log(`[pebble] open_answer panel spawned for answer=${answerID}`);
         } catch (err) {
           console.warn(`[pebble] open_answer panel.spawn failed for ${answerID}:`, err);
@@ -1123,11 +1072,13 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
       sidecarManager.onEvent(async (sidecarId, event) => {
         if (event.event_type !== 'pebble.blind_toggle') return;
         try {
-          const { saveUserSection } = await import('./user-settings.ts');
-          const wasEnabled = zoyaConfig.awareness?.enabled ?? true;
+          const { loadConfig, saveConfig } = await import('../config/loader.ts');
+          const fresh = await loadConfig();
+          const wasEnabled = fresh.awareness?.enabled ?? true;
           const nextEnabled = !wasEnabled;
-          (zoyaConfig.awareness as { enabled?: boolean }).enabled = nextEnabled;
-          saveUserSection('awareness', zoyaConfig.awareness);
+          if (fresh.awareness) fresh.awareness.enabled = nextEnabled;
+          await saveConfig(fresh);
+          (jarvisConfig.awareness as { enabled?: boolean }).enabled = nextEnabled;
           // Toggle live awareness service if it exists.
           if (awarenessService) awarenessService.toggle(nextEnabled);
           // Push visual: blinded = !enabled.
@@ -1192,20 +1143,21 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
       // pipeline (capture done → transcribe → think → speak), not timers.
       const audioSessions = new (await import('./audio-sessions.ts')).AudioSessionRegistry();
       audioSessions.attach((cb) => sidecarManager.onEvent(cb));
-      // T20 — voice-driven settings mutation. Patches `zoyaConfig`,
-      // persists via the DB settings store, and rebuilds the live providers so
+      // T20 — voice-driven settings mutation. Patches `jarvisConfig`,
+      // persists via `saveConfig`, and rebuilds the live providers so
       // the next response uses the new setting without a daemon
       // restart. The user explicitly hit this with "turn off TTS in
       // the settings" — the panel opened but the toggle didn't flip
       // because no handler was wired to the request. This closes that
-      // gap. New providers added to `zoyaConfig` (e.g. Groq STT)
+      // gap. New providers added to `jarvisConfig` (e.g. Groq STT)
       // become voice-switchable too.
       const applyTTSEnabled = async (enabled: boolean): Promise<void> => {
-        const { saveUserSection } = await import('./user-settings.ts');
-        if (!zoyaConfig.tts) zoyaConfig.tts = { enabled, provider: 'edge' };
-        else zoyaConfig.tts.enabled = enabled;
-        saveUserSection('tts', zoyaConfig.tts);
-        const fresh = { tts: zoyaConfig.tts };
+        const { loadConfig, saveConfig } = await import('../config/loader.ts');
+        const fresh = await loadConfig();
+        if (!fresh.tts) fresh.tts = { enabled, provider: 'edge' };
+        else fresh.tts.enabled = enabled;
+        await saveConfig(fresh);
+        jarvisConfig.tts = fresh.tts;
         // Rebuild the pebble's TTS provider so the next response cycle
         // either uses the new provider or skips TTS entirely.
         if (enabled) {
@@ -1232,19 +1184,20 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
       };
 
       const applySTTProvider = async (provider: 'openai' | 'groq' | 'sarvam' | 'local'): Promise<boolean> => {
-        const { saveUserSection } = await import('./user-settings.ts');
-        if (!zoyaConfig.stt) zoyaConfig.stt = { provider };
+        const { loadConfig, saveConfig } = await import('../config/loader.ts');
+        const fresh = await loadConfig();
+        if (!fresh.stt) fresh.stt = { provider };
         // Refuse the switch if the target provider has no API key
         // configured — we don't want to silently break STT.
         const hasKey = (() => {
-          if (provider === 'local') return !!zoyaConfig.stt!.local?.endpoint;
-          const sub = (zoyaConfig.stt as unknown as Record<string, { api_key?: string } | undefined>)[provider];
+          if (provider === 'local') return !!fresh.stt.local?.endpoint;
+          const sub = (fresh.stt as unknown as Record<string, { api_key?: string } | undefined>)[provider];
           return !!sub?.api_key;
         })();
         if (!hasKey) return false;
-        zoyaConfig.stt.provider = provider;
-        saveUserSection('stt', zoyaConfig.stt);
-        const fresh = { stt: zoyaConfig.stt };
+        fresh.stt.provider = provider;
+        await saveConfig(fresh);
+        jarvisConfig.stt = fresh.stt;
         try {
           const { createSTTProvider } = await import('../comms/voice.ts');
           pebbleSTT = createSTTProvider(fresh.stt);
@@ -1386,7 +1339,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
         };
         // Disqualify common false-positive contexts: anything mentioning
         // a real browser/window/app makes "tab" almost certainly the
-        // browser-tab sense, not a ZOYA panel sub-tab.
+        // browser-tab sense, not a JARVIS panel sub-tab.
         const browserContext = /\b(chrome|firefox|edge|safari|browser|gmail|google|mail|youtube|github|window)\b/i;
         if (browserContext.test(t)) return false;
         const known = tabSyn[tabRaw];
@@ -1514,7 +1467,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
       };
 
       // W3-T3 — restore last-known bounds for a room (voice / palette
-      // open). Saved values come from `~/.zoya/window-state.json`,
+      // open). Saved values come from `~/.jarvis/window-state.json`,
       // populated by the panel.bounds_changed handler above. Fallback
       // is the room's catalog default with a sentinel x/y of -1 so the
       // sidecar picks a position near the cursor (the existing behaviour
@@ -1550,7 +1503,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
         if (list.length === 0) panelsBySidecar.delete(sidecarId);
       };
 
-      // W3-T2 — persist per-room window bounds to ~/.zoya/window-state.json
+      // W3-T2 — persist per-room window bounds to ~/.jarvis/window-state.json
       // so reopening a room lands it where the user last left it. Bounds
       // come from the sidecar's 1 Hz poll as `panel.bounds_changed`
       // events; we resolve panel id → room key against the tracked
@@ -1871,13 +1824,13 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
           '',
           '**Prefer the efficient automation path — never click via the OS cursor when there\'s a structured alternative.**',
           '',
-          '  - **Web apps** (Gmail, Notion, GitHub, the ZOYA dashboard, anything in a browser): use `browser_navigate` / `browser_snapshot` / `browser_click` / `browser_type`. These dispatch DOM events through CDP — no OS cursor involved, very reliable, very fast. The user can keep using their mouse for other things while you operate the page.',
+          '  - **Web apps** (Gmail, Notion, GitHub, the JARVIS dashboard, anything in a browser): use `browser_navigate` / `browser_snapshot` / `browser_click` / `browser_type`. These dispatch DOM events through CDP — no OS cursor involved, very reliable, very fast. The user can keep using their mouse for other things while you operate the page.',
           '',
           '  - **Native Windows apps** (Notepad, File Explorer, settings, dialogs, menus): `desktop_snapshot` to enumerate UI elements, then `desktop_click({element_id})`. Win32 UIA invokes the element directly via COM patterns where possible — no cursor move when the widget supports the Invoke pattern.',
           '',
           '  - **Open an app**: `desktop_launch_app({name: "Chrome"})` is faster and more reliable than clicking a desktop icon. Only fall back to clicking icons if launch_app doesn\'t resolve the app.',
           '',
-          'The pebble is a *visual narrator only* — it flies to the action target so the user can see what ZOYA is doing, but it does NOT control the user\'s cursor. The user keeps full mouse freedom while you operate apps through the structured paths above.',
+          'The pebble is a *visual narrator only* — it flies to the action target so the user can see what JARVIS is doing, but it does NOT control the user\'s cursor. The user keeps full mouse freedom while you operate apps through the structured paths above.',
           '',
           'When the user asks for something that genuinely requires a click on a non-UIA surface (desktop icon, system tray, popup), prefer asking them to do it themselves rather than wrestling with coordinate clicks — coordinate clicks move the OS cursor and steal control from the user.',
           '',
@@ -1893,13 +1846,13 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
             `The user is currently looking at: **${foreground.title || foreground.processName || 'unknown'}**` +
               (foreground.processName ? ` (process: ${foreground.processName})` : ''),
             '',
-            'When they say "this", "here", "the window", "this app" without naming a ZOYA panel, they likely mean THIS foreground window. If they ask "where do I click for X?" or "show me Y", reason from this app\'s typical UI: e.g. Chrome\'s close button is in the top-right, VSCode\'s file explorer is the leftmost icon in the activity bar, CapCut\'s timeline is along the bottom. Emit a `[POINT:x,y:label]` tag with your best estimate based on the app and the user\'s screen layout. If the request is ambiguous between the foreground app and a ZOYA panel, prefer the foreground app unless they reference a ZOYA room by name.',
+            'When they say "this", "here", "the window", "this app" without naming a JARVIS panel, they likely mean THIS foreground window. If they ask "where do I click for X?" or "show me Y", reason from this app\'s typical UI: e.g. Chrome\'s close button is in the top-right, VSCode\'s file explorer is the leftmost icon in the activity bar, CapCut\'s timeline is along the bottom. Emit a `[POINT:x,y:label]` tag with your best estimate based on the app and the user\'s screen layout. If the request is ambiguous between the foreground app and a JARVIS panel, prefer the foreground app unless they reference a JARVIS room by name.',
             '',
           );
         }
         if (hasPanels) {
           sections.push(
-            '# ZOYA dashboard panels currently open as native windows',
+            '# JARVIS dashboard panels currently open as native windows',
             'The user has these dashboard panels visible on their desktop:',
             ...lines,
             '',
@@ -2019,7 +1972,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
             const audio = await pebbleTTS.synthesize(text);
             await sidecarManager.dispatchRPC(sidecarId, 'pebble.play_audio', {
               data: audio.toString('base64'),
-              mime_type: ttsMimeType(zoyaConfig.tts),
+              mime_type: ttsMimeType(jarvisConfig.tts),
               blocking: false,
             });
           } catch (err) {
@@ -2395,7 +2348,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
             const audio = await pebbleTTS.synthesize(confirm);
             await sidecarManager.dispatchRPC(sidecarId, 'pebble.play_audio', {
               data: audio.toString('base64'),
-              mime_type: ttsMimeType(zoyaConfig.tts),
+              mime_type: ttsMimeType(jarvisConfig.tts),
               blocking: false,
             });
           } catch (err) {
@@ -2693,7 +2646,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
 
               await sidecarManager.dispatchRPC(sidecarId, 'pebble.play_audio', {
                 data: audio.toString('base64'),
-                mime_type: ttsMimeType(zoyaConfig.tts),
+                mime_type: ttsMimeType(jarvisConfig.tts),
                 blocking: false,
               });
               if (firstAudioDispatchAt === 0) {
@@ -2855,7 +2808,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
                 void setState(sidecarId, 'working', label);
 
                 // T26b — fly the pebble to the actual click target so
-                // the user SEES ZOYA reach for the button before it
+                // the user SEES JARVIS reach for the button before it
                 // clicks. Only for tools where we can resolve coords
                 // before execution; everything else stays label-only.
                 void flyPebbleToToolTarget(sidecarId, tcName, tcArgs, label);
@@ -2923,7 +2876,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
         const firstTokenMs = firstTokenAt > 0 ? firstTokenAt - llmStart : 0;
         const firstAudioMs = firstAudioDispatchAt > 0 ? firstAudioDispatchAt - llmStart : 0;
         console.log(
-          `[ambient-ui] ZOYA (${llmMs}ms LLM, ${firstTokenMs}ms to first token, ${firstAudioMs}ms to first audio) → ` +
+          `[ambient-ui] JARVIS (${llmMs}ms LLM, ${firstTokenMs}ms to first token, ${firstAudioMs}ms to first audio) → ` +
           `"${fullText.slice(0, 200)}${fullText.length > 200 ? '…' : ''}"`,
         );
         console.log(
@@ -2938,7 +2891,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
         // When TTS is off (totalAudioMs === 0), the bubble would otherwise
         // close immediately — too fast to read the answer. Hold it open for
         // a text-length-derived reading window so no-TTS users get time
-        // to actually read what ZOYA said. User can dismiss anytime by
+        // to actually read what JARVIS said. User can dismiss anytime by
         // pressing the summon hotkey (Ctrl+Space).
         let readingHoldMs = 0;
         if (totalAudioMs === 0 && fullText.length > 0) {
@@ -3016,19 +2969,19 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
 
       // T16 — sidecar wake-word path. The sidecar's WakeListenerService
       // emits one `audio.wake_segment` per VAD-detected utterance. We
-      // transcribe and word-search for "zoya"; on a hit, we either
+      // transcribe and word-search for "jarvis"; on a hit, we either
       //   - run the LLM directly with the trailing command (single-shot,
-      //     "Zoya play music" works without saying it twice), or
-      //   - if only "zoya" alone, fire a normal listening summon so the
+      //     "Jarvis play music" works without saying it twice), or
+      //   - if only "jarvis" alone, fire a normal listening summon so the
       //     user can speak the command after the bubble pops up.
       // Suppressed when a summon cycle is already running so the
       // continuous wake stream doesn't fight with the active turn.
-      const wakePhrase = /\bzoya\b/i;
+      const wakePhrase = /\bjarvis\b/i;
       const stripWakePrefix = (text: string): string => {
-        // Pull out the segment after the LAST occurrence of "zoya" so
-        // "I'm at home, Zoya play music" → "play music". Trailing
+        // Pull out the segment after the LAST occurrence of "jarvis" so
+        // "I'm at home, Jarvis play music" → "play music". Trailing
         // punctuation/whitespace removed; if nothing follows, returns "".
-        const re = /\bzoya\b[\s,.\-—:]*/gi;
+        const re = /\bjarvis\b[\s,.\-—:]*/gi;
         let last: RegExpExecArray | null = null;
         let m: RegExpExecArray | null;
         while ((m = re.exec(text)) !== null) {
@@ -3041,7 +2994,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
       sidecarManager.onEvent(async (sidecarId, event) => {
         if (event.event_type !== 'audio.wake_segment') return;
         // Suppress while an active summon is in flight — the user already
-        // got ZOYA's attention via Ctrl+Space (or a prior wake).
+        // got JARVIS's attention via Ctrl+Space (or a prior wake).
         if (pendingSummons.has(sidecarId)) return;
         if (!pebbleSTT) return;
         // Claim a synchronous in-flight flag before the first await so a
@@ -3091,7 +3044,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
         pendingSummons.set(sidecarId, ctrl);
 
         if (!command) {
-          // Just "Zoya" alone — flip to listening and trigger a fresh
+          // Just "Jarvis" alone — flip to listening and trigger a fresh
           // session capture on the sidecar so the user's next utterance
           // gets transcribed + run through the LLM. The session_end
           // event will land in `audioSessions.onComplete` above, which
@@ -3230,27 +3183,27 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
     wsService.setChannelService(channelService);
 
     // 8c. Wire TTS provider if configured
-    if (zoyaConfig.tts?.enabled) {
+    if (jarvisConfig.tts?.enabled) {
       const { createTTSProvider } = await import('../comms/voice.ts');
-      const ttsProvider = createTTSProvider(zoyaConfig.tts);
+      const ttsProvider = createTTSProvider(jarvisConfig.tts);
       if (ttsProvider) {
         wsService.setTTSProvider(ttsProvider);
-        console.log(`[Daemon] TTS enabled: ${zoyaConfig.tts.voice ?? 'en-US-AriaNeural'}`);
+        console.log(`[Daemon] TTS enabled: ${jarvisConfig.tts.voice ?? 'en-US-AriaNeural'}`);
       }
     }
 
     // 8d. Wire STT provider for voice input via dashboard
-    if (zoyaConfig.stt) {
+    if (jarvisConfig.stt) {
       const { createSTTProvider } = await import('../comms/voice.ts');
-      const sttProvider = createSTTProvider(zoyaConfig.stt);
+      const sttProvider = createSTTProvider(jarvisConfig.stt);
       if (sttProvider) {
         wsService.setSTTProvider(sttProvider);
-        console.log(`[Daemon] STT for voice input: ${zoyaConfig.stt.provider}`);
+        console.log(`[Daemon] STT for voice input: ${jarvisConfig.stt.provider}`);
       }
     }
 
     // 8e. Wire Authority & Autonomy Engine
-    const authorityConfig = zoyaConfig.authority ?? { default_level: 3 };
+    const authorityConfig = jarvisConfig.authority ?? { default_level: 3 };
     const authorityEngine = new AuthorityEngine({
       default_level: authorityConfig.default_level,
       governed_categories: (authorityConfig.governed_categories ?? ['send_email', 'send_message', 'make_payment']) as any,
@@ -3286,14 +3239,15 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
     if (savedEmergencyState === 'paused') emergencyController.pause();
     else if (savedEmergencyState === 'killed') emergencyController.kill();
 
-    // Persist emergency state changes to the DB settings store
+    // Persist emergency state changes to config.yaml
     emergencyController.setStateChangeCallback(async (state) => {
       wsService.broadcastEmergencyState(state);
       try {
-        const { saveUserSection } = await import('./user-settings.ts');
-        if (!zoyaConfig.authority) zoyaConfig.authority = { default_level: 3 } as any;
-        zoyaConfig.authority.emergency_state = state;
-        saveUserSection('authority', zoyaConfig.authority);
+        const { loadConfig: reloadConfig, saveConfig: resaveConfig } = await import('../config/loader.ts');
+        const fresh = await reloadConfig();
+        if (!fresh.authority) fresh.authority = { default_level: 3 } as any;
+        fresh.authority.emergency_state = state;
+        await resaveConfig(fresh);
       } catch (err) {
         console.error('[Daemon] Failed to persist emergency state:', err);
       }
@@ -3379,7 +3333,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
       daemonStartedAt: Date.now(),
       healthMonitor,
       agentService,
-      config: zoyaConfig,
+      config: jarvisConfig,
       wsService,
       channelService,
       authorityEngine,
@@ -3392,7 +3346,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
       goalService: undefined,
       sidecarManager,
     };
-    setCorsOrigin(zoyaConfig.daemon.port);
+    setCorsOrigin(jarvisConfig.daemon.port);
 
     // Construct the workflow runtime's shared collaborators early so the
     // route table can carry a TriggerManager reference (used for cron /
@@ -3413,12 +3367,12 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
     // executor / chat-stale watcher onto these so the 15-min heartbeat can
     // be deleted; for now nothing subscribes and the events are inert.
     const { SystemCronService } = await import('./system-cron.ts');
-    systemCron = new SystemCronService(sharedEventBus, zoyaConfig.cron);
+    systemCron = new SystemCronService(sharedEventBus, jarvisConfig.cron);
     systemCron.start();
 
     // Bootstrap the workflow engine: build/locate the bundle, compile pieces,
     // start the loopback SandboxApi, construct the EngineRuntime, extract the
-    // canonical PieceCatalog. /v1/zoya/* service backends are wired below
+    // canonical PieceCatalog. /v1/jarvis/* service backends are wired below
     // after registry.startAll() so toolRegistry + notifier dependencies are
     // ready; until then each backend returns 503 (mutation via
     // api.setServices propagates to live route handlers).
@@ -3431,37 +3385,37 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
     // services keep running.
     let engineBoot: BootstrapWorkflowEngineResult | null = null;
     const bootstrapStart = Date.now();
-    // Build the credential resolver early so we can register Zoya-managed
+    // Build the credential resolver early so we can register Jarvis-managed
     // sources (Google OAuth file, etc.) before pieces start asking for
-    // connections. Each `zoya:<source>` external id dispatches to the
+    // connections. Each `jarvis:<source>` external id dispatches to the
     // matching source; non-prefixed ids fall through to the `app_connection`
     // repo (encrypted at rest).
     const credentialResolver = new CredentialResolver();
     if (googleAuth) {
-      const { ZoyaGoogleConnectionSource } = await import(
+      const { JarvisGoogleConnectionSource } = await import(
         "../workflows/credentials/google-source.ts"
       );
-      credentialResolver.register(new ZoyaGoogleConnectionSource(googleAuth));
+      credentialResolver.register(new JarvisGoogleConnectionSource(googleAuth));
       logWithTimestamp(
-        "Workflow credential resolver: registered zoya:google source",
+        "Workflow credential resolver: registered jarvis:google source",
       );
     }
-    // zoya:telegram bridges the same bot token the daemon's Telegram
+    // jarvis:telegram bridges the same bot token the daemon's Telegram
     // adapter is using -- pieces (activepieces telegram-bot, custom flows)
-    // can reference `zoya:telegram` instead of asking the user to create
+    // can reference `jarvis:telegram` instead of asking the user to create
     // a separate app_connection. The closure reads from the live config so
     // a token rotation + daemon restart picks up automatically.
-    if (zoyaConfig.channels?.telegram?.enabled && zoyaConfig.channels.telegram.bot_token) {
-      const { ZoyaTelegramConnectionSource } = await import(
+    if (jarvisConfig.channels?.telegram?.enabled && jarvisConfig.channels.telegram.bot_token) {
+      const { JarvisTelegramConnectionSource } = await import(
         "../workflows/credentials/telegram-source.ts"
       );
       credentialResolver.register(
-        new ZoyaTelegramConnectionSource(
-          () => zoyaConfig.channels?.telegram?.bot_token ?? null,
+        new JarvisTelegramConnectionSource(
+          () => jarvisConfig.channels?.telegram?.bot_token ?? null,
         ),
       );
       logWithTimestamp(
-        "Workflow credential resolver: registered zoya:telegram source",
+        "Workflow credential resolver: registered jarvis:telegram source",
       );
     }
     try {
@@ -3504,7 +3458,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
           `         Common causes:`,
           `           - Engine bundle / pieces stale or build failed: rerun \`bun install\` then \`bun run build:workflows\``,
           `           - Vendored Activepieces tree out of sync: rerun \`bun run scripts/sync-activepieces.ts\``,
-          `           - Disk full or ~/.zoya/cache unwriteable`,
+          `           - Disk full or ~/.jarvis/cache unwriteable`,
           `         Workflow features (/api/workflows/*, manage_workflow tool, cron + on_event triggers) are disabled.`,
           `         The rest of the daemon (agent, vault, observers) continues to run.`,
         ].join("\n"),
@@ -3584,44 +3538,19 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
     const uiPublicDir = path.join(import.meta.dir, '../../ui/public');
     wsService.setPublicDir(uiPublicDir);
 
-    // 9c. Access model. JWT-only by default: the dashboard and every API
-    // route require a valid enrolled-device token. The one escape hatch is
-    // auth.insecure_open_access (system config), meant ONLY for first-time
-    // self-host setup before a device is enrolled.
-    if (zoyaConfig.auth?.insecure_open_access === true) {
-      wsService.setInsecureOpenAccess(true);
-      console.warn('[Daemon] ============================================================');
-      console.warn('[Daemon] WARNING: auth.insecure_open_access is enabled.');
-      console.warn('[Daemon] The dashboard and API accept requests WITHOUT authentication');
-      console.warn('[Daemon] from anyone who can reach this machine. Enroll your device');
-      console.warn('[Daemon] (`zoya enroll "<device-name>"`, paste the token into the');
-      console.warn('[Daemon] sidecar) and remove this flag from config.yaml as soon as');
-      console.warn('[Daemon] enrollment is done.');
-      console.warn('[Daemon] ============================================================');
+    // 9c. Configure auth token if set
+    const authToken = jarvisConfig.auth?.token;
+    if (authToken) {
+      wsService.setAuthToken(authToken);
+      console.log('[Daemon] Auth token configured — dashboard routes require ?token= or cookie');
     } else {
-      console.log('[Daemon] JWT-only access: routes require an enrolled device token (default)');
-    }
-    // Upgrade UX: the shared dashboard token was removed (JWT-only). A config
-    // still carrying auth.token would otherwise be silently ignored while the
-    // operator's bookmarked ?token= URL just 401s.
-    if ((zoyaConfig.auth as Record<string, unknown> | undefined)?.token !== undefined) {
-      console.warn('[Daemon] auth.token is no longer supported and was ignored. Access is JWT-only:');
-      console.warn('[Daemon] enroll a device (`zoya enroll`) or, for setup only, set auth.insecure_open_access.');
+      console.warn('[Daemon] No auth token configured — dashboard is open to anyone on the network');
     }
 
     // 9b. Apply --no-local-tools flag if set
     if (config.noLocalTools) {
       const { setNoLocalTools } = await import('../actions/tools/builtin.ts');
       setNoLocalTools(true);
-    }
-
-    // 9b'. browser.local: false (system config) - never launch a local
-    // Chrome on this machine. Hosted instances set this so no CDP port can
-    // open on a shared VPS; browser actions route to a sidecar browser
-    // (launchChrome is the enforcement choke point).
-    if (zoyaConfig.browser?.local === false) {
-      const { setLocalBrowserDisabled } = await import('../actions/tools/local-tools-guard.ts');
-      setLocalBrowserDisabled(true);
     }
 
     // 10. Start all services
@@ -3658,7 +3587,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
       const { createManageWorkflowTool } = await import('../actions/tools/manage-workflow.ts');
       // Build a minimal piece-side LLM client + tool-registry shim for the
       // composer. Both are tiny structural wrappers; we no longer need the
-      // legacy `ZoyaLlmClient`/`ZoyaToolRegistryAdapter` classes since
+      // legacy `JarvisLlmClient`/`JarvisToolRegistryAdapter` classes since
       // the engine path is the production runtime.
       const llmManager = agentService.getLLMManager();
       const composeLlm = {
@@ -3688,7 +3617,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
         ? {
             listNames: (cat?: string) => toolRegistry.list(cat).map((t) => t.name),
             // Surface each tool's parameter schema so the composer can wire
-            // correct `params` and reject a zoya-tool:invoke step that omits a
+            // correct `params` and reject a jarvis-tool:invoke step that omits a
             // required param (e.g. content_pipeline needs `action`).
             listDetailed: (cat?: string) =>
               toolRegistry.list(cat).map((t) => ({
@@ -3709,7 +3638,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
         ...(workflowPieceCatalog ? { pieceRegistry: workflowPieceCatalog } : {}),
         // Surface tool names to the composer so the LLM can compose flows
         // that integrate with services that aren't first-class pieces (e.g.,
-        // Gmail/Calendar via Zoya tools).
+        // Gmail/Calendar via Jarvis tools).
         ...(composerToolRegistry ? { toolRegistry: composerToolRegistry } : {}),
         // Surface the discovered specialist roles so a composed delegate step
         // can only reference a sub-agent that exists (the LLM otherwise guesses
@@ -3741,13 +3670,13 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
       wsService.broadcastNotification(text, 'normal');
     });
 
-    // 10.1. Workflow runtime: wire `/v1/zoya/*` service backends and start
+    // 10.1. Workflow runtime: wire `/v1/jarvis/*` service backends and start
     // the worker that drains workflow_job, driven by the engine-backed
     // executor. Skipped entirely when `workflowEngineRuntime` is null (engine
     // bootstrap failed earlier; we logged a structured error there).
     if (workflowSandboxApi && workflowEngineRuntime) {
       // M7 hookup: pass orchestrator + specialists + authority components so
-      // `zoya-agent.delegate` runs the full sub-agent loop (LLM + tool
+      // `jarvis-agent.delegate` runs the full sub-agent loop (LLM + tool
       // calls + authority gate). Falls back to single-shot LLM mode inside
       // buildSandboxServiceBackends if any of these are missing.
       const agentSpecialists = agentService.getSpecialists();
@@ -3766,13 +3695,13 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
         authorityEngine,
         auditTrail,
         emergencyController,
-        // Give the zoya-ask piece the same Zoya-flavoured system
+        // Give the jarvis-ask piece the same Jarvis-flavoured system
         // prompt the chat agent uses, so workflow LLM calls answer as
-        // Zoya rather than as the bare base model. `"workflow"` is the
+        // Jarvis rather than as the bare base model. `"workflow"` is the
         // channel slug -- not a real channel, just a key for personality
         // overrides if any are configured.
-        buildZoyaSystemPrompt: (userMessage) =>
-          agentService.buildFullSystemPromptParts("workflow", userMessage),
+        buildJarvisSystemPrompt: (userMessage) =>
+          agentService.buildFullSystemPrompt("workflow", userMessage),
       });
       workflowSandboxApi.setServices(backends);
       logWithTimestamp("Workflow engine service backends wired (llm/tools/notify/context/agent/events/workflows)");
@@ -3825,7 +3754,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
     // does NOT need to be restarted for background services to come
     // online. Critical for Docker/VPS deploys where a process restart
     // breaks WS connections, sidecars, and watchers.
-    const inSetupMode = !zoyaConfig.onboarding?.setup_completed_at;
+    const inSetupMode = !jarvisConfig.onboarding?.setup_completed_at;
     if (inSetupMode) {
       console.log('[Daemon] Setup mode — bgAgent / executor / awareness will start when onboarding completes');
     }
@@ -3836,7 +3765,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
       if (bgAgent) return; // already running
 
       // 10b. Background agent (needs LLM providers from agentService.start())
-      const bgAgentService = new BackgroundAgentService(zoyaConfig, agentService.getLLMManager());
+      const bgAgentService = new BackgroundAgentService(jarvisConfig, agentService.getLLMManager());
       bgAgentService.setResearchQueue(researchQueue);
       await bgAgentService.start();
       bgAgent = bgAgentService;
@@ -3855,7 +3784,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
 
       // 10e. Awareness Service (M13). Skipped when --no-local-tools is set
       //       (headless / Docker) or explicitly disabled in config.
-      if (zoyaConfig.awareness?.enabled !== false && !config.noLocalTools) {
+      if (jarvisConfig.awareness?.enabled !== false && !config.noLocalTools) {
         await startAwarenessService();
       }
     };
@@ -3869,7 +3798,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
         const { AwarenessService } = await import('../awareness/service.ts');
         const awarenessWarnedTypes = new Set<string>();
         const svc = new AwarenessService(
-          zoyaConfig,
+          jarvisConfig,
           agentService.getLLMManager(),
           (event) => {
             // Route awareness events through existing event pipeline
@@ -3914,7 +3843,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
               if (hasWsClients) {
                 // Primary: deliver via WebSocket + voice
                 wsService.broadcastNotification(text, 'urgent');
-                sendDesktopNotification(`ZOYA: ${title}`, body, { urgency: 'normal' });
+                sendDesktopNotification(`JARVIS: ${title}`, body, { urgency: 'normal' });
                 wsService.broadcastProactiveVoice(body).catch(err =>
                   console.error('[Daemon] Awareness TTS error:', err)
                 );
@@ -3924,7 +3853,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
                 channelService.broadcastToAll(text).catch(err =>
                   console.error('[Daemon] Channel broadcast error:', err)
                 );
-                sendDesktopNotification(`ZOYA: ${title}`, body, { urgency: 'critical', expireMs: 30000 });
+                sendDesktopNotification(`JARVIS: ${title}`, body, { urgency: 'critical', expireMs: 30000 });
               }
             }
 
@@ -3943,7 +3872,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
                   if (solution && solution.length > 10) {
                     const solutionText = `**Fix for error in ${appName}:**\n${solution.slice(0, 500)}`;
                     wsService.broadcastNotification(solutionText, 'urgent');
-                    sendDesktopNotification(`ZOYA: Fix for ${appName}`, solution.slice(0, 200), { urgency: 'critical', expireMs: 15000 });
+                    sendDesktopNotification(`JARVIS: Fix for ${appName}`, solution.slice(0, 200), { urgency: 'critical', expireMs: 15000 });
                     // Strip markdown for TTS — voice should sound natural
                     const voiceText = solution
                       .replace(/#{1,6}\s*/g, '')
@@ -3989,7 +3918,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
                   if (solution && solution.length > 10) {
                     const solutionText = `**Help for ${sAppName}:**\n${solution.slice(0, 500)}`;
                     wsService.broadcastNotification(solutionText, 'urgent');
-                    sendDesktopNotification(`ZOYA: Help for ${sAppName}`, solution.slice(0, 200), { urgency: 'critical', expireMs: 15000 });
+                    sendDesktopNotification(`JARVIS: Help for ${sAppName}`, solution.slice(0, 200), { urgency: 'critical', expireMs: 15000 });
                     const voiceText = solution
                       .replace(/#{1,6}\s*/g, '')
                       .replace(/\*{1,2}([^*]+)\*{1,2}/g, '$1')
@@ -4089,7 +4018,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
         // retention tier — catches files that piled up while the sidecar
         // was offline.
         sidecarManager.onConnect((sidecarId) => {
-          const cfg = zoyaConfig.awareness;
+          const cfg = jarvisConfig.awareness;
           if (!cfg) return;
           const cutoffMs = Date.now() - cfg.retention.key_moment_hours * 60 * 60 * 1000;
           sidecarManager.dispatchRPC(sidecarId, 'cleanup_captures', { before_ms: cutoffMs })
@@ -4107,7 +4036,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
         });
 
         // Auto-launch overlay widget (non-blocking, best-effort)
-        if (zoyaConfig.awareness?.overlay_autolaunch !== false && zoyaConfig.browser?.local !== false) {
+        if (jarvisConfig.awareness?.overlay_autolaunch !== false) {
           try {
             const overlayUrl = `http://localhost:${config.port}/overlay`;
             const browsers = ['chromium-browser', 'chromium', 'google-chrome', 'google-chrome-stable'];
@@ -4149,12 +4078,12 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
     }
 
     // 10a-2. Site Builder Service
-    if (zoyaConfig.sites?.enabled !== false) {
+    if (jarvisConfig.sites?.enabled !== false) {
       try {
         const { SiteBuilderService } = await import('../sites/service.ts');
-        const sitesConfig = zoyaConfig.sites ?? {
+        const sitesConfig = jarvisConfig.sites ?? {
           enabled: true,
-          projects_dir: '~/.zoya/projects',
+          projects_dir: '~/.jarvis/projects',
           port_range_start: 4000,
           port_range_end: 4999,
           auto_commit: true,
@@ -4190,7 +4119,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
     //       in step 10.1 owns all workflow execution.)
 
     // 10f. Goal Service (M16)
-    const goalsConfig = zoyaConfig.goals;
+    const goalsConfig = jarvisConfig.goals;
     if (goalsConfig?.enabled !== false) {
       try {
         const { GoalService } = await import('../goals/service.ts');
@@ -4387,7 +4316,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
     // `heartbeatConfig.aggressiveness` is still read by CommitmentExecutor.
     // `heartbeatConfig.interval_minutes` and `active_hours` are now ignored.
 
-    logWithTimestamp(`ZOYA daemon running on port ${config.port}`);
+    logWithTimestamp(`JARVIS daemon running on port ${config.port}`);
     console.log('');
     console.log('Press Ctrl+C to stop');
     console.log('');
@@ -4430,4 +4359,3 @@ if (import.meta.main) {
   const args = parseArgs();
   await startDaemon(args);
 }
-

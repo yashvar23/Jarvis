@@ -804,7 +804,7 @@ function CreateDialog({
               className="v2-tasks__input"
               value={assignedTo}
               onChange={(e) => setAssignedTo(e.target.value)}
-              placeholder="you / zoya / agent name"
+              placeholder="you / jarvis / agent name"
             />
           </label>
 

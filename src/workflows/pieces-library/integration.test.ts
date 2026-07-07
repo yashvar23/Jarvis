@@ -1,11 +1,11 @@
 /**
  * Gated integration test: runs a real `bun install` for one catalog entry
  * (gmail) into a temp pieces dir and confirms the published package can be
- * `require()`d. Skipped unless `ZOYA_TEST_PIECES_LIBRARY=1` because it
+ * `require()`d. Skipped unless `JARVIS_TEST_PIECES_LIBRARY=1` because it
  * needs outbound network to npm and adds ~5-10s to the test run.
  *
  * Run with:
- *   ZOYA_TEST_PIECES_LIBRARY=1 bun test src/workflows/pieces-library/integration.test.ts
+ *   JARVIS_TEST_PIECES_LIBRARY=1 bun test src/workflows/pieces-library/integration.test.ts
  *
  * Purpose:
  *   - Catches if npm changes the published-package layout for activepieces
@@ -18,7 +18,7 @@
  *   - Stops at "the bundle is requireable and exports a piece-shaped object."
  *   - Does NOT exercise the full engine subprocess + metadata extraction --
  *     that's an order of magnitude more setup and is covered indirectly by
- *     the engine-end-to-end suite for Zoya-native pieces.
+ *     the engine-end-to-end suite for Jarvis-native pieces.
  *
  * Coverage gates a single entry by default. Add more pieces to
  * `ENTRIES_UNDER_TEST` if you want a broader smoke -- each adds ~5s to
@@ -32,7 +32,7 @@ import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { CATALOG } from "./catalog";
 
-const ENABLED = process.env.ZOYA_TEST_PIECES_LIBRARY === "1";
+const ENABLED = process.env.JARVIS_TEST_PIECES_LIBRARY === "1";
 
 /**
  * Catalog entries to smoke-test. Gmail is the canary -- biggest dep
@@ -45,7 +45,7 @@ let tempDir: string;
 
 beforeEach(() => {
   if (!ENABLED) return;
-  tempDir = mkdtempSync(join(tmpdir(), "zoya-pieces-integration-"));
+  tempDir = mkdtempSync(join(tmpdir(), "jarvis-pieces-integration-"));
 });
 
 afterEach(() => {
@@ -53,7 +53,7 @@ afterEach(() => {
   if (tempDir) rmSync(tempDir, { recursive: true, force: true });
 });
 
-describe("pieces-library integration (gated on ZOYA_TEST_PIECES_LIBRARY=1)", () => {
+describe("pieces-library integration (gated on JARVIS_TEST_PIECES_LIBRARY=1)", () => {
   for (const id of ENTRIES_UNDER_TEST) {
     test.skipIf(!ENABLED)(
       `${id}: bun installs the package and the bundle is requireable`,
@@ -65,7 +65,7 @@ describe("pieces-library integration (gated on ZOYA_TEST_PIECES_LIBRARY=1)", () 
         writeFileSync(
           resolve(tempDir, "package.json"),
           JSON.stringify({
-            name: "zoya-pieces-integration",
+            name: "jarvis-pieces-integration",
             private: true,
             type: "commonjs",
             dependencies: { [entry.npmPackage]: entry.versionRange },
@@ -156,4 +156,3 @@ describe("pieces-library integration (gated on ZOYA_TEST_PIECES_LIBRARY=1)", () 
     );
   }
 });
-

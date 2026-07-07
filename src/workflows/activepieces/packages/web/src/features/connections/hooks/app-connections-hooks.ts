@@ -333,4 +333,3 @@ export const appConnectionsQueries = {
     });
   },
 };
-

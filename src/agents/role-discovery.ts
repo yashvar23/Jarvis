@@ -59,4 +59,3 @@ export function formatSpecialistList(specialists: Map<string, RoleDefinition>): 
 
   return lines.join('\n');
 }
-

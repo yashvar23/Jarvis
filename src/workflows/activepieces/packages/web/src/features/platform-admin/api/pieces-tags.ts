@@ -22,4 +22,3 @@ export const piecesTagsApi = {
     return api.delete<void>('/v1/tags/' + id);
   },
 };
-

@@ -27,7 +27,7 @@ permissions:
 env:
   GO_VERSION: "1.25"
   BUN_VERSION: "latest"
-  SIDECAR_BIN: zoya
+  SIDECAR_BIN: jarvis
   DRY_RUN: ${{ inputs.dry_run || false }}
   RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
 
@@ -128,7 +128,7 @@ jobs:
           if [ "$DRY_RUN" = "true" ]; then FLAGS="$FLAGS --dry-run"; fi
           if echo "${{ steps.version.outputs.VERSION }}" | grep -q '-'; then FLAGS="$FLAGS --tag next"; fi
           VERSION="${{ steps.version.outputs.VERSION }}"
-          pkg="zoya"
+          pkg="@usejarvis/brain"
 
           if ! npm publish --access public $FLAGS; then
             if [ "$DRY_RUN" != "true" ] && npm view "${pkg}@${VERSION}" version >/dev/null 2>&1; then
@@ -215,7 +215,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.RELEASE_TAG }}
-          name: Zoya v${{ steps.version.outputs.VERSION }}
+          name: Jarvis v${{ steps.version.outputs.VERSION }}
           generate_release_notes: true
           draft: false
           prerelease: ${{ contains(steps.version.outputs.VERSION, '-') }}
@@ -235,7 +235,7 @@ jobs:
   # ─── Build and push Docker images ──────────────────────────────
   # Gated by the npm publishes — if any npm publish fails, docker never
   # pushes. Keeps the release atomic from the user-visible side: a Docker
-  # image tagged vX.Y.Z always has matching @zoya/* npm versions.
+  # image tagged vX.Y.Z always has matching @usejarvis/* npm versions.
   publish-docker:
     needs: [sidecar, publish-brain]
     runs-on: ubuntu-latest
@@ -279,9 +279,9 @@ jobs:
             type=semver,pattern={{major}}.{{minor}},value=${{ env.RELEASE_TAG }}
             type=raw,value=latest,enable=${{ steps.version.outputs.IS_PRERELEASE == 'false' }}
           labels: |
-            org.opencontainers.image.title=Zoya
-            org.opencontainers.image.description=ZOYA — Always-on autonomous AI daemon
-            org.opencontainers.image.vendor=yashvar23
+            org.opencontainers.image.title=Jarvis
+            org.opencontainers.image.description=J.A.R.V.I.S. — Always-on autonomous AI daemon
+            org.opencontainers.image.vendor=vierisid
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.documentation=https://github.com/${{ github.repository }}
 
@@ -358,7 +358,7 @@ jobs:
           CLEAN=$(sed -e '/^<!--/d' -e '/^## What.s Changed$/d' /tmp/whats_changed.txt)
           CLEAN=$(printf '%s\n' "$CLEAN" | awk 'NF{p=1} p')
 
-          PREFIX=$'@everyone\n\n**Zoya '"${TAG}"$' has been released!** 🎉\n\n'
+          PREFIX=$'@everyone\n\n**Jarvis '"${TAG}"$' has been released!** 🎉\n\n'
           SUFFIX=$'\n\n🔗 **Full release:** <'"${HTML_URL}"'>'
 
           TOTAL_PRS=$(printf '%s\n' "$CLEAN" | grep -c '^\* ' || true)

@@ -10,7 +10,7 @@ package main
 
 extern void goPanelClosed(unsigned long long token);
 
-static void zoya_panel_apply_flags(
+static void jarvis_panel_apply_flags(
     void* nswindow_ptr,
     int alwaysOnTop,
     int clickThrough,
@@ -57,21 +57,21 @@ static void zoya_panel_apply_flags(
     }
 }
 
-static void zoya_panel_focus(void* nswindow_ptr) {
+static void jarvis_panel_focus(void* nswindow_ptr) {
     if (!nswindow_ptr) return;
     NSWindow* w = (__bridge NSWindow*)nswindow_ptr;
     [NSApp activateIgnoringOtherApps:YES];
     [w makeKeyAndOrderFront:nil];
 }
 
-static void zoya_panel_destroy(void* nswindow_ptr) {
+static void jarvis_panel_destroy(void* nswindow_ptr) {
     if (!nswindow_ptr) return;
     NSWindow* w = (__bridge NSWindow*)nswindow_ptr;
     [w close];
 }
 
 // 0=normal, 1=minimized, 2=maximized — matches platformSetWindowState.
-static void zoya_panel_set_window_state(void* nswindow_ptr, int state) {
+static void jarvis_panel_set_window_state(void* nswindow_ptr, int state) {
     if (!nswindow_ptr) return;
     NSWindow* w = (__bridge NSWindow*)nswindow_ptr;
     if (state == 1) {
@@ -86,13 +86,13 @@ static void zoya_panel_set_window_state(void* nswindow_ptr, int state) {
     }
 }
 
-static void zoya_panel_set_visible(void* nswindow_ptr, int visible) {
+static void jarvis_panel_set_visible(void* nswindow_ptr, int visible) {
     if (!nswindow_ptr) return;
     NSWindow* w = (__bridge NSWindow*)nswindow_ptr;
     if (visible) [w makeKeyAndOrderFront:nil]; else [w orderOut:nil];
 }
 
-static void zoya_panel_set_click_through(void* nswindow_ptr, int clickThrough) {
+static void jarvis_panel_set_click_through(void* nswindow_ptr, int clickThrough) {
     if (!nswindow_ptr) return;
     NSWindow* w = (__bridge NSWindow*)nswindow_ptr;
     [w setIgnoresMouseEvents:(clickThrough ? YES : NO)];
@@ -101,7 +101,7 @@ static void zoya_panel_set_click_through(void* nswindow_ptr, int clickThrough) {
 // Returns cursor position in screen coordinates with origin at top-left
 // (Cocoa native is bottom-left; we flip Y so the value matches the
 // cross-platform contract used by the tracker goroutine).
-static void zoya_panel_cursor_pos(int* x, int* y) {
+static void jarvis_panel_cursor_pos(int* x, int* y) {
     NSPoint p = [NSEvent mouseLocation];
     NSScreen* main = [[NSScreen screens] firstObject];
     CGFloat screenH = main ? main.frame.size.height : 0;
@@ -109,7 +109,7 @@ static void zoya_panel_cursor_pos(int* x, int* y) {
     *y = (int)(screenH - p.y);
 }
 
-static void zoya_panel_move_window(void* nswindow_ptr, int x, int y) {
+static void jarvis_panel_move_window(void* nswindow_ptr, int x, int y) {
     if (!nswindow_ptr) return;
     NSWindow* w = (__bridge NSWindow*)nswindow_ptr;
     NSRect frame = [w frame];
@@ -128,7 +128,7 @@ static void zoya_panel_move_window(void* nswindow_ptr, int x, int y) {
 // thread (close happens there). NSWindowWillClose is one-shot, so the block
 // removes its own observer after firing — otherwise every Settings/Logs/panel
 // open leaks an NSNotificationCenter observer for the life of the process.
-static void zoya_panel_watch_close(void* nswindow_ptr, unsigned long long token) {
+static void jarvis_panel_watch_close(void* nswindow_ptr, unsigned long long token) {
     if (!nswindow_ptr) return;
     NSWindow* w = (__bridge NSWindow*)nswindow_ptr;
     __block id obs = [[NSNotificationCenter defaultCenter]
@@ -171,7 +171,7 @@ func registerPanelCloseWatch(handle unsafe.Pointer, impl *panelImpl) {
 	panelCloseFuncs.Store(token, func() {
 		impl.uiCloseOnce.Do(func() { close(impl.uiClosed) })
 	})
-	C.zoya_panel_watch_close(handle, C.ulonglong(token))
+	C.jarvis_panel_watch_close(handle, C.ulonglong(token))
 }
 
 // watchWindowClose fires onClose (once) when the given NSWindow closes. Used by
@@ -185,7 +185,7 @@ func watchWindowClose(handle unsafe.Pointer, onClose func()) {
 	}
 	token := panelCloseSeq.Add(1)
 	panelCloseFuncs.Store(token, onClose)
-	C.zoya_panel_watch_close(handle, C.ulonglong(token))
+	C.jarvis_panel_watch_close(handle, C.ulonglong(token))
 }
 
 func boolToCInt(b bool) C.int {
@@ -199,7 +199,7 @@ func applyPlatformFlags(handle unsafe.Pointer, spec PanelSpec) error {
 	if handle == nil {
 		return fmt.Errorf("nil NSWindow*")
 	}
-	C.zoya_panel_apply_flags(
+	C.jarvis_panel_apply_flags(
 		handle,
 		boolToCInt(spec.AlwaysOnTop),
 		boolToCInt(spec.ClickThrough),
@@ -214,13 +214,13 @@ func platformFocusWindow(handle unsafe.Pointer) error {
 	if handle == nil {
 		return fmt.Errorf("nil NSWindow*")
 	}
-	C.zoya_panel_focus(handle)
+	C.jarvis_panel_focus(handle)
 	return nil
 }
 
 func platformGetCursorPos() (int, int, error) {
 	var x, y C.int
-	C.zoya_panel_cursor_pos(&x, &y)
+	C.jarvis_panel_cursor_pos(&x, &y)
 	return int(x), int(y), nil
 }
 
@@ -228,7 +228,7 @@ func platformMoveWindow(handle unsafe.Pointer, x, y int) error {
 	if handle == nil {
 		return fmt.Errorf("nil NSWindow*")
 	}
-	C.zoya_panel_move_window(handle, C.int(x), C.int(y))
+	C.jarvis_panel_move_window(handle, C.int(x), C.int(y))
 	return nil
 }
 
@@ -257,7 +257,7 @@ func platformSetClickThrough(handle unsafe.Pointer, clickThrough bool) error {
 	if handle == nil {
 		return fmt.Errorf("nil NSWindow*")
 	}
-	C.zoya_panel_set_click_through(handle, boolToCInt(clickThrough))
+	C.jarvis_panel_set_click_through(handle, boolToCInt(clickThrough))
 	return nil
 }
 
@@ -275,7 +275,7 @@ func platformReassertTopmost(handle unsafe.Pointer) error {
 	if handle == nil {
 		return nil
 	}
-	C.zoya_panel_focus(handle)
+	C.jarvis_panel_focus(handle)
 	return nil
 }
 
@@ -283,7 +283,7 @@ func platformDestroyWindow(handle unsafe.Pointer) error {
 	if handle == nil {
 		return fmt.Errorf("nil NSWindow*")
 	}
-	C.zoya_panel_destroy(handle)
+	C.jarvis_panel_destroy(handle)
 	return nil
 }
 
@@ -302,7 +302,7 @@ func platformSetWindowState(handle unsafe.Pointer, state PanelWindowState) error
 	default:
 		return fmt.Errorf("unknown window state: %q", state)
 	}
-	C.zoya_panel_set_window_state(handle, s)
+	C.jarvis_panel_set_window_state(handle, s)
 	return nil
 }
 
@@ -318,6 +318,6 @@ func platformSetWindowVisible(handle unsafe.Pointer, visible bool) error {
 	if visible {
 		v = 1
 	}
-	C.zoya_panel_set_visible(handle, v)
+	C.jarvis_panel_set_visible(handle, v)
 	return nil
 }

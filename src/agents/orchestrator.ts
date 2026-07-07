@@ -1,5 +1,4 @@
 import type { RoleDefinition } from '../roles/types.ts';
-import type { SystemPromptParts } from '../roles/prompt-builder.ts';
 import type { LLMMessage, LLMResponse, LLMStreamEvent, LLMToolCall, LLMTool, ContentBlock } from '../llm/provider.ts';
 import { guardImageSize } from '../llm/provider.ts';
 import { LLMManager } from '../llm/manager.ts';
@@ -15,30 +14,6 @@ import type { AuditTrail } from '../authority/audit.ts';
 import type { DeferredExecutor } from '../authority/deferred-executor.ts';
 import type { EmergencyController } from '../authority/emergency.ts';
 import { getActionForTool } from '../authority/tool-action-map.ts';
-
-/**
- * Convert a system prompt (legacy string or static/dynamic parts) into the
- * leading system messages of a conversation.
- *
- * Parts form: the static half is marked as a provider cache boundary
- * (`cache: true`) - it is byte-stable turn-over-turn, so Anthropic can cache
- * tools + static prompt across requests. The dynamic half follows unmarked.
- *
- * Legacy string form: a single unmarked system message. It may embed per-turn
- * volatile content, so marking it would pay cache-write premiums with no
- * reads; within-loop caching still applies via the provider's last-message
- * breakpoint.
- */
-function toSystemMessages(systemPrompt: string | SystemPromptParts): LLMMessage[] {
-  if (typeof systemPrompt === 'string') {
-    return [{ role: 'system', content: systemPrompt }];
-  }
-  const messages: LLMMessage[] = [{ role: 'system', content: systemPrompt.static, cache: true }];
-  if (systemPrompt.dynamic) {
-    messages.push({ role: 'system', content: systemPrompt.dynamic });
-  }
-  return messages;
-}
 
 const MAX_TOOL_ITERATIONS = 200;
 const MAX_TOOL_RESULT_CHARS = 6000; // Cap individual tool results to control context size
@@ -326,7 +301,7 @@ export class AgentOrchestrator {
    * @param subsystem Usage-tracking label for the tier call.
    */
   async processMessage(
-    systemPrompt: string | SystemPromptParts,
+    systemPrompt: string,
     message: string,
     tier: Tier = 'medium',
     subsystem: string = 'chat_orchestrator',
@@ -348,7 +323,7 @@ export class AgentOrchestrator {
 
     // Build local messages array for this turn (system + history)
     const messages: LLMMessage[] = [
-      ...toSystemMessages(systemPrompt),
+      { role: 'system', content: systemPrompt },
       ...primary.getMessages(),
     ];
 
@@ -380,7 +355,7 @@ export class AgentOrchestrator {
 
           // Capture document markers so they appear in the final response
           if (typeof result === 'string') {
-            const docMarker = result.match(/<!-- zoya:document id="[^"]+" title="[^"]+" format="[^"]+" size="[^"]+" -->/);
+            const docMarker = result.match(/<!-- jarvis:document id="[^"]+" title="[^"]+" format="[^"]+" size="[^"]+" -->/);
             if (docMarker) {
               finalText += '\n' + docMarker[0] + '\n';
             }
@@ -423,7 +398,7 @@ export class AgentOrchestrator {
    * record so a subsequent `resume` can continue from the same buffer.
    */
   async processTaskCall(opts: {
-    systemPrompt: string | SystemPromptParts;
+    systemPrompt: string;
     userMessage: string;
     tier: Tier;
     subsystem: string;
@@ -441,7 +416,7 @@ export class AgentOrchestrator {
     const messages: LLMMessage[] = opts.history
       ? [...opts.history, { role: 'user', content: opts.userMessage }]
       : [
-          ...toSystemMessages(opts.systemPrompt),
+          { role: 'system', content: opts.systemPrompt },
           { role: 'user', content: opts.userMessage },
         ];
 
@@ -521,7 +496,7 @@ export class AgentOrchestrator {
    * Yields text/tool_call events through all iterations.
    * Only emits 'done' when the final response is complete.
    */
-  async *streamMessage(systemPrompt: string | SystemPromptParts, message: string | import('../llm/provider.ts').ContentBlock[]): AsyncIterable<LLMStreamEvent> {
+  async *streamMessage(systemPrompt: string, message: string | import('../llm/provider.ts').ContentBlock[]): AsyncIterable<LLMStreamEvent> {
     const primary = this.getPrimary();
     if (!primary) {
       throw new Error('No primary agent exists. Create one first.');
@@ -551,7 +526,7 @@ export class AgentOrchestrator {
 
     // Build local messages array for this turn
     const messages: LLMMessage[] = [
-      ...toSystemMessages(systemPrompt),
+      { role: 'system', content: systemPrompt },
       ...primary.getMessages(),
     ];
 
@@ -647,7 +622,7 @@ export class AgentOrchestrator {
 
         // Inject document markers into the stream so the UI can render download cards
         if (typeof result === 'string') {
-          const docMarker = result.match(/<!-- zoya:document id="[^"]+" title="[^"]+" format="[^"]+" size="[^"]+" -->/);
+          const docMarker = result.match(/<!-- jarvis:document id="[^"]+" title="[^"]+" format="[^"]+" size="[^"]+" -->/);
           if (docMarker) {
             yield { type: 'text' as const, text: '\n' + docMarker[0] + '\n' };
           }
@@ -991,4 +966,3 @@ export class AgentOrchestrator {
     return 'normal';
   }
 }
-

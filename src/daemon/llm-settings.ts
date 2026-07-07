@@ -16,7 +16,7 @@
  * hotReloadLLMProviders.
  */
 
-import type { ZoyaConfig, LLMProviderEntry, LLMProviderKind } from '../config/types.ts';
+import type { JarvisConfig, LLMProviderEntry, LLMProviderKind } from '../config/types.ts';
 import { getSetting, setSetting } from '../vault/settings.ts';
 import { getSecret, setSecret, deleteSecret, hasSecret } from '../vault/keychain.ts';
 import type { LLMManager } from '../llm/manager.ts';
@@ -34,7 +34,6 @@ const SETTING_TIER_CONVERSATION = 'llm.tiers.conversation';
 const SETTING_TIER_HIGH = 'llm.tiers.high';
 const SETTING_TIER_MEDIUM = 'llm.tiers.medium';
 const SETTING_TIER_LOW = 'llm.tiers.low';
-const SETTING_PROMPT_CACHE = 'llm.prompt_cache';
 
 /** Keychain key for a provider's API key, by provider NAME (not kind). */
 function keychainKey(providerName: string): string {
@@ -69,8 +68,6 @@ export type LLMSettingsResponse = {
   };
   /** Provider classes the system can instantiate. UI dropdowns use this. */
   available_kinds: LLMProviderKind[];
-  /** Provider-side prompt caching. Defaults to true; only explicit false disables. */
-  prompt_cache: boolean;
 };
 
 /** Body shape accepted by saveLLMSettings - all fields optional/partial. */
@@ -88,7 +85,6 @@ export type LLMSettingsRequest = {
     medium?: string | null;
     low?: string | null;
   };
-  prompt_cache?: boolean;
 };
 
 export const AVAILABLE_KINDS: LLMProviderKind[] = [
@@ -105,7 +101,7 @@ export const AVAILABLE_KINDS: LLMProviderKind[] = [
 
 // ── getLLMSettings ───────────────────────────────────────────────────────
 
-export function getLLMSettings(config: ZoyaConfig): LLMSettingsResponse {
+export function getLLMSettings(config: JarvisConfig): LLMSettingsResponse {
   const providers: Record<string, LLMSettingsProviderView> = {};
   for (const [name, entry] of Object.entries(config.llm.providers ?? {})) {
     if (!entry) continue;
@@ -142,7 +138,6 @@ export function getLLMSettings(config: ZoyaConfig): LLMSettingsResponse {
     mode,
     tiers,
     available_kinds: AVAILABLE_KINDS,
-    prompt_cache: config.llm.prompt_cache !== false,
   };
 }
 
@@ -154,7 +149,7 @@ export function getLLMSettings(config: ZoyaConfig): LLMSettingsResponse {
  * `config` so subsequent reads see the new values.
  */
 export function saveLLMSettings(
-  config: ZoyaConfig,
+  config: JarvisConfig,
   body: LLMSettingsRequest,
 ): void {
   if (!config.llm.providers) config.llm.providers = {};
@@ -223,11 +218,6 @@ export function saveLLMSettings(
   setSetting(SETTING_TIER_HIGH, config.llm.tiers.high ?? '');
   setSetting(SETTING_TIER_MEDIUM, config.llm.tiers.medium ?? '');
   setSetting(SETTING_TIER_LOW, config.llm.tiers.low ?? '');
-
-  if (body.prompt_cache !== undefined) {
-    config.llm.prompt_cache = body.prompt_cache;
-    setSetting(SETTING_PROMPT_CACHE, body.prompt_cache ? 'true' : 'false');
-  }
 }
 
 /**
@@ -264,7 +254,7 @@ export function stripSecretsFromProviders(
  * pre-rework installs and migrates them in-memory so users upgrading don't
  * lose their saved credentials.
  */
-export function mergeLLMSettingsIntoConfig(config: ZoyaConfig): void {
+export function mergeLLMSettingsIntoConfig(config: JarvisConfig): void {
   // Replace, don't merge: the DB is authoritative for every LLM setting.
   config.llm.providers = {};
   config.llm.tiers = {};
@@ -296,15 +286,6 @@ export function mergeLLMSettingsIntoConfig(config: ZoyaConfig): void {
     if (value) config.llm.tiers[tier] = value;
   }
 
-  // Prompt caching: only override when a DB setting exists, so a value
-  // already present on the config object (e.g. from config.yaml) survives
-  // until the user touches the dashboard setting. Absent everywhere =
-  // enabled (every consumer checks `prompt_cache !== false`).
-  const storedPromptCache = getSetting(SETTING_PROMPT_CACHE);
-  if (storedPromptCache !== null) {
-    config.llm.prompt_cache = storedPromptCache !== 'false';
-  }
-
   // 2. Legacy shape: migrate per-provider DB keys + KEY_* secrets if any
   // are present and no new-shape providers exist for them. This is the
   // upgrade path for installs that pre-date the provider/model split.
@@ -333,7 +314,7 @@ export function mergeLLMSettingsIntoConfig(config: ZoyaConfig): void {
  * the legacy keys, just synthesize the new shape from them when the new
  * shape is empty.
  */
-function migrateLegacyDBSettings(config: ZoyaConfig): void {
+function migrateLegacyDBSettings(config: JarvisConfig): void {
   const LEGACY_KIND_KEYS: Array<{ kind: LLMProviderKind; secretKey: string; modelKey: string; baseUrlKey?: string }> = [
     { kind: 'anthropic', secretKey: 'llm.anthropic.api_key', modelKey: 'llm.anthropic.model' },
     { kind: 'openai', secretKey: 'llm.openai.api_key', modelKey: 'llm.openai.model' },
@@ -398,7 +379,7 @@ function migrateLegacyDBSettings(config: ZoyaConfig): void {
  * them atomically to the manager. Safe for in-flight requests because the
  * underlying replaceProviders/setTierMap operations are atomic.
  */
-export function hotReloadLLMProviders(config: ZoyaConfig, llmManager: LLMManager): void {
+export function hotReloadLLMProviders(config: JarvisConfig, llmManager: LLMManager): void {
   // Build enriched entries with keychain secrets injected so providers can
   // instantiate. The injection is transient - only the in-memory entries
   // see it; persisted forms (DB / YAML) get stripped via
@@ -414,9 +395,7 @@ export function hotReloadLLMProviders(config: ZoyaConfig, llmManager: LLMManager
   // Atomic single-step swap: build the new provider list, then replaceProviders
   // does the map swap in one assignment. In-flight requests see EITHER the
   // old map or the new one, never an empty/partial map.
-  const built = atomicReloadProviders(llmManager, enrichedProviders, {
-    promptCache: config.llm.prompt_cache !== false,
-  });
+  const built = atomicReloadProviders(llmManager, enrichedProviders);
   if (built.length === 0) {
     console.warn('[LLM] Hot-reload: no providers registered (all entries missing credentials).');
   }
@@ -445,7 +424,7 @@ export async function testLLMProvider(
     base_url?: string;
     model?: string;
   },
-  config: ZoyaConfig,
+  config: JarvisConfig,
 ): Promise<{ ok: boolean; model?: string; error?: string }> {
   // Resolve effective name + kind. Legacy `provider` is treated as `name`.
   const name = opts.name ?? opts.provider ?? opts.kind;
@@ -480,4 +459,3 @@ export async function testLLMProvider(
     return { ok: false, error: err instanceof Error ? err.message : String(err) };
   }
 }
-

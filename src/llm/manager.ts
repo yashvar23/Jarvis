@@ -24,7 +24,7 @@ export class LLMManager {
   private tierMap: TierMap = {};
   private static readonly MAX_RETRIES_PER_PROVIDER = 3;
   private static readonly REQUEST_TIMEOUT_MS = 90000; // 90 second timeout for LLM calls
-  private static readonly isDebugging = process.env.ZOYA_LOG_LEVEL === 'debug' || process.env.DEBUG_LLM === 'true';
+  private static readonly isDebugging = process.env.JARVIS_LOG_LEVEL === 'debug' || process.env.DEBUG_LLM === 'true';
 
   constructor() {}
 
@@ -229,8 +229,6 @@ export class LLMManager {
         model: response.model || model || '',
         input_tokens: response.usage?.input_tokens ?? 0,
         output_tokens: response.usage?.output_tokens ?? 0,
-        cache_read_input_tokens: response.usage?.cache_read_input_tokens ?? 0,
-        cache_creation_input_tokens: response.usage?.cache_creation_input_tokens ?? 0,
         latency_ms: Date.now() - started,
       });
       return response;
@@ -287,8 +285,6 @@ export class LLMManager {
         model: finalResponse?.model || model || '',
         input_tokens: finalResponse?.usage?.input_tokens ?? 0,
         output_tokens: finalResponse?.usage?.output_tokens ?? 0,
-        cache_read_input_tokens: finalResponse?.usage?.cache_read_input_tokens ?? 0,
-        cache_creation_input_tokens: finalResponse?.usage?.cache_creation_input_tokens ?? 0,
         latency_ms: Date.now() - started,
         error_code: errored ? classifyErrorString(errored) : undefined,
       });
@@ -535,4 +531,3 @@ export class LLMManager {
     };
   }
 }
-

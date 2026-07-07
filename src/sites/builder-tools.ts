@@ -16,8 +16,8 @@ const BLOCKED_SERVER_PATTERNS = /\b(make\s+dev|bun\s+--hot|vite\s*$|next\s+dev|n
 /** Env keys that must never leak to subprocesses */
 const SECRET_ENV_PATTERNS = [
   /api[_-]?key/i, /secret/i, /token/i, /password/i, /credential/i,
-  /^ZOYA_API_KEY$/, /^ZOYA_AUTH_TOKEN$/, /^ZOYA_OPENAI_KEY$/,
-  /^ZOYA_OPENROUTER_KEY$/, /^ANTHROPIC_API_KEY$/, /^OPENAI_API_KEY$/,
+  /^JARVIS_API_KEY$/, /^JARVIS_AUTH_TOKEN$/, /^JARVIS_OPENAI_KEY$/,
+  /^JARVIS_OPENROUTER_KEY$/, /^ANTHROPIC_API_KEY$/, /^OPENAI_API_KEY$/,
 ];
 
 /** Build a sanitized env with secrets stripped */
@@ -243,4 +243,3 @@ export function createSiteBuilderTools(
     } as ToolDefinition] : []),
   ];
 }
-

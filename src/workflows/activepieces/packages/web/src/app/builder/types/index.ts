@@ -9,4 +9,3 @@ export enum ChatDrawerSource {
   TEST_FLOW = 'test-flow',
   TEST_STEP = 'test-step',
 }
-

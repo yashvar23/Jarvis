@@ -72,4 +72,3 @@ export function createWaitpointsRoute(deps: WaitpointRouteDeps): RouteHandler {
     });
   };
 }
-

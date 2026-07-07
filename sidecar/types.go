@@ -103,11 +103,6 @@ type SidecarRegistration struct {
 	Version                 string                  `json:"version"`
 	Capabilities            []SidecarCapability     `json:"capabilities"`
 	UnavailableCapabilities []UnavailableCapability `json:"unavailable_capabilities,omitempty"`
-	// Timezone is the machine's IANA zone (e.g. "Europe/Rome"), best-effort
-	// ("" = unknown). Hosted brains run on UTC VPSs and use this for the
-	// user's local-time crons; the hosting server schedules follow-the-night
-	// maintenance with it.
-	Timezone string `json:"timezone,omitempty"`
 }
 
 // SidecarCapabilitiesUpdate is sent when config changes to sync capabilities with the brain.
@@ -119,26 +114,22 @@ type SidecarCapabilitiesUpdate struct {
 
 // SidecarConfig is the YAML config file structure.
 type SidecarConfig struct {
-	Token string `yaml:"token"`
-	Brain string `yaml:"brain"`
-	// HostedBaseURL overrides the zoya connect origin for the first-run
-	// handshake. Honored ONLY in `-tags zoyadebug` builds (see hosted.go);
-	// release binaries always use the production origin.
-	HostedBaseURL string              `yaml:"hosted_base_url,omitempty"`
-	Capabilities  []SidecarCapability `yaml:"capabilities"`
-	Terminal      TerminalConfig      `yaml:"terminal"`
-	Filesystem    FilesystemConfig    `yaml:"filesystem"`
-	Browser       BrowserConfig       `yaml:"browser"`
-	Awareness     AwarenessConfig     `yaml:"awareness"`
-	Preferences   PreferencesConfig   `yaml:"preferences"`
-	Telemetry     TelemetryConfig     `yaml:"telemetry"`
+	Token        string              `yaml:"token"`
+	Brain        string              `yaml:"brain"`
+	Capabilities []SidecarCapability `yaml:"capabilities"`
+	Terminal     TerminalConfig      `yaml:"terminal"`
+	Filesystem   FilesystemConfig    `yaml:"filesystem"`
+	Browser      BrowserConfig       `yaml:"browser"`
+	Awareness    AwarenessConfig     `yaml:"awareness"`
+	Preferences  PreferencesConfig   `yaml:"preferences"`
+	Telemetry    TelemetryConfig     `yaml:"telemetry"`
 }
 
 // TelemetryConfig controls anonymous sidecar usage metrics. Independent of the
-// brain's telemetry: it does NOT honor the brain's ZOYA_TELEMETRY/DO_NOT_TRACK
+// brain's telemetry: it does NOT honor the brain's JARVIS_TELEMETRY/DO_NOT_TRACK
 // env vars. Enabled is a pointer so a config file without the key reads as "on"
 // (the opt-out default) rather than a zero-value false. Toggle it from the
-// settings window's Privacy section or with ZOYA_SIDECAR_TELEMETRY=0.
+// settings window's Privacy section or with JARVIS_SIDECAR_TELEMETRY=0.
 type TelemetryConfig struct {
 	// omitempty so an unset (default-on) config doesn't persist `enabled: null`;
 	// an explicit true/false is a non-nil pointer and is still written.
@@ -171,7 +162,7 @@ type BrowserConfig struct {
 	// empty the sidecar auto-detects one (the OS default browser if it is
 	// Chromium-based, otherwise a known install: Chrome, Edge, Brave, ...).
 	ExecutablePath string `yaml:"executable_path"`
-	// ProfileDir is the dedicated user-data dir for Zoya's automation browser
+	// ProfileDir is the dedicated user-data dir for Jarvis's automation browser
 	// (kept separate from the user's own profile). Defaults to a temp dir.
 	ProfileDir string `yaml:"profile_dir"`
 	// CDPPort is retained for backward-compatible config files but is no longer

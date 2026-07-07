@@ -14,7 +14,7 @@ export type VoiceState =
   | "muted";
 
 const HINT: Record<VoiceState, string> = {
-  idle: "Tap the orb, or say “Hey Zoya.”",
+  idle: "Tap the orb, or say “Hey Jarvis.”",
   listening: "Listening. Pause to send.",
   thinking: "Thinking through that…",
   speaking: "Speaking — the reply is in the thread.",
@@ -38,8 +38,8 @@ const STATUS_LABEL: Record<VoiceState, string> = {
 const STATUS_ANNOUNCEMENT: Record<VoiceState, string> = {
   idle: "Microphone idle.",
   listening: "Listening for your voice.",
-  thinking: "Zoya is thinking.",
-  speaking: "Zoya is speaking.",
+  thinking: "Jarvis is thinking.",
+  speaking: "Jarvis is speaking.",
   "awaiting-approval": "Awaiting your confirmation.",
   muted: "Microphone muted.",
 };
@@ -111,7 +111,7 @@ export function VoiceRail({
         <div className="v2-rail__hint-meta">Replies appear in the thread →</div>
       </div>
 
-      {/* Phase 6.5.5 — last sentence of Zoya's most recent reply,
+      {/* Phase 6.5.5 — last sentence of Jarvis's most recent reply,
           only visible inside a Room (component gates itself). Sits above
           the confirmation stack: replies are conversational flow,
           confirmations are actions, both are highest-salience. */}

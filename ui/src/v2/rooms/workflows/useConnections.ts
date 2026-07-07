@@ -1,6 +1,6 @@
 /**
  * Hook for the Connections panel: fetches `/api/workflows/connections`,
- * exposes the list + registered Zoya sources, and offers add/delete
+ * exposes the list + registered Jarvis sources, and offers add/delete
  * mutations. Connection `value` is never returned by the API (encrypted at
  * rest server-side), so this layer only models the metadata.
  */
@@ -31,8 +31,8 @@ export interface ConnectionMeta {
   updated: number;
 }
 
-export interface ZoyaSourceMeta {
-  /** Source id, e.g. "google". External ids it claims look like `zoya:<id>` or `zoya:<id>:*`. */
+export interface JarvisSourceMeta {
+  /** Source id, e.g. "google". External ids it claims look like `jarvis:<id>` or `jarvis:<id>:*`. */
   id: string;
 }
 
@@ -40,7 +40,7 @@ export interface ConnectionsState {
   loading: boolean;
   error: string | null;
   connections: ConnectionMeta[];
-  zoyaSources: ZoyaSourceMeta[];
+  jarvisSources: JarvisSourceMeta[];
   refresh: () => Promise<void>;
   create: (input: {
     externalId: string;
@@ -72,7 +72,7 @@ export function useConnections(): ConnectionsState {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [connections, setConnections] = useState<ConnectionMeta[]>([]);
-  const [zoyaSources, setZoyaSources] = useState<ZoyaSourceMeta[]>([]);
+  const [jarvisSources, setJarvisSources] = useState<JarvisSourceMeta[]>([]);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -85,10 +85,10 @@ export function useConnections(): ConnectionsState {
       }
       const body = (await r.json()) as {
         connections: ConnectionMeta[];
-        zoyaSources: ZoyaSourceMeta[];
+        jarvisSources: JarvisSourceMeta[];
       };
       setConnections(body.connections);
-      setZoyaSources(body.zoyaSources);
+      setJarvisSources(body.jarvisSources);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -161,6 +161,5 @@ export function useConnections(): ConnectionsState {
     [refresh],
   );
 
-  return { loading, error, connections, zoyaSources, refresh, create, update, remove };
+  return { loading, error, connections, jarvisSources, refresh, create, update, remove };
 }
-

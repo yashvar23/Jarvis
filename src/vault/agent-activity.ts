@@ -130,4 +130,3 @@ function deserialize(row: DbRow): AgentActivityRow {
     created_at: row.created_at,
   };
 }
-

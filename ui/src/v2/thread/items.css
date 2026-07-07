@@ -35,7 +35,7 @@
   color: var(--ink-3);
 }
 
-.v2-item__who--zoya {
+.v2-item__who--jarvis {
   color: var(--ink-3);
 }
 
@@ -74,7 +74,7 @@
   vertical-align: -1px;
 }
 
-/* ── zoya-speech ── */
+/* ── jarvis-speech ── */
 .v2-item--speech .v2-item__body {
   font-family: var(--font-display);
   color: var(--ink);
@@ -100,7 +100,7 @@
   .v2-item__speaking-dot { animation: none; opacity: 0.7; }
 }
 
-/* ── zoya-thought ── */
+/* ── jarvis-thought ── */
 .v2-item--thought {
   padding-left: var(--s-4);
   border-left: 2px dotted var(--rule);

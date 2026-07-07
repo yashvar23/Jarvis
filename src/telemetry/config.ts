@@ -1,4 +1,4 @@
-import type { ZoyaConfig } from '../config/types.ts';
+import type { JarvisConfig } from '../config/types.ts';
 
 export type TelemetryDecision = {
   enabled: boolean;
@@ -12,7 +12,7 @@ function isFalsy(value: string): boolean {
 }
 
 export function resolveTelemetryEnabled(
-  config: Pick<ZoyaConfig, 'telemetry'>,
+  config: Pick<JarvisConfig, 'telemetry'>,
   env: NodeJS.ProcessEnv = process.env,
 ): TelemetryDecision {
   const dnt = env.DO_NOT_TRACK;
@@ -20,11 +20,11 @@ export function resolveTelemetryEnabled(
     return { enabled: false, reason: 'DO_NOT_TRACK is set' };
   }
 
-  if (env.ZOYA_TELEMETRY !== undefined) {
-    if (isFalsy(env.ZOYA_TELEMETRY)) {
-      return { enabled: false, reason: 'ZOYA_TELEMETRY opt-out' };
+  if (env.JARVIS_TELEMETRY !== undefined) {
+    if (isFalsy(env.JARVIS_TELEMETRY)) {
+      return { enabled: false, reason: 'JARVIS_TELEMETRY opt-out' };
     }
-    return { enabled: true, reason: 'ZOYA_TELEMETRY opt-in' };
+    return { enabled: true, reason: 'JARVIS_TELEMETRY opt-in' };
   }
 
   if (config.telemetry?.enabled === false) {
@@ -33,4 +33,3 @@ export function resolveTelemetryEnabled(
 
   return { enabled: true, reason: 'enabled by default' };
 }
-

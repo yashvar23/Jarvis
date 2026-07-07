@@ -112,4 +112,3 @@ export const WorkerSettingsResponse = z.object({
 })
 
 export type WorkerSettingsResponse = z.infer<typeof WorkerSettingsResponse>
-

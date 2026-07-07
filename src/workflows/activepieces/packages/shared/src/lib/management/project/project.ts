@@ -151,4 +151,3 @@ export const PROJECT_COLOR_PALETTE: Record<ColorName, ProjectColor> = {
         color: '#ea580c',
     },
 }
-

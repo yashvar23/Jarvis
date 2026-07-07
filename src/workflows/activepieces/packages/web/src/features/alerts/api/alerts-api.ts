@@ -18,4 +18,3 @@ export const alertsApi = {
     return api.delete<void>(`/v1/alerts/${alertId}`);
   },
 };
-

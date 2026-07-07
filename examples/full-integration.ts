@@ -24,7 +24,7 @@ import {
 import type { LLMProvider, LLMMessage } from '../src/llm/provider.ts';
 
 // Initialize database
-initDatabase('./data/zoya.db');
+initDatabase('./data/jarvis.db');
 
 // Mock LLM Provider for demo
 const mockLLM: LLMProvider = {
@@ -98,7 +98,7 @@ async function handleMessage(
   const adaptedPersonality = getChannelPersonality(personality, channel);
 
   // 2. Generate personality-aware system prompt
-  const systemPrompt = `You are ZOYA, an adaptive AI assistant.
+  const systemPrompt = `You are J.A.R.V.I.S., an adaptive AI assistant.
 
 ${personalityToPrompt(adaptedPersonality)}
 
@@ -188,7 +188,7 @@ function displayKnowledgeStats() {
 // Demo: Simulate a conversation
 async function runDemo() {
   console.log('\n╔════════════════════════════════════════════════════════════╗');
-  console.log('║   ZOYA Full Integration Demo                      ║');
+  console.log('║   J.A.R.V.I.S. Full Integration Demo                      ║');
   console.log('║   Personality Engine + Vault Extractor                    ║');
   console.log('╚════════════════════════════════════════════════════════════╝');
 
@@ -233,4 +233,3 @@ async function runDemo() {
 
 // Run the demo
 runDemo().catch(console.error);
-

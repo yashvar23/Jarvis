@@ -22,5 +22,3 @@ export type ExecutioOutputFile = {
 }
 
 export type ResumePayload = TriggerPayload
-
-

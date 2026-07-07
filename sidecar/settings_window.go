@@ -43,7 +43,7 @@ func connStateString(s int32) string {
 }
 
 func (c *SidecarClient) runSettingsWindow() {
-	runLocalWebview("ZOYA — Sidecar Settings", 520, 560, webview.HintNone, func(w webview.WebView) {
+	runLocalWebview("JARVIS — Sidecar Settings", 520, 560, webview.HintNone, func(w webview.WebView) {
 
 		// getState returns the live connection status + current preferences.
 		_ = w.Bind("getState", func() settingsState {
@@ -244,7 +244,7 @@ const settingsWindowHTML = `<!doctype html>
     <label class="pref">
       <input type="checkbox" id="ethereal_pebble" onchange="togglePref(this)">
       <span><span class="label">Ethereal pebble</span>
-        <div class="hint">Fade the pebble out while it sits idle; it pops back in when Zoya activates.</div></span>
+        <div class="hint">Fade the pebble out while it sits idle; it pops back in when Jarvis activates.</div></span>
     </label>
     <div class="idlerow" id="etherealIdleRow">
       <span class="label">Fade out after</span>
@@ -324,7 +324,7 @@ const settingsWindowHTML = `<!doctype html>
     try {
       await window.restartSidecar();
       msg.className = 'msg ok';
-      msg.textContent = 'Restarting Zoya…';
+      msg.textContent = 'Restarting Jarvis…';
     } catch (e) {
       btn.disabled = false;
       msg.className = 'msg err';
@@ -346,7 +346,7 @@ const settingsWindowHTML = `<!doctype html>
       msg.textContent = 'Saved — restart to reconnect with the new token.';
       tok.value = '';
       // Morph Save -> Restart for a one-click apply.
-      btn.textContent = 'Restart Zoya';
+      btn.textContent = 'Restart Jarvis';
       btn.onclick = doRestart;
     } catch (e) {
       msg.className = 'msg err';

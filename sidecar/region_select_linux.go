@@ -164,22 +164,22 @@ static gboolean region_start_idle(gpointer data) {
     return G_SOURCE_REMOVE;
 }
 
-// zoyaRegionStart shows the overlay (called from an arbitrary goroutine).
-static void zoyaRegionStart(void) {
+// jarvisRegionStart shows the overlay (called from an arbitrary goroutine).
+static void jarvisRegionStart(void) {
     g_idle_add(region_start_idle, NULL);
 }
 
-// zoyaRegionClose tears the overlay down. Called from goRegionFinish/Cancel,
+// jarvisRegionClose tears the overlay down. Called from goRegionFinish/Cancel,
 // which run on the GTK main thread, so it can run directly.
-static void zoyaRegionClose(void) {
+static void jarvisRegionClose(void) {
     if (gRegionWin) { gtk_widget_destroy(gRegionWin); gRegionWin = NULL; gRegionArea = NULL; }
     if (gRegionShot) { g_object_unref(gRegionShot); gRegionShot = NULL; }
     gDragging = FALSE;
 }
 
-// zoyaRegionCrop crops the snapshot to (x,y,w,h) and PNG-encodes it. Returns a
+// jarvisRegionCrop crops the snapshot to (x,y,w,h) and PNG-encodes it. Returns a
 // g_malloc'd buffer (caller frees via g_free) and sets *outLen. NULL on failure.
-static guchar* zoyaRegionCrop(int x, int y, int w, int h, int* outLen) {
+static guchar* jarvisRegionCrop(int x, int y, int w, int h, int* outLen) {
     *outLen = 0;
     if (!gRegionShot) return NULL;
     if (x < 0) { w += x; x = 0; }
@@ -198,7 +198,7 @@ static guchar* zoyaRegionCrop(int x, int y, int w, int h, int* outLen) {
     return (guchar*)buf;
 }
 
-static void zoyaRegionFree(guchar* p) { if (p) g_free(p); }
+static void jarvisRegionFree(guchar* p) { if (p) g_free(p); }
 */
 import "C"
 
@@ -235,7 +235,7 @@ func (s *regionSelectionLinux) Start(onCapture func([]byte, int, int), onCancel 
 	s.onCancel = onCancel
 	s.mu.Unlock()
 	activeRegionLinux.Store(s)
-	C.zoyaRegionStart()
+	C.jarvisRegionStart()
 	return nil
 }
 
@@ -245,7 +245,7 @@ func (s *regionSelectionLinux) Start(onCapture func([]byte, int, int), onCancel 
 
 func (s *regionSelectionLinux) cancel() {
 	cb := s.onCancel
-	C.zoyaRegionClose()
+	C.jarvisRegionClose()
 	activeRegionLinux.Store(nil)
 	s.reset()
 	if cb != nil {
@@ -260,16 +260,16 @@ func (s *regionSelectionLinux) finish(x0, y0, x1, y1 int) {
 		return
 	}
 	var outLen C.int
-	ptr := C.zoyaRegionCrop(C.int(x), C.int(y), C.int(w), C.int(h), &outLen)
+	ptr := C.jarvisRegionCrop(C.int(x), C.int(y), C.int(w), C.int(h), &outLen)
 	if ptr == nil || outLen <= 0 {
 		log.Printf("[region] crop failed")
 		s.cancel()
 		return
 	}
 	png := C.GoBytes(unsafe.Pointer(ptr), outLen)
-	C.zoyaRegionFree(ptr)
+	C.jarvisRegionFree(ptr)
 	cb := s.onCapture
-	C.zoyaRegionClose()
+	C.jarvisRegionClose()
 	activeRegionLinux.Store(nil)
 	s.reset()
 	log.Printf("[region] captured %dx%d, %d PNG bytes", w, h, len(png))

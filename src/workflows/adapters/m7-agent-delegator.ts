@@ -1,5 +1,5 @@
 /**
- * `M7AgentDelegator` -- backs `zoya-agent.delegate` with the full M7 sub-agent
+ * `M7AgentDelegator` -- backs `jarvis-agent.delegate` with the full M7 sub-agent
  * loop. Spawns a sub-agent under the daemon's primary agent, runs it through
  * `runSubAgent` (LLM + tool-call loop, authority-gated), and returns the final
  * message + tool-call trace + termination reason.
@@ -29,8 +29,8 @@
  *
  * Authority: sub-agents are denied actions that would require user approval
  * (per `runSubAgent`'s policy). A workflow step that needs a destructive
- * action should expose it via a separate piece (e.g., `zoya-tool` or
- * `zoya-notify` + waitpoint), not piggy-back on the sub-agent.
+ * action should expose it via a separate piece (e.g., `jarvis-tool` or
+ * `jarvis-notify` + waitpoint), not piggy-back on the sub-agent.
  */
 
 import type {
@@ -38,7 +38,7 @@ import type {
   PieceAgentDelegateResult,
   PieceAgentDelegator,
   PieceAgentToolCall,
-} from "../zoya-pieces/types";
+} from "../jarvis-pieces/types";
 import type { LLMManager } from "../../llm/manager";
 import type { LLMMessage } from "../../llm/provider";
 import type { AgentOrchestrator } from "../../agents/orchestrator";
@@ -263,4 +263,3 @@ export function extractToolCallsTrace(
   }
   return trace;
 }
-

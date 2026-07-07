@@ -120,4 +120,3 @@ export async function routeToSidecar(
     return `Error [${sidecar.name}]: ${msg}`;
   }
 }
-

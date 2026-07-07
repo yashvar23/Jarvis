@@ -20,4 +20,3 @@ import { z } from 'zod'
  */
 export const Metadata = z.record(z.string(), z.unknown())
 export type Metadata = z.infer<typeof Metadata>
-

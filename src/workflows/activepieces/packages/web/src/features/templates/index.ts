@@ -10,4 +10,3 @@ export {
   templateKeys,
 } from './hooks/templates-hook';
 export { useGradientFromPieces } from './hooks/use-gradient-from-pieces';
-

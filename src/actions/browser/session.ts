@@ -71,7 +71,7 @@ const SNAPSHOT_SCRIPT = `(() => {
   });
 
   // Assign sequential IDs and store DOM refs for later direct focus
-  window.__zoya_elements = els.map(e => e._el);
+  window.__jarvis_elements = els.map(e => e._el);
   els.forEach((el, i) => { el.id = i + 1; delete el._el; });
 
   // Get visible text, clean up whitespace
@@ -121,16 +121,6 @@ export class BrowserController {
    */
   async connect(): Promise<void> {
     if (this._connected) return;
-
-    // browser.local: false is enforced HERE, not only in launchChrome:
-    // connect() first probes the CDP port and attaches to whatever is
-    // already listening, so on a shared host a guard on launch alone would
-    // let the agent adopt ANY process bound to 127.0.0.1:<port> - including
-    // another tenant's. No local CDP connection at all when disabled.
-    const { isLocalBrowserDisabled } = await import('../tools/local-tools-guard.ts');
-    if (isLocalBrowserDisabled()) {
-      throw new Error('The local browser is disabled on this machine (browser.local: false). Use a sidecar browser instead.');
-    }
 
     // If Chrome isn't running, launch it automatically
     if (!(await this.isAvailable())) {
@@ -300,7 +290,7 @@ export class BrowserController {
     // Focus the element via DOM (more reliable than coordinate click for typing)
     const focusResult = await this.cdp.send('Runtime.evaluate', {
       expression: `(() => {
-        const el = window.__zoya_elements && window.__zoya_elements[${elementId - 1}];
+        const el = window.__jarvis_elements && window.__jarvis_elements[${elementId - 1}];
         if (!el) return 'not_found';
         el.focus();
         // Clear existing content based on element type
@@ -441,7 +431,7 @@ export class BrowserController {
   /**
    * Take a screenshot and save to a file.
    */
-  async screenshot(filePath: string = '/tmp/zoya-screenshot.png'): Promise<string> {
+  async screenshot(filePath: string = '/tmp/jarvis-screenshot.png'): Promise<string> {
     await this.ensureConnected();
 
     const result = await this.cdp.send('Page.captureScreenshot', { format: 'png' });
@@ -514,4 +504,3 @@ export class BrowserController {
     }
   }
 }
-

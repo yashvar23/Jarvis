@@ -115,4 +115,3 @@ const getStepsSizeWithAllInputsTruncated = (totalSize: number, entries: InputKey
 const jsonExceedMaxSize = (jsonSize: number, maxSize: number): boolean => {
     return jsonSize > maxSize
 }
-

@@ -284,4 +284,3 @@ export function useLogsFeed() {
     refresh,
   };
 }
-

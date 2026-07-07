@@ -4,7 +4,7 @@
  * spawn + connect + cleanup loop.
  *
  * Skipped when the bundle isn't on disk; cold rebuilds are slow and gated
- * behind `ZOYA_TEST_ENGINE_BUILD=1` (matches the build.test.ts pattern).
+ * behind `JARVIS_TEST_ENGINE_BUILD=1` (matches the build.test.ts pattern).
  * In CI, run `bun run scripts/build-engine.ts` once before the test suite.
  */
 
@@ -20,7 +20,7 @@ import { findCachedBundle, buildEngineBundle } from "./build";
 import { EngineRuntime } from "./engine-runtime";
 import type { FlowTriggerNode } from "../../db/repos/flow-version";
 
-const buildOptIn = process.env.ZOYA_TEST_ENGINE_BUILD === "1";
+const buildOptIn = process.env.JARVIS_TEST_ENGINE_BUILD === "1";
 
 // `test.skipIf` evaluates at module-load time, so we cannot gate on
 // beforeAll-time state. Compute bundle availability up front here.
@@ -228,4 +228,3 @@ describe("EngineRuntime (D1: error paths)", () => {
     }
   });
 });
-

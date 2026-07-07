@@ -69,4 +69,3 @@ export type ExecutePropsResult<T extends PropertyType.DROPDOWN | PropertyType.MU
   type: T
   options: T extends PropertyType.DROPDOWN ? DropdownState<unknown> : T extends PropertyType.MULTI_SELECT_DROPDOWN ? DropdownState<unknown> : InputPropertyMap
 }
-

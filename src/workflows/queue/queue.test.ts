@@ -244,4 +244,3 @@ describe("Worker", () => {
     expect(queueStats().succeeded).toBe(1);
   });
 });
-

@@ -152,4 +152,3 @@ export const resolveValueFromProps = (props: Record<string, unknown> | undefined
     })
     return resolvedScope
 }
-

@@ -188,4 +188,3 @@ export function verifyFact(id: string): void {
   const stmt = db.prepare('UPDATE facts SET verified_at = ? WHERE id = ?');
   stmt.run(Date.now(), id);
 }
-

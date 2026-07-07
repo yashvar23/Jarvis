@@ -66,4 +66,3 @@ export function useFlowDetailsData(report?: PlatformAnalyticsReport) {
     setTimeSavedPerRunOverride,
   };
 }
-

@@ -51,4 +51,3 @@ export function useOwnerOptions() {
     return options;
   }, [currentUser, projectMembers]);
 }
-

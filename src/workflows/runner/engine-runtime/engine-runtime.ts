@@ -41,7 +41,7 @@ import {
   toUpstreamFlowVersion,
   type UpstreamFlowVersion,
 } from "./flow-version-adapter";
-import type { FlowVersion as ZoyaFlowVersion } from "../../db/repos/flow-version";
+import type { FlowVersion as JarvisFlowVersion } from "../../db/repos/flow-version";
 import { getFlowRun, type FlowRun } from "../../db/repos/flow-run";
 
 export interface EngineRuntimeOptions {
@@ -63,19 +63,19 @@ export interface EngineRuntimeOptions {
   pool?: boolean;
   /**
    * Where the engine materializes CODE-action source files. Defaults to
-   * `~/.zoya/workflow-codes`. The engine appends `${flowVersionId}/${stepName}/index.js`.
+   * `~/.jarvis/workflow-codes`. The engine appends `${flowVersionId}/${stepName}/index.js`.
    */
   baseCodeDir?: string;
   /**
    * Working directory for the spawned engine. The piece-loader's dev-pieces
    * mode resolves `packages/pieces` relative to CWD, so we default to the
    * vendored activepieces dir which has the right layout for finding
-   * `packages/pieces/zoya/<name>/dist/package.json`.
+   * `packages/pieces/jarvis/<name>/dist/package.json`.
    */
   cwd?: string;
   /** Search roots for vendored pieces. Default: vendored `packages/pieces` tree. */
   customPiecesPaths?: string[];
-  /** CSV of dev-piece names exposed via AP_DEV_PIECES. Default: zoya pieces. */
+  /** CSV of dev-piece names exposed via AP_DEV_PIECES. Default: jarvis pieces. */
   devPieces?: string[];
   /** Engine WS handshake deadline. Default 10s. */
   handshakeTimeoutMs?: number;
@@ -104,7 +104,7 @@ export interface AcquireOptions {
 
 export interface ExecuteFlowOnHandleOptions {
   /** Either our DB-shaped FlowVersion, or a pre-adapted upstream FlowVersion. */
-  flowVersion: ZoyaFlowVersion | UpstreamFlowVersion;
+  flowVersion: JarvisFlowVersion | UpstreamFlowVersion;
   /** Trigger payload (webhook body, manual run input). Default: empty object. */
   triggerPayload?: unknown;
   /** When true, the engine first invokes the trigger's `run` hook. Default: false. */
@@ -366,18 +366,18 @@ interface WarmEngine {
 }
 
 /**
- * Walk the vendored Zoya pieces directory and return each piece's
+ * Walk the vendored Jarvis pieces directory and return each piece's
  * short alias (the part the engine's `getPieceNameFromAlias` strips
  * `piece-` from). Used as the default `devPieces` list so adding a
- * new Zoya piece doesn't require an engine-runtime edit.
+ * new Jarvis piece doesn't require an engine-runtime edit.
  *
  * Failure-tolerant: returns an empty list if the vendor tree is
  * missing or unreadable, so the runtime still constructs (the engine
  * will just fail piece extraction with a clearer error than "missing
  * dir").
  */
-function discoverZoyaDevPieces(): string[] {
-  const root = resolve(ENGINE_BUILD_PATHS.VENDOR_PACKAGES, "pieces/zoya");
+function discoverJarvisDevPieces(): string[] {
+  const root = resolve(ENGINE_BUILD_PATHS.VENDOR_PACKAGES, "pieces/jarvis");
   if (!existsSync(root)) return [];
   const out: string[] = [];
   for (const name of readdirSync(root).sort()) {
@@ -391,7 +391,7 @@ function discoverZoyaDevPieces(): string[] {
       const pkg = JSON.parse(readFileSync(pkgPath, "utf8")) as { name?: unknown };
       if (typeof pkg.name === "string" && pkg.name.length > 0) {
         // Drop the npm scope so the alias matches the format the engine
-        // expects: `@zoyapieces/piece-zoya-foo` -> `zoya-foo`.
+        // expects: `@jarvispieces/piece-jarvis-foo` -> `jarvis-foo`.
         const short = pkg.name.replace(/^@[^/]+\//, "").replace(/^piece-/, "");
         out.push(short);
       }
@@ -450,18 +450,18 @@ export class EngineRuntime {
     this.spawnEnvOverride = opts.spawnEnvOverride;
     this.runtime = opts.runtime;
     // Default to the vendored activepieces dir so dev-pieces resolution finds
-    // packages/pieces/zoya/*/dist/package.json without further env setup.
+    // packages/pieces/jarvis/*/dist/package.json without further env setup.
     this.cwd = opts.cwd ?? resolve(ENGINE_BUILD_PATHS.VENDOR_PACKAGES, "..");
     // Accept piece names with or without the `piece-` prefix; the engine's
     // `getPieceNameFromAlias` normalizes by stripping `piece-` so we
     // match its own behaviour.
     //
-    // Auto-discover Zoya pieces from the vendored tree so adding a
+    // Auto-discover Jarvis pieces from the vendored tree so adding a
     // new piece (regex, anything-next) doesn't need an edit here. The
     // hardcoded list was an easy oversight: forgot one entry and the
     // engine raised PieceNotFoundError at extraction time. Caller can
     // still override via `opts.devPieces` for tests.
-    this.devPieces = opts.devPieces ?? discoverZoyaDevPieces();
+    this.devPieces = opts.devPieces ?? discoverJarvisDevPieces();
   }
 
   /** Expose for callers that need to resolve files into the same baseCodeDir. */
@@ -691,7 +691,7 @@ export class EngineRuntime {
 }
 
 function isUpstreamFlowVersion(
-  v: ZoyaFlowVersion | UpstreamFlowVersion,
+  v: JarvisFlowVersion | UpstreamFlowVersion,
 ): v is UpstreamFlowVersion {
   return typeof (v as UpstreamFlowVersion).created === "string";
 }
@@ -733,4 +733,3 @@ function bindEngineStream(
   // ignored -- the spawned process is gone, nothing to do about it.
   stream.on("error", () => {});
 }
-

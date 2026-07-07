@@ -103,4 +103,3 @@ export function composeBreadcrumb(
   parts.push(roomTitle);
   return parts;
 }
-

@@ -88,4 +88,3 @@ describe("workflow db", () => {
     }).toThrow();
   });
 });
-

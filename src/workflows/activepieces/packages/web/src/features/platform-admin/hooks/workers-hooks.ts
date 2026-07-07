@@ -17,4 +17,3 @@ export const workersQueries = {
       queryFn: () => workersApi.list(),
     }),
 };
-

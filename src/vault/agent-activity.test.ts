@@ -104,4 +104,3 @@ describe('agent-activity', () => {
     expect(countAgentActivity('nope')).toBe(0);
   });
 });
-

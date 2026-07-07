@@ -7,4 +7,3 @@ export const workersApi = {
     return api.get<WorkerMachineWithStatus[]>('/v1/worker-machines');
   },
 };
-

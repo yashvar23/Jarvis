@@ -171,4 +171,3 @@ export function getRecentConversation(channel: string): {
 
   return { conversation, messages };
 }
-

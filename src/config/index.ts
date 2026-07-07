@@ -1,9 +1,6 @@
 // Config types
-export type { ZoyaConfig, UserOwnedSection } from './types.ts';
-export { DEFAULT_CONFIG, USER_OWNED_SECTIONS } from './types.ts';
+export type { JarvisConfig } from './types.ts';
+export { DEFAULT_CONFIG } from './types.ts';
 
-// Config loader. There is no saveConfig: config.yaml is read-only system
-// configuration; user-owned settings persist to the vault DB instead
-// (daemon/user-settings.ts).
-export { loadConfig, readRawConfigFile, applyEnvOverrides, deepMerge } from './loader.ts';
-
+// Config loader
+export { loadConfig, saveConfig } from './loader.ts';

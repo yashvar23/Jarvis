@@ -1,6 +1,6 @@
 /**
  * Drift detection between the hardcoded `sampleCatalog` test fixture and
- * the real Zoya pieces. Gated on `ZOYA_TEST_ENGINE_BUILD=1` because
+ * the real Jarvis pieces. Gated on `JARVIS_TEST_ENGINE_BUILD=1` because
  * we need to spawn the engine to extract metadata.
  *
  * The fixture is structural -- composer/manage-workflow tests bind to its
@@ -32,25 +32,25 @@ import { closeWorkflowDb, initWorkflowDb } from "../db";
 import { CredentialResolver } from "../credentials/adapter";
 import { SandboxApi } from "../sandbox-api/server";
 import { findCachedBundle, buildEngineBundle, ENGINE_BUILD_PATHS } from "../runner/engine-runtime/build";
-import { buildAllZoyaPieces } from "../runner/engine-runtime/build-pieces";
+import { buildAllJarvisPieces } from "../runner/engine-runtime/build-pieces";
 import { EngineRuntime } from "../runner/engine-runtime/engine-runtime";
 import { sampleCatalog } from "./test-fixtures";
 import { buildPieceCatalog } from "./piece-catalog";
 
-const buildOptIn = process.env.ZOYA_TEST_ENGINE_BUILD === "1";
+const buildOptIn = process.env.JARVIS_TEST_ENGINE_BUILD === "1";
 const initialCached = findCachedBundle();
 const skipBundleTests = initialCached === null && !buildOptIn;
 const piecesAlreadyBuilt = existsSync(
-  resolve(ENGINE_BUILD_PATHS.VENDOR_PACKAGES, "pieces/zoya/ask/dist/src/index.js"),
+  resolve(ENGINE_BUILD_PATHS.VENDOR_PACKAGES, "pieces/jarvis/ask/dist/src/index.js"),
 );
 const skipE2eTests = skipBundleTests || (!piecesAlreadyBuilt && !buildOptIn);
 
 // Map the fixture's bare-name keys to the real npm-style package names the
 // engine extracts. These are the three pieces the fixture mirrors today.
 const FIXTURE_TO_REAL: Record<string, string> = {
-  "zoya-ask": "@zoyapieces/piece-zoya-ask",
-  "zoya-notify": "@zoyapieces/piece-zoya-notify",
-  "zoya-trigger": "@zoyapieces/piece-zoya-trigger",
+  "jarvis-ask": "@jarvispieces/piece-jarvis-ask",
+  "jarvis-notify": "@jarvispieces/piece-jarvis-notify",
+  "jarvis-trigger": "@jarvispieces/piece-jarvis-trigger",
 };
 
 describe("sampleCatalog drift vs real piece metadata", () => {
@@ -65,7 +65,7 @@ describe("sampleCatalog drift vs real piece metadata", () => {
     let cached = initialCached;
     if (!cached && buildOptIn) cached = await buildEngineBundle();
     if (!cached) return;
-    if (buildOptIn) await buildAllZoyaPieces();
+    if (buildOptIn) await buildAllJarvisPieces();
     runtime = new EngineRuntime({ api, bundlePath: cached.bundlePath });
   });
 
@@ -78,7 +78,7 @@ describe("sampleCatalog drift vs real piece metadata", () => {
   test.skipIf(skipE2eTests)(
     "fixture action + trigger + field names exist in the real piece metadata",
     async () => {
-      const pieceRoots = [resolve(ENGINE_BUILD_PATHS.VENDOR_PACKAGES, "pieces/zoya")];
+      const pieceRoots = [resolve(ENGINE_BUILD_PATHS.VENDOR_PACKAGES, "pieces/jarvis")];
       const { catalog, failures } = await buildPieceCatalog({
         runtime: runtime!,
         pieceRoots,
@@ -157,4 +157,3 @@ describe("sampleCatalog drift vs real piece metadata", () => {
     60_000,
   );
 });
-

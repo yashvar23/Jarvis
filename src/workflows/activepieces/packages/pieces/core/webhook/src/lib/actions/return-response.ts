@@ -169,4 +169,3 @@ function ensureProtocol(url: string): string {
   }
   return url;
 }
-

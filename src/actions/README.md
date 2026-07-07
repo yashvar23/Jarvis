@@ -1,4 +1,4 @@
-# ZOYA Action Layer
+# J.A.R.V.I.S. Action Layer
 
 The Action Layer provides cross-platform interfaces for controlling applications, browsers, terminals, and managing tool execution.
 
@@ -360,7 +360,7 @@ bun run src/actions/test.ts
 
 Expected output:
 ```
-Testing ZOYA Action Layer
+Testing J.A.R.V.I.S. Action Layer
 
 1. App Controller
    Platform: linux
@@ -368,7 +368,7 @@ Testing ZOYA Action Layer
 
 2. Terminal Executor
    Detected shell: /bin/bash
-   ✓ Command executed: Hello from ZOYA
+   ✓ Command executed: Hello from JARVIS
    Duration: 35ms
 
 3. WSL Bridge
@@ -381,7 +381,7 @@ Testing ZOYA Action Layer
 5. Tool Registry
    Registered tools: 1
    Categories: utility
-   ✓ Tool execution: Echo: Hello ZOYA!
+   ✓ Tool execution: Echo: Hello JARVIS!
 
 ✓ Action Layer test complete!
 ```
@@ -418,5 +418,4 @@ Testing ZOYA Action Layer
 
 ## License
 
-Part of Project ZOYA - See root LICENSE file.
-
+Part of Project J.A.R.V.I.S. - See root LICENSE file.

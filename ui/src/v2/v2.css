@@ -1,8 +1,8 @@
 /* v2 shell scoped styles.
-   All rules live under .zoya-v2-root so the redesign cannot bleed into
+   All rules live under .jarvis-v2-root so the redesign cannot bleed into
    the legacy UI while the feature flag is in play. */
 
-.zoya-v2-root {
+.jarvis-v2-root {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font-sans);
@@ -16,9 +16,9 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.zoya-v2-root *,
-.zoya-v2-root *::before,
-.zoya-v2-root *::after {
+.jarvis-v2-root *,
+.jarvis-v2-root *::before,
+.jarvis-v2-root *::after {
   box-sizing: border-box;
 }
 
@@ -37,7 +37,7 @@
    window. No AppShell, no Thread/Rail, no voice handlers. Padding gives
    the body breathing room from the OS window chrome; overflow:auto so
    long lists scroll within the panel rather than the whole window. */
-.zoya-v2-panel-mode {
+.jarvis-v2-panel-mode {
   padding: 16px 20px;
   overflow: auto;
 }
@@ -46,13 +46,13 @@
    collapse the CommandPalette's scrim to a no-op and let the card fill
    the panel's bounds. The card already has its own border + offset
    shadow from CommandPalette.css. */
-.zoya-v2-palette-mode {
+.jarvis-v2-palette-mode {
   width: 100vw;
   height: 100vh;
   background: transparent;
   overflow: hidden;
 }
-.zoya-v2-palette-mode .v2-palette__scrim {
+.jarvis-v2-palette-mode .v2-palette__scrim {
   position: absolute;
   inset: 0;
   padding: 0;
@@ -61,7 +61,7 @@
   align-items: stretch;
   justify-content: stretch;
 }
-.zoya-v2-palette-mode .v2-palette {
+.jarvis-v2-palette-mode .v2-palette {
   width: 100%;
   max-height: 100%;
   border-radius: 0;
@@ -85,9 +85,9 @@
   border: 0;
 }
 
-.zoya-v2-root h1,
-.zoya-v2-root h2,
-.zoya-v2-root h3 {
+.jarvis-v2-root h1,
+.jarvis-v2-root h2,
+.jarvis-v2-root h3 {
   font-family: var(--font-display);
   font-weight: 500;
   letter-spacing: -0.01em;
@@ -95,13 +95,13 @@
   color: var(--ink);
 }
 
-.zoya-v2-root code,
-.zoya-v2-root pre,
-.zoya-v2-root kbd {
+.jarvis-v2-root code,
+.jarvis-v2-root pre,
+.jarvis-v2-root kbd {
   font-family: var(--font-mono);
 }
 
-.zoya-v2-root ::selection {
+.jarvis-v2-root ::selection {
   background: var(--accent);
   color: var(--accent-ink);
 }

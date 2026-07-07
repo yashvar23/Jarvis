@@ -1,6 +1,6 @@
 # Vault Module
 
-Knowledge graph storage and extraction system for ZOYA
+Knowledge graph storage and extraction system for J.A.R.V.I.S.
 
 ## Modules
 
@@ -21,7 +21,7 @@ Knowledge graph storage and extraction system for ZOYA
 ```typescript
 import { initDatabase } from '@/vault';
 
-initDatabase('./data/zoya.db');
+initDatabase('./data/jarvis.db');
 ```
 
 ### Store Knowledge Manually
@@ -76,7 +76,7 @@ const pending = findCommitments({ status: 'pending' });
 
 ## Documentation
 
-- **Vault Extractor**: [docs/VAULT_EXTRACTOR.md](~/zoya/docs/VAULT_EXTRACTOR.md)
+- **Vault Extractor**: [docs/VAULT_EXTRACTOR.md](~/jarvis/docs/VAULT_EXTRACTOR.md)
 - **Entity Types**: person, project, tool, place, concept, event
 - **Commitment Statuses**: pending, active, completed, failed, escalated
 
@@ -108,4 +108,3 @@ SQLite database with the following tables:
 - `agent_messages`: Inter-agent communication
 - `personality_state`: Personality model storage
 - `conversations`: Conversation tracking
-

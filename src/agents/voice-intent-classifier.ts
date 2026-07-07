@@ -250,7 +250,7 @@ content room ("room": "content"):
    IMPORTANT — do NOT extract "create_content" for utterances that mention
    "site", "website", "landing page", "web app", "homepage", "page", "build
    a page", "site builder", "use the site builder", "edit the site". Those
-   are SITE BUILDER requests (the user wants Zoya to write code into a
+   are SITE BUILDER requests (the user wants Jarvis to write code into a
    project), not content-pipeline drafts. Leave "room_action" null and let
    the chat agent handle them — its "site_*" tools will write the files.
 - "advance" — args: { "name"?: string }
@@ -294,9 +294,9 @@ settings room ("room": "settings"):
 - "set_heartbeat_interval" — args: { "minutes": number }
    matches "set heartbeat to 30 minutes", "check in every hour"
 - "set_heartbeat_aggressiveness" — args: { "level": "passive"|"moderate"|"aggressive" }
-   matches "make zoya more aggressive", "set heartbeat to passive"
+   matches "make jarvis more aggressive", "set heartbeat to passive"
 - "restart_daemon" — args: {}
-   matches "restart zoya", "restart the daemon", "apply the changes"
+   matches "restart jarvis", "restart the daemon", "apply the changes"
    Confirmation required — disconnects the WebSocket briefly. Voice should
    only fire this when the user is explicit; do NOT infer it from indirect
    utterances ("apply settings" is fine; "save settings" is not).
@@ -319,7 +319,7 @@ workspaces room ("room": "workspaces"):
 - "search" — args: { "query": string }
    matches "search projects for dashboard", "filter to react projects"
 - "select_project" — args: { "name": string }
-   matches "open the dashboard project", "select my-app", "open zoya-ui"
+   matches "open the dashboard project", "select my-app", "open jarvis-ui"
 - "back_to_list" — args: {}
    matches "go back", "back to projects", "close this project"
 - "create_project" — args: { "name": string, "template"?: string }
@@ -345,7 +345,7 @@ tasks room ("room": "tasks"):
    value (status): "all" | "pending" | "active" | "completed" | "failed" | "escalated"
    value (priority): "all" | "low" | "normal" | "high" | "critical"
    value (assigned_to): assignee name verbatim, or "all" or "unassigned"
-   matches "show only active tasks", "filter by critical priority", "show zoya's tasks"
+   matches "show only active tasks", "filter by critical priority", "show jarvis's tasks"
 - "select" — args: { "name": string }
    matches "find the OAuth task", "select the standup"
 - "create_task" — args: { "title": string, "when"?: string, "priority"?: "low"|"normal"|"high"|"critical", "assigned_to"?: string }
@@ -360,7 +360,7 @@ tasks room ("room": "tasks"):
 - "update_priority" — args: { "name": string, "level": "low"|"normal"|"high"|"critical" }
    matches "bump the OAuth task to high priority", "make this critical"
 - "reassign" — args: { "name": string, "agent": string }
-   matches "reassign the OAuth task to alice", "give this to zoya"
+   matches "reassign the OAuth task to alice", "give this to jarvis"
 
 goals room ("room": "goals"):
 - "switch_tab" — args: { "tab": "constellation" | "timeline" | "metrics" }
@@ -403,7 +403,7 @@ authority room ("room": "authority"):
 - "set_filter" — args: { "decision": "all" | "allowed" | "denied" | "approval_required" }
    matches "show only denied", "filter audit by approval required", "show all decisions"
 - "grant_access" — args: { "action": ActionCategory }
-   matches "grant Zoya email access", "allow send_email globally",
+   matches "grant Jarvis email access", "allow send_email globally",
    "grant access to send messages", "let agents access the browser"
    The "action" must be one of: read_data, write_data, delete_data,
    send_message, send_email, execute_command, install_software,
@@ -505,7 +505,7 @@ Transcript: "turn off TTS"
 Transcript: "use elevenlabs for tts"
 {"verb":"update","object":null,"args":{},"impact":"write","confidence":0.94,"room_action":{"room":"settings","action":"set_tts_provider","args":{"provider":"elevenlabs"}}}
 
-Transcript: "restart zoya"
+Transcript: "restart jarvis"
 {"verb":"run","object":null,"args":{},"impact":"write","confidence":0.93,"room_action":{"room":"settings","action":"restart_daemon","args":{}}}
 
 Transcript: "replay onboarding"
@@ -586,7 +586,7 @@ Transcript: "I'm back at the PC after lunch how are you"
 Transcript: "I'm ready to go back to work how are you"
 {"verb":"ask","object":null,"args":{},"impact":"read","confidence":0.92}
 
-Transcript: "good morning zoya"
+Transcript: "good morning jarvis"
 {"verb":"ask","object":null,"args":{},"impact":"read","confidence":0.95}
 
 Transcript: "thanks that's all I needed"
@@ -649,7 +649,7 @@ Transcript: "show only people"
 Transcript: "switch to constellation"
 {"verb":"show","object":null,"args":{},"impact":"read","confidence":0.96,"room_action":{"room":"memory","action":"switch_tab","args":{"tab":"constellation"}}}
 
-Transcript: "grant Zoya email access"
+Transcript: "grant Jarvis email access"
 {"verb":"grant","object":{"type":"authority","query":"send_email"},"args":{},"impact":"write","confidence":0.92,"room_action":{"room":"authority","action":"grant_access","args":{"action":"send_email"}}}
 
 Transcript: "show only denied audit entries"
@@ -815,7 +815,7 @@ export async function classifyVoiceIntent(
 
   const contextLines = recentTurns
     .slice(-3)
-    .map((t) => `${t.role === 'user' ? 'USER' : 'ZOYA'}: ${t.text.replace(/\s+/g, ' ').slice(0, 240)}`)
+    .map((t) => `${t.role === 'user' ? 'USER' : 'JARVIS'}: ${t.text.replace(/\s+/g, ' ').slice(0, 240)}`)
     .join('\n');
 
   // Phase 6.7.C — surface where the user is right now so the classifier
@@ -850,4 +850,3 @@ export async function classifyVoiceIntent(
     return permissiveIntent(text);
   }
 }
-

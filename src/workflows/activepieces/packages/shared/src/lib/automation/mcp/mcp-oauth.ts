@@ -46,4 +46,3 @@ export const McpOAuthAuthorizationCode = z.object({
 })
 
 export type McpOAuthAuthorizationCode = z.infer<typeof McpOAuthAuthorizationCode>
-

@@ -1,9 +1,9 @@
 /**
  * Google OAuth2 Setup Script
  *
- * Interactive CLI to authenticate ZOYA with Google APIs.
+ * Interactive CLI to authenticate JARVIS with Google APIs.
  * Opens browser to Google consent screen, handles callback,
- * and saves tokens to ~/.zoya/google-tokens.json.
+ * and saves tokens to ~/.jarvis/google-tokens.json.
  *
  * Usage: bun run src/scripts/google-setup.ts
  */
@@ -18,21 +18,11 @@ const SCOPES = [
 
 async function main() {
   console.log('');
-  console.log('=== Google OAuth2 Setup for ZOYA ===');
+  console.log('=== Google OAuth2 Setup for JARVIS ===');
   console.log('');
 
-  // Load config to get client_id / client_secret. Dashboard-entered creds
-  // live in the vault DB (user-settings google fallback), so open it and
-  // merge before concluding nothing is configured.
+  // Load config to get client_id / client_secret
   const config = await loadConfig();
-  try {
-    const { initDatabase } = await import('../vault/schema.ts');
-    const { mergeUserSettingsIntoConfig } = await import('../daemon/user-settings.ts');
-    initDatabase(config.daemon.db_path, { quiet: true });
-    mergeUserSettingsIntoConfig(config);
-  } catch {
-    // No DB yet (fresh install) - the interactive prompt below handles it.
-  }
 
   let clientId = config.google?.client_id ?? '';
   let clientSecret = config.google?.client_secret ?? '';
@@ -40,7 +30,7 @@ async function main() {
   if (!clientId || !clientSecret) {
     console.log('No Google OAuth credentials found in config.yaml.');
     console.log('');
-    console.log('Add the following to your ~/.zoya/config.yaml:');
+    console.log('Add the following to your ~/.jarvis/config.yaml:');
     console.log('');
     console.log('google:');
     console.log('  client_id: "your-client-id.apps.googleusercontent.com"');
@@ -83,7 +73,7 @@ async function main() {
 
   // Check if already authenticated
   if (auth.isAuthenticated()) {
-    console.log('Already authenticated! Tokens exist at ~/.zoya/google-tokens.json');
+    console.log('Already authenticated! Tokens exist at ~/.jarvis/google-tokens.json');
     console.log('To re-authenticate, delete that file and run this again.');
     process.exit(0);
   }
@@ -143,7 +133,7 @@ async function main() {
           console.log('Authorization successful!');
           console.log(`Access token: ${tokens.access_token.slice(0, 20)}...`);
           console.log(`Refresh token: ${tokens.refresh_token.slice(0, 20)}...`);
-          console.log(`Tokens saved to ~/.zoya/google-tokens.json`);
+          console.log(`Tokens saved to ~/.jarvis/google-tokens.json`);
 
           setTimeout(() => {
             server.stop();
@@ -151,7 +141,7 @@ async function main() {
           }, 500);
 
           return new Response(
-            '<html><body><h1>ZOYA Google Authorization Complete!</h1><p>Tokens saved. You can close this tab.</p></body></html>',
+            '<html><body><h1>JARVIS Google Authorization Complete!</h1><p>Tokens saved. You can close this tab.</p></body></html>',
             { headers: { 'Content-Type': 'text/html' } }
           );
         } catch (err) {
@@ -176,4 +166,3 @@ main().catch((err) => {
   console.error('Setup failed:', err);
   process.exit(1);
 });
-

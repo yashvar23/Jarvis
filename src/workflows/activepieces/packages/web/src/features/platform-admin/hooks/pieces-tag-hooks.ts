@@ -68,4 +68,3 @@ type ApplyTagsParams = {
   piecesName: string[];
   tags: string[];
 };
-

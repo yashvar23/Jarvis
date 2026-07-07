@@ -73,4 +73,3 @@ const executeAction: ActionHandler<CodeAction> = async ({ action, executionState
 
     return executionStateResult
 }
-

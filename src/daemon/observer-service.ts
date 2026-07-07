@@ -86,7 +86,7 @@ export class ObserverService implements Service {
     this.reactor = reactor ?? null;
     this.coalescer = coalescer ?? null;
     this.googleAuth = googleAuth ?? null;
-    this.dataDir = dataDir ?? `${homedir()}/.zoya`;
+    this.dataDir = dataDir ?? `${homedir()}/.jarvis`;
   }
 
   /**
@@ -106,7 +106,7 @@ export class ObserverService implements Service {
       // and stream to the brain, which ingests them in src/daemon/index.ts.
       // This service registers only the account-level integrations below.
       //
-      // NB: this supersedes the ZOYA_FILE_WATCH_PATHS boot-hang workaround
+      // NB: this supersedes the JARVIS_FILE_WATCH_PATHS boot-hang workaround
       // (#246) — there is no brain-side file watcher to hang boot anymore.
 
       // Register Gmail observer (if Google auth available)
@@ -179,4 +179,3 @@ export class ObserverService implements Service {
     return this._status;
   }
 }
-

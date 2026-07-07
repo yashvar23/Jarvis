@@ -19,10 +19,10 @@ package main
 extern void goHotkeyFire(unsigned long long hotkeyID);
 
 // Returns a retained handle (void*) for the installed monitor; remove via
-// zoyaHotkeyRemove. modMask is an NSEventModifierFlags subset; keyCode is the
+// jarvisHotkeyRemove. modMask is an NSEventModifierFlags subset; keyCode is the
 // hardware key code. NOTE: the id param must not be named `id` -- that shadows
 // the Objective-C `id` type used for the monitor handle below.
-static void* zoyaHotkeyAdd(unsigned long modMask, unsigned short keyCode, unsigned long long hotkeyID) {
+static void* jarvisHotkeyAdd(unsigned long modMask, unsigned short keyCode, unsigned long long hotkeyID) {
     NSEventModifierFlags want = (NSEventModifierFlags)modMask;
     id mon = [NSEvent addGlobalMonitorForEventsMatchingMask:NSEventMaskKeyDown
                                                     handler:^(NSEvent* e) {
@@ -35,7 +35,7 @@ static void* zoyaHotkeyAdd(unsigned long modMask, unsigned short keyCode, unsign
     return (__bridge_retained void*)mon;
 }
 
-static void zoyaHotkeyRemove(void* p) {
+static void jarvisHotkeyRemove(void* p) {
     if (!p) return;
     id mon = (__bridge_transfer id)p;
     [NSEvent removeMonitor:mon];
@@ -77,13 +77,13 @@ func startHotkeyListener(keyspec string, onFire func()) (func(), error) {
 	}
 	id := hotkeyCounterDarwin.Add(1)
 	hotkeyRegDarwin.Store(id, onFire)
-	mon := C.zoyaHotkeyAdd(C.ulong(mods), C.ushort(keyCode), C.ulonglong(id))
+	mon := C.jarvisHotkeyAdd(C.ulong(mods), C.ushort(keyCode), C.ulonglong(id))
 	if mon == nil {
 		hotkeyRegDarwin.Delete(id)
 		return nil, fmt.Errorf("addGlobalMonitor failed for %q (Accessibility permission?)", keyspec)
 	}
 	stop := func() {
-		C.zoyaHotkeyRemove(mon)
+		C.jarvisHotkeyRemove(mon)
 		hotkeyRegDarwin.Delete(id)
 	}
 	return stop, nil

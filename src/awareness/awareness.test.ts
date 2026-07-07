@@ -47,7 +47,7 @@ describe('Vault — Screen Captures', () => {
       timestamp: Date.now(),
       pixelChangePct: 0.15,
       appName: 'VS Code',
-      windowTitle: 'index.ts - zoya - Visual Studio Code',
+      windowTitle: 'index.ts - jarvis - Visual Studio Code',
       ocrText: 'function hello() { return "world"; }',
     });
     expect(row.id).toBeTruthy();
@@ -64,14 +64,14 @@ describe('Vault — Screen Captures', () => {
       timestamp: Date.now(),
       pixelChangePct: 0.2,
       sidecarId: 'sidecar-abc-123',
-      imagePath: '/home/user/.zoya/captures/2026-05-11/12-00-00.png',
+      imagePath: '/home/user/.jarvis/captures/2026-05-11/12-00-00.png',
       appName: 'Terminal',
     });
     expect(row.sidecar_id).toBe('sidecar-abc-123');
 
     const fetched = getCapture(row.id);
     expect(fetched!.sidecar_id).toBe('sidecar-abc-123');
-    expect(fetched!.image_path).toBe('/home/user/.zoya/captures/2026-05-11/12-00-00.png');
+    expect(fetched!.image_path).toBe('/home/user/.jarvis/captures/2026-05-11/12-00-00.png');
   });
 
   test('createCapture without sidecarId stores null (legacy rows)', () => {
@@ -377,4 +377,3 @@ describe('ContextGraph', () => {
     expect(entities[0].type).toBe('tool');
   });
 });
-

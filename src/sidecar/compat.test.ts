@@ -62,4 +62,3 @@ describe('classifySidecarVersion', () => {
     expect(classifySidecarVersion('0.0.0')).toBe('blocked');
   });
 });
-

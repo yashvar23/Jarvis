@@ -2,11 +2,11 @@ import { createHash } from 'node:crypto';
 import os from 'node:os';
 
 /**
- * Namespace prefix mixed into the hash so the digest is specific to ZOYA
+ * Namespace prefix mixed into the hash so the digest is specific to JARVIS
  * telemetry and can be rotated (bump the version) without colliding with any
  * other hash of the same hostname+username.
  */
-const ANON_ID_NAMESPACE = 'zoya-telemetry-v1';
+const ANON_ID_NAMESPACE = 'jarvis-telemetry-v1';
 
 /**
  * Deterministic, non-reversible anonymous machine id.
@@ -46,4 +46,3 @@ function safeUsername(): string {
     return 'unknown-user';
   }
 }
-

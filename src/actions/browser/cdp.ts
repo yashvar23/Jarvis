@@ -136,4 +136,3 @@ export class CDPClient {
     return this.ws !== null && this.ws.readyState === WebSocket.OPEN;
   }
 }
-

@@ -11,4 +11,3 @@ export const ProjectRole = z.object({
 })
 
 export type ProjectRole = z.infer<typeof ProjectRole>
-

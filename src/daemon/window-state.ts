@@ -3,7 +3,7 @@
  *
  * Stores the last known bounds (x, y, w, h) for each spawnable room so
  * voice / palette / direct opens land the panel where the user left it.
- * Lives at ~/.zoya/window-state.json so it's per-machine — different
+ * Lives at ~/.jarvis/window-state.json so it's per-machine — different
  * monitors warrant different positions.
  *
  * Keyed by room key (workflows / memory / settings / …) rather than panel
@@ -25,7 +25,7 @@ type WindowStateFile = {
   rooms: Record<string, RoomBounds>;
 };
 
-const STATE_DIR = path.join(os.homedir(), '.zoya');
+const STATE_DIR = path.join(os.homedir(), '.jarvis');
 const STATE_PATH = path.join(STATE_DIR, 'window-state.json');
 const WRITE_DEBOUNCE_MS = 400;
 
@@ -113,4 +113,3 @@ export function clampBoundsToViewport(
   if (x === bounds.x && y === bounds.y) return bounds;
   return { x, y, w: bounds.w, h: bounds.h };
 }
-

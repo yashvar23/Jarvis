@@ -15,4 +15,3 @@ export type JsonProperty<R extends boolean> = BasePropertySchema &
     PropertyType.JSON,
     R
   >;
-

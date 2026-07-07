@@ -7,7 +7,6 @@ export type LLMMessage = {
   content: string | ContentBlock[];
   tool_calls?: LLMToolCall[];   // present on assistant messages with tool use
   tool_call_id?: string;        // present on tool result messages
-  cache?: boolean;              // marks a stable prompt-cache boundary. Only honored on SYSTEM messages (Anthropic puts a cache_control breakpoint on the marked block); conversation-history caching is automatic via the provider's last-message breakpoint. Providers without explicit prompt caching ignore it.
 };
 
 export type LLMTool = {
@@ -25,15 +24,7 @@ export type LLMToolCall = {
 export type LLMResponse = {
   content: string;
   tool_calls: LLMToolCall[];
-  usage: {
-    // Normalized across providers: input_tokens counts only UNCACHED prompt
-    // tokens (billed at full price). The full prompt size is
-    // input_tokens + cache_read_input_tokens + cache_creation_input_tokens.
-    input_tokens: number;
-    output_tokens: number;
-    cache_read_input_tokens?: number;      // tokens served from provider prompt cache (~0.1x on Anthropic, 0.5x on OpenAI)
-    cache_creation_input_tokens?: number;  // tokens written to provider prompt cache (1.25x on Anthropic; always 0 on OpenAI)
-  };
+  usage: { input_tokens: number; output_tokens: number };
   model: string;
   finish_reason: 'stop' | 'tool_use' | 'length' | 'error';
 };
@@ -127,4 +118,3 @@ export function guardImageSize(block: ContentBlock): ContentBlock {
   }
   return block;
 }
-

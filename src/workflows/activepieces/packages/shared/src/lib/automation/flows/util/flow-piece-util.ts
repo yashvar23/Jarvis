@@ -15,4 +15,3 @@ export const flowPieceUtil = {
             .map((step) => step.settings.pieceName)
     },
 }
-

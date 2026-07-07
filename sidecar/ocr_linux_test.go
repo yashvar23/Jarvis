@@ -33,7 +33,7 @@ func TestPlatformOCRRunsWhenTesseractAvailable(t *testing.T) {
 	// We don't ship a sample PNG; smoke-test that platformOCR returns an
 	// error for a non-existent path (i.e., the tesseract invocation happens
 	// and propagates the failure).
-	_, err := platformOCR("/nonexistent/zoya-ocr-smoke.png")
+	_, err := platformOCR("/nonexistent/jarvis-ocr-smoke.png")
 	if err == nil {
 		t.Fatal("expected error for nonexistent image path")
 	}

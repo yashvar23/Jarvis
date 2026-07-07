@@ -1,13 +1,13 @@
 import { test, expect, describe } from 'bun:test';
 import { resolveRealtimeVoice, DEFAULT_BLOCKED_CATEGORIES } from './realtime.ts';
 import { DEFAULT_CONFIG } from './types.ts';
-import type { ZoyaConfig } from './types.ts';
+import type { JarvisConfig } from './types.ts';
 
-function makeConfig(overrides: Partial<ZoyaConfig> = {}): ZoyaConfig {
+function makeConfig(overrides: Partial<JarvisConfig> = {}): JarvisConfig {
   return { ...structuredClone(DEFAULT_CONFIG), ...overrides };
 }
 
-function withOpenAIProvider(config: ZoyaConfig, key: string): ZoyaConfig {
+function withOpenAIProvider(config: JarvisConfig, key: string): JarvisConfig {
   config.llm.providers = { ...(config.llm.providers ?? {}), openai: { api_key: key } };
   return config;
 }
@@ -61,16 +61,16 @@ describe('resolveRealtimeVoice', () => {
     // config.llm.providers at runtime). There is no config.yaml or env fallback.
     const config = makeConfig();
     config.voice!.realtime = { enabled: true };
-    const prevZoya = process.env.ZOYA_OPENAI_KEY;
+    const prevJarvis = process.env.JARVIS_OPENAI_KEY;
     const prevOpenAI = process.env.OPENAI_API_KEY;
-    process.env.ZOYA_OPENAI_KEY = 'env-key';
+    process.env.JARVIS_OPENAI_KEY = 'env-key';
     process.env.OPENAI_API_KEY = 'env-key';
     try {
       const res = resolveRealtimeVoice(config);
       expect(res.ok).toBe(false);
       if (!res.ok) expect(res.reason).toContain('no OpenAI key');
     } finally {
-      if (prevZoya === undefined) delete process.env.ZOYA_OPENAI_KEY; else process.env.ZOYA_OPENAI_KEY = prevZoya;
+      if (prevJarvis === undefined) delete process.env.JARVIS_OPENAI_KEY; else process.env.JARVIS_OPENAI_KEY = prevJarvis;
       if (prevOpenAI === undefined) delete process.env.OPENAI_API_KEY; else process.env.OPENAI_API_KEY = prevOpenAI;
     }
   });
@@ -128,4 +128,3 @@ describe('resolveRealtimeVoice', () => {
     }
   });
 });
-

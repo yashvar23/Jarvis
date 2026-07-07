@@ -6,7 +6,7 @@ import { secureDirectory, secureParentDirectory, secureWriteFile } from './fs-se
 
 describe('secureWriteFile', () => {
   test('writes data and applies the requested mode', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'zoya-fs-secure-'));
+    const dir = await mkdtemp(join(tmpdir(), 'jarvis-fs-secure-'));
     try {
       const target = join(dir, 'secret.txt');
       await secureWriteFile(target, 'hello', 0o600, 'Test');
@@ -18,7 +18,7 @@ describe('secureWriteFile', () => {
   });
 
   test('refuses to write through a symlink (ELOOP via O_NOFOLLOW)', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'zoya-fs-secure-'));
+    const dir = await mkdtemp(join(tmpdir(), 'jarvis-fs-secure-'));
     try {
       const decoy = join(dir, 'decoy.txt');
       const link = join(dir, 'secret.txt');
@@ -34,7 +34,7 @@ describe('secureWriteFile', () => {
   });
 
   test('truncates an existing regular file', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'zoya-fs-secure-'));
+    const dir = await mkdtemp(join(tmpdir(), 'jarvis-fs-secure-'));
     try {
       const target = join(dir, 'secret.txt');
       await writeFile(target, 'old longer contents');
@@ -48,7 +48,7 @@ describe('secureWriteFile', () => {
 
 describe('secureDirectory', () => {
   test('creates the directory with 0o700 and tightens an existing looser one', async () => {
-    const root = await mkdtemp(join(tmpdir(), 'zoya-fs-secure-'));
+    const root = await mkdtemp(join(tmpdir(), 'jarvis-fs-secure-'));
     try {
       const nested = join(root, 'a', 'b');
       await secureDirectory(nested);
@@ -70,4 +70,3 @@ describe('secureParentDirectory', () => {
     await expect(secureParentDirectory('config.yaml')).resolves.toBeUndefined();
   });
 });
-

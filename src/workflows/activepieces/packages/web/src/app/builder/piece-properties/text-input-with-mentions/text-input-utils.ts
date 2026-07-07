@@ -290,4 +290,3 @@ export const textMentionUtils = {
   dataSelectorCssClassSelector,
   isDataSelectorOrChildOfDataSelector,
 };
-

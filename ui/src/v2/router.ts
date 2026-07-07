@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
  *  - `room` is the Phase 6 fullscreen Room overlay (used inside the dashboard
  *    when the user navigates within the SPA).
  *  - `panel` is the bare-room mode used when the sidecar spawns a Room as a
- *    standalone native window (T18 — "Zoya open settings"). Renders ONLY
+ *    standalone native window (T18 — "Jarvis open settings"). Renders ONLY
  *    the RoomBody, no AppShell, no voice handlers — so the pebble's sidecar-
  *    side voice loop is the single source of voice input (no double-voice).
  *
@@ -121,4 +121,3 @@ export function openRoom(key: RoomKey): void {
 export function closeRoom(): void {
   navigateV2({ kind: "home" });
 }
-

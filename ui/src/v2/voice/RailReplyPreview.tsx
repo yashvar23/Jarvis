@@ -8,13 +8,13 @@ import "./RailReplyPreview.css";
 const MAX_CHARS = 200;
 
 /**
- * Phase 6.5.5 — surfaces the LAST SENTENCE of Zoya's most recent reply
+ * Phase 6.5.5 — surfaces the LAST SENTENCE of Jarvis's most recent reply
  * in the VoiceRail, but ONLY when the user is inside a Room. On the home
  * thread the reply is already visible in the thread itself, so duplicating
  * here would just be visual noise.
  *
  * The user explicitly asked for last-sentence-only — long replies stay in
- * the thread; this preview is a peek so the user knows Zoya answered
+ * the thread; this preview is a peek so the user knows Jarvis answered
  * without leaving the Room.
  */
 export function RailReplyPreview() {
@@ -39,7 +39,7 @@ export function RailReplyPreview() {
       className="v2-rail-reply"
       role="status"
       aria-live="polite"
-      aria-label="Zoya just said"
+      aria-label="Jarvis just said"
       // Keying on text length triggers the fade-in animation as new
       // tokens stream in; a stable key would skip the animation.
       key={latestAssistantReply.text.length}
@@ -47,7 +47,7 @@ export function RailReplyPreview() {
       <div className="v2-rail-reply__head">
         <span className="v2-rail-reply__attrib">
           <span className="v2-rail-reply__dot" aria-hidden="true" />
-          Zoya said
+          Jarvis said
         </span>
         {latestAssistantReply.isStreaming && (
           <span className="v2-rail-reply__streaming" aria-hidden="true">

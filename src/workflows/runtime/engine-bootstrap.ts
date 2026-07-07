@@ -1,6 +1,6 @@
 /**
  * Daemon-side bootstrap for the workflow engine: locates / builds the engine
- * bundle, ensures Zoya-native pieces are compiled to dist/, starts a
+ * bundle, ensures Jarvis-native pieces are compiled to dist/, starts a
  * loopback `SandboxApi` server on a random port, constructs an
  * `EngineRuntime` against the bundle, and extracts the `PieceCatalog`.
  *
@@ -26,7 +26,7 @@ import {
   ENGINE_BUILD_PATHS,
   findCachedBundle,
 } from "../runner/engine-runtime/build";
-import { buildAllZoyaPieces } from "../runner/engine-runtime/build-pieces";
+import { buildAllJarvisPieces } from "../runner/engine-runtime/build-pieces";
 import { EngineRuntime } from "../runner/engine-runtime/engine-runtime";
 import {
   SandboxApi,
@@ -45,7 +45,7 @@ import {
 import { piecesBaseDir } from "../pieces-library/installer";
 
 export interface BootstrapWorkflowEngineOptions {
-  /** Service backends for the `/v1/zoya/*` routes. Each unset slot returns 503. */
+  /** Service backends for the `/v1/jarvis/*` routes. Each unset slot returns 503. */
   services: SandboxApiServices;
   /**
    * Bind host for the SandboxApi. Default `127.0.0.1` -- the engine spawns
@@ -56,12 +56,12 @@ export interface BootstrapWorkflowEngineOptions {
   log?: (line: string) => void;
   /**
    * Optional override for the catalog cache file. Default
-   * `~/.zoya/cache/piece-metadata.json`. Tests can pass their own path.
+   * `~/.jarvis/cache/piece-metadata.json`. Tests can pass their own path.
    */
   cacheFile?: string;
   /**
    * Optional override for the piece root dirs scanned during catalog build.
-   * Default: the vendored Zoya piece tree only. Future community pieces
+   * Default: the vendored Jarvis piece tree only. Future community pieces
    * will be added here.
    */
   pieceRoots?: string[];
@@ -91,7 +91,7 @@ export interface BootstrapWorkflowEngineResult {
   shutdown: () => Promise<void>;
 }
 
-const DEFAULT_CACHE_FILE = resolve(homedir(), ".zoya", "cache", "piece-metadata.json");
+const DEFAULT_CACHE_FILE = resolve(homedir(), ".jarvis", "cache", "piece-metadata.json");
 
 export async function bootstrapWorkflowEngine(
   opts: BootstrapWorkflowEngineOptions,
@@ -102,7 +102,7 @@ export async function bootstrapWorkflowEngine(
   // 0. Reconcile the user-installed pieces library before anything else.
   // A fresh Docker container (volume mounted but no node_modules yet) needs
   // `bun install` to re-materialize the install set declared in
-  // `~/.zoya/pieces/installed.json`. Empty manifest = no-op. Failures are
+  // `~/.jarvis/pieces/installed.json`. Empty manifest = no-op. Failures are
   // logged but don't block engine startup -- the catalog will just exclude
   // the missing pieces and the user can re-trigger via the Library UI.
   try {
@@ -148,7 +148,7 @@ export async function bootstrapWorkflowEngine(
         return c;
       })(),
     ),
-    labelled("piece-compile", buildAllZoyaPieces()),
+    labelled("piece-compile", buildAllJarvisPieces()),
     labelled("sandbox-api-start", api.start({ host: opts.host ?? "127.0.0.1", port: 0 })),
   ]);
   log(`bundle + pieces + sandbox api ready in ${Date.now() - t0}ms (${api.baseUrl})`);
@@ -161,8 +161,8 @@ export async function bootstrapWorkflowEngine(
   // released engine ends up in the warm slot and is reused by the first
   // real RUN_FLOW after bootstrap -- effectively "pre-warm for free".
   //
-  // customPiecesPaths includes the user pieces dir (`~/.zoya/pieces`)
-  // alongside the vendored Zoya pieces. The engine's piece-loader walks
+  // customPiecesPaths includes the user pieces dir (`~/.jarvis/pieces`)
+  // alongside the vendored Jarvis pieces. The engine's piece-loader walks
   // both at runtime: vendored pieces resolve via the standard upstream
   // layout, user-installed pieces via our patched shared-node_modules
   // shape (see piece-loader.ts).
@@ -182,11 +182,11 @@ export async function bootstrapWorkflowEngine(
   // (~3s cold) and runs EXTRACT_PIECE_METADATA per piece.
   // pieceRoots feeds discoverPieces -- which walks each root's children for
   // a `package.json` and registers them in the catalog. Two roots today:
-  //   1. vendored Zoya-native pieces (always present)
-  //   2. user-installed community pieces under `~/.zoya/pieces/node_modules/@activepieces/`
+  //   1. vendored Jarvis-native pieces (always present)
+  //   2. user-installed community pieces under `~/.jarvis/pieces/node_modules/@activepieces/`
   //      (may be missing; discoverPieces handles a missing dir gracefully)
   const pieceRoots = opts.pieceRoots ?? [
-    resolve(ENGINE_BUILD_PATHS.VENDOR_PACKAGES, "pieces/zoya"),
+    resolve(ENGINE_BUILD_PATHS.VENDOR_PACKAGES, "pieces/jarvis"),
     resolve(piecesNodeModulesDir(), "@activepieces"),
   ];
   const cacheKey = computeCatalogCacheKey({
@@ -227,4 +227,3 @@ export async function bootstrapWorkflowEngine(
     },
   };
 }
-

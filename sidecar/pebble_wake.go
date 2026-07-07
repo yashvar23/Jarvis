@@ -5,10 +5,10 @@ package main
 // Strategy: continuous mic capture + VAD-driven segmentation. Each speech
 // segment (roughly one phrase the user said) is streamed to the daemon as
 // an `audio.wake_segment` event. The daemon transcribes via the existing
-// STT provider and word-searches the transcript for "zoya". Catching
+// STT provider and word-searches the transcript for "jarvis". Catching
 // the wake via STT (rather than openwakeword + ONNX runtime) means:
 //   - No new native deps to bundle per platform
-//   - Naturally handles "any phrase containing Zoya" (the user's ask)
+//   - Naturally handles "any phrase containing Jarvis" (the user's ask)
 //   - Reuses 100% of the STT infrastructure
 //
 // Trade-off vs. native wake-word: latency = silence-cutoff (~1 s) + STT
@@ -19,7 +19,7 @@ package main
 // Suppression: WakeListener.Pause() releases the mic device entirely so
 // the Ctrl+Space-triggered session capture can grab it without contention.
 // Resume() restarts the continuous capture once the session ends. The
-// daemon also gates wake_segment processing during TTS playback so ZOYA
+// daemon also gates wake_segment processing during TTS playback so JARVIS
 // saying his own name doesn't re-trigger the loop.
 
 import (
@@ -32,7 +32,7 @@ import (
 )
 
 // WakeListenerOpts tunes the wake-word listener's segmentation. Defaults
-// favor catching brief utterances ("Zoya") over avoiding false segments,
+// favor catching brief utterances ("Jarvis") over avoiding false segments,
 // since the daemon's transcript word-search filters out non-wake speech
 // for free.
 type WakeListenerOpts struct {
@@ -45,7 +45,7 @@ type WakeListenerOpts struct {
 
 // DefaultWakeListenerOpts — tuned for typical desktop mics with
 // responsiveness as the priority. Silence cutoff is aggressive (350 ms) so
-// the wake match → listening transition feels instant; "Hey Zoya" runs
+// the wake match → listening transition feels instant; "Hey Jarvis" runs
 // together as one phrase so mid-phrase pauses shorter than this are rare.
 // If you find segments getting cut mid-word, raise this.
 func DefaultWakeListenerOpts() WakeListenerOpts {
@@ -71,7 +71,7 @@ type WakeListenerService struct {
 	// suppression (during summon) doesn't tear down the device.
 	// suppressDepth is the lighter-weight gate used while the device stays
 	// open but captured chunks must be dropped (TTS playback, region select)
-	// so ZOYA's own voice / chord-press audio can't trigger a wake. It is a
+	// so JARVIS's own voice / chord-press audio can't trigger a wake. It is a
 	// COUNTER, not a bool, because the sources are independent and can overlap:
 	// a bool let whichever source released first re-enable the mic while the
 	// other still needed it suppressed. Suppressed iff depth > 0.
@@ -285,7 +285,7 @@ func (w *WakeListenerService) coordinate(ctx context.Context) {
 // minWakeSpeechChunks is the floor on speech-energy chunks for a segment to be
 // shipped for STT. At the ~30 ms capture buffer this is ~90 ms of voiced audio
 // — enough to reject stray clicks/blips while still catching a single short
-// "Zoya". (Replaces the old first-to-last speech-timestamp span, which
+// "Jarvis". (Replaces the old first-to-last speech-timestamp span, which
 // under-measured clipped words and silently dropped the core wake utterance.)
 const minWakeSpeechChunks = 3
 
@@ -312,10 +312,10 @@ func (w *WakeListenerService) maybeEmitSegment(ctx context.Context) {
 
 	// Discard tiny blips — most likely background noise, not a real utterance.
 	// Gate on the COUNT of speech-energy chunks, not the first-to-last speech
-	// timestamp span: a single clipped/quiet word ("Zoya") whose energy only
+	// timestamp span: a single clipped/quiet word ("Jarvis") whose energy only
 	// crosses the threshold in a few non-contiguous chunks has a tiny span yet
 	// is exactly what we must catch. The chunk count is gap-tolerant. The
-	// daemon's STT + "zoya" regex is the real noise filter, so we err toward
+	// daemon's STT + "jarvis" regex is the real noise filter, so we err toward
 	// keeping borderline segments.
 	if speechChunks < minWakeSpeechChunks {
 		log.Printf("[wake] discard short segment (%d speech chunks, %dms span)", speechChunks, speechDur.Milliseconds())

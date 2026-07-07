@@ -250,12 +250,12 @@ export function SetupRoom({ onComplete }: { onComplete: () => void }) {
   const [skipError, setSkipError] = useState<string | null>(null);
 
   // Escape hatch available from every setup screen. No LLM gets
-  // configured, so Zoya can't chat until the user wires a provider
+  // configured, so Jarvis can't chat until the user wires a provider
   // up in Settings — but they reach the dashboard immediately.
   const handleSkipSetup = async () => {
     if (
       !confirm(
-        "Skip setup? Zoya won't be able to respond until you configure an LLM in Settings. You can re-run onboarding any time from Settings.",
+        "Skip setup? Jarvis won't be able to respond until you configure an LLM in Settings. You can re-run onboarding any time from Settings.",
       )
     ) {
       return;
@@ -447,7 +447,7 @@ export function SetupRoom({ onComplete }: { onComplete: () => void }) {
     <div className="v2-setup" role="dialog" aria-modal="true" aria-label="First-run setup">
       <div className="v2-setup__wrap">
         <header className="v2-setup__head">
-          <div className="v2-setup__brand">ZOYA</div>
+          <div className="v2-setup__brand">JARVIS</div>
           <div className="v2-setup__progress">
             <div
               className="v2-setup__progress-step"
@@ -491,7 +491,7 @@ export function SetupRoom({ onComplete }: { onComplete: () => void }) {
 
         {screen === "llm" ? (
           <section className="v2-setup__screen">
-            <h1 className="v2-setup__title">Pick an LLM to power Zoya.</h1>
+            <h1 className="v2-setup__title">Pick an LLM to power Jarvis.</h1>
             <p className="v2-setup__sub">
               Anthropic's Claude is the recommended default. Ollama runs
               locally with no API key. You can change this any time from
@@ -806,7 +806,7 @@ export function SetupRoom({ onComplete }: { onComplete: () => void }) {
           </section>
         ) : screen === "stt" ? (
           <section className="v2-setup__screen">
-            <h1 className="v2-setup__title">How should Zoya hear you?</h1>
+            <h1 className="v2-setup__title">How should Jarvis hear you?</h1>
             <p className="v2-setup__sub">
               Speech-to-text powers voice messages and the mic button. Skip
               for now if you only plan to type — you can wire this up later
@@ -863,7 +863,7 @@ export function SetupRoom({ onComplete }: { onComplete: () => void }) {
                   autoComplete="off"
                 />
                 <p className="v2-setup__hint">
-                  Stored locally in your ZOYA config — never sent anywhere
+                  Stored locally in your JARVIS config — never sent anywhere
                   except {sttChoice === "openai" ? "OpenAI" : "Groq"}.
                 </p>
               </div>
@@ -922,7 +922,7 @@ export function SetupRoom({ onComplete }: { onComplete: () => void }) {
           </section>
         ) : (
           <section className="v2-setup__screen">
-            <h1 className="v2-setup__title">Should Zoya speak to you?</h1>
+            <h1 className="v2-setup__title">Should Jarvis speak to you?</h1>
             <p className="v2-setup__sub">
               Voice replies are optional. You can always change this in
               Settings later.
@@ -943,7 +943,7 @@ export function SetupRoom({ onComplete }: { onComplete: () => void }) {
                 onClick={() => setTtsChoice("edge")}
                 icon={Volume2}
                 title="Edge TTS"
-                body="Free, clean, ships with Zoya. Pick a voice below."
+                body="Free, clean, ships with Jarvis. Pick a voice below."
               />
               <ChoiceCard
                 id="elevenlabs"

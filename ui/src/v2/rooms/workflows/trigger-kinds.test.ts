@@ -35,8 +35,8 @@ describe("detectTriggerKind", () => {
     expect(detectTriggerKind(pieceTrigger("t", "webhook"))).toBe("webhook");
   });
 
-  test("zoya-trigger pieceName -> event", () => {
-    expect(detectTriggerKind(pieceTrigger("t", "@zoyapieces/piece-zoya-trigger", "on_event"))).toBe("event");
+  test("jarvis-trigger pieceName -> event", () => {
+    expect(detectTriggerKind(pieceTrigger("t", "@jarvispieces/piece-jarvis-trigger", "on_event"))).toBe("event");
   });
 
   test("community pieceName -> other (NOT manual -- otherwise the picker would silently overwrite)", () => {
@@ -56,7 +56,7 @@ describe("transitionTriggerKind", () => {
   // so a typo on either entry surfaces in this file.
   test("TRIGGER_KINDS table contains exactly the four canonical kinds in presentation order", () => {
     expect(TRIGGER_KINDS.map((tk) => tk.kind)).toEqual(["manual", "schedule", "webhook", "event"]);
-    expect(TRIGGER_KINDS.find((tk) => tk.kind === "event")?.pieceName).toBe("@zoyapieces/piece-zoya-trigger");
+    expect(TRIGGER_KINDS.find((tk) => tk.kind === "event")?.pieceName).toBe("@jarvispieces/piece-jarvis-trigger");
     expect(TRIGGER_KINDS.find((tk) => tk.kind === "event")?.triggerName).toBe("on_event");
   });
 
@@ -99,8 +99,8 @@ describe("transitionTriggerKind", () => {
       const scheduleSettings = { pieceName: "schedule", input: { cron_expression: "0 9 * * *" } };
       const r1 = transitionTriggerKind("schedule", scheduleSettings, "manual", makeEmptyStash());
       const r2 = transitionTriggerKind("manual", r1.settings, "event", r1.nextStash);
-      // Event starts fresh with the canonical zoya-trigger pieceName.
-      expect(r2.settings?.pieceName).toBe("@zoyapieces/piece-zoya-trigger");
+      // Event starts fresh with the canonical jarvis-trigger pieceName.
+      expect(r2.settings?.pieceName).toBe("@jarvispieces/piece-jarvis-trigger");
       expect(r2.settings?.triggerName).toBe("on_event");
       // Schedule stash survives the manual-detour: a later click can still restore the cron.
       expect(r2.nextStash.schedule?.input?.cron_expression).toBe("0 9 * * *");
@@ -109,12 +109,12 @@ describe("transitionTriggerKind", () => {
     });
 
     test("event -> event is a no-op-ish (fresh settings only because stash is empty)", () => {
-      const eventSettings = { pieceName: "@zoyapieces/piece-zoya-trigger", triggerName: "on_event", input: { eventType: "observer.clipboard_changed" } };
+      const eventSettings = { pieceName: "@jarvispieces/piece-jarvis-trigger", triggerName: "on_event", input: { eventType: "observer.clipboard_changed" } };
       const r = transitionTriggerKind("event", eventSettings, "event", makeEmptyStash());
       // No incoming stash + outgoing same kind = the transition resets to fresh.
       // (This is a slightly weird corner; the picker UI never fires self-transitions
       // since clicking the active button is a no-op in the UI's click handler.)
-      expect(r.settings?.pieceName).toBe("@zoyapieces/piece-zoya-trigger");
+      expect(r.settings?.pieceName).toBe("@jarvispieces/piece-jarvis-trigger");
       expect(r.settings?.input).toEqual({});
     });
   });
@@ -147,4 +147,3 @@ describe("transitionTriggerKind", () => {
     });
   });
 });
-

@@ -87,8 +87,8 @@ func getCDP(cfg *SidecarConfig, headless, explicit bool) (*cdpClient, error) {
 }
 
 // browserProfileName derives a per-browser user-data dir name from the
-// executable, e.g. chrome.exe -> "zoya-chrome-profile",
-// msedge.exe -> "zoya-msedge-profile".
+// executable, e.g. chrome.exe -> "jarvis-chrome-profile",
+// msedge.exe -> "jarvis-msedge-profile".
 func browserProfileName(exe string) string {
 	base := strings.ToLower(filepath.Base(exe))
 	if ext := filepath.Ext(base); ext != "" {
@@ -98,7 +98,7 @@ func browserProfileName(exe string) string {
 	if base == "" {
 		base = "chromium"
 	}
-	return "zoya-" + base + "-profile"
+	return "jarvis-" + base + "-profile"
 }
 
 // chromiumLaunchArgs builds the command-line flags for the automation browser.

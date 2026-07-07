@@ -370,8 +370,8 @@ func (s *subPebbleServiceWindows) createOverlayWindow(entry *subPebbleEntry) err
 	// Per-instance class isn't needed — Win32 allows N windows of the same
 	// class. Use a sub-pebble-specific class so messages don't get confused
 	// with the main pebble's class.
-	className, _ := syscall.UTF16PtrFromString("ZoyaSubPebbleOverlay")
-	windowName, _ := syscall.UTF16PtrFromString("ZOYA sub-agent")
+	className, _ := syscall.UTF16PtrFromString("JarvisSubPebbleOverlay")
+	windowName, _ := syscall.UTF16PtrFromString("JARVIS sub-agent")
 
 	hInstance, _, _ := procGetModuleHandleW.Call(0)
 

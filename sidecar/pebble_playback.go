@@ -256,7 +256,7 @@ drain:
 
 // SetPlayStateListener registers a callback that fires with true when
 // playback starts and false when it ends. Used by the wake listener to
-// gate captures during TTS so ZOYA's voice through the speakers doesn't
+// gate captures during TTS so JARVIS's voice through the speakers doesn't
 // trigger a self-wake. Pass nil to clear.
 func (s *AudioPlaybackService) SetPlayStateListener(cb func(playing bool)) {
 	s.onPlayStateMu.Lock()

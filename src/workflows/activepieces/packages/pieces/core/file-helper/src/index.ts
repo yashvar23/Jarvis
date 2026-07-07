@@ -27,5 +27,3 @@ export const filesHelper = createPiece({
   ],
   triggers: [],
 });
-
-

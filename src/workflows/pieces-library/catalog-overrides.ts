@@ -35,7 +35,7 @@
  * Verified pieces. Each id below has been smoke-tested + run end-to-end
  * through the engine. Adding to this set is the trust boundary: by listing
  * an id here, you're claiming the piece's source has been read and its
- * basic actions verified against the Zoya runtime.
+ * basic actions verified against the Jarvis runtime.
  *
  * Promotion checklist:
  *   1. Install the piece (`bun run scripts/install-piece.ts <id>` or via UI).
@@ -158,4 +158,3 @@ export const DESCRIPTION_OVERRIDE: Record<string, string> = {
     "Send messages and react to Telegram bot updates. Requires a bot token.",
   claude: "Chat completions via the Anthropic Claude API.",
 };
-

@@ -320,4 +320,3 @@ export function useAgentActivityHistory(agentId: string | null, limit = 50) {
 
   return { events, error };
 }
-

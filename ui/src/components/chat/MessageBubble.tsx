@@ -68,14 +68,14 @@ export function MessageBubble({ message }: Props) {
     );
   }
 
-  // User / ZOYA messages
+  // User / JARVIS messages
   return (
-    <div className={`chat-msg ${isUser ? "chat-msg-user" : "chat-msg-zoya"}`}>
-      {/* ZOYA sender row */}
+    <div className={`chat-msg ${isUser ? "chat-msg-user" : "chat-msg-jarvis"}`}>
+      {/* JARVIS sender row */}
       {!isUser && (
         <div className="chat-sender">
           <div className="chat-sender-orb" />
-          <span className="chat-sender-name">ZOYA</span>
+          <span className="chat-sender-name">JARVIS</span>
           <span className="chat-sender-ts">{timestamp}</span>
         </div>
       )}
@@ -90,7 +90,7 @@ export function MessageBubble({ message }: Props) {
       )}
 
       {/* Bubble */}
-      <div className={`chat-bubble ${isUser ? "chat-bubble-user" : "chat-bubble-zoya"}`}>
+      <div className={`chat-bubble ${isUser ? "chat-bubble-user" : "chat-bubble-jarvis"}`}>
         {isUser ? message.content : <MarkdownContent content={message.content} />}
         {message.isStreaming && <span className="chat-cursor" />}
       </div>

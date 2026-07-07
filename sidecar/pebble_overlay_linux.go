@@ -13,7 +13,7 @@ package main
 // the main thread. The cgo bridge marshals onto the GLib main loop via
 // g_idle_add. Motion + state + lifecycle live in the shared pebbleCore runtime
 // (pebble_runtime.go); the frame loop runs on a separate goroutine and pushes
-// each eased frame here via zoyaPebblePresent.
+// each eased frame here via jarvisPebblePresent.
 
 /*
 #cgo pkg-config: gtk+-3.0
@@ -40,7 +40,7 @@ static const double kAnchorY = 28;
 
 static GtkWidget* gPebbleWindow = NULL;
 static GtkWidget* gPebbleArea   = NULL;
-// State + frame tick are pushed every frame by zoyaPebblePresent (the shared
+// State + frame tick are pushed every frame by jarvisPebblePresent (the shared
 // Go runtime drives motion); draw_pebble reads them. Position/easing/offset
 // state moved to pebbleCore (Go) — no gCurX/gOffset/gTimer here anymore.
 static int gPebbleState = 0;
@@ -292,7 +292,7 @@ static gboolean draw_pebble(GtkWidget* widget, cairo_t* cr, gpointer data) {
         double eyR = speaking ? kPaperR : kAccR;
         double eyG = speaking ? kPaperG : kAccG;
         double eyB = speaking ? kPaperB : kAccB;
-        draw_text_layout(cr, 26, 60, "ZOYA", "JetBrains Mono Medium 8", eyR, eyG, eyB);
+        draw_text_layout(cr, 26, 60, "JARVIS", "JetBrains Mono Medium 8", eyR, eyG, eyB);
         // Body draw height tracks the auto-fitted card.
         double bodyDrawH = by1 - kBodyY0 - kBubbleBottomP/2.0;
         draw_text_wrapped(cr, kBodyX0, kBodyY0, kBodyX1-kBodyX0, bodyDrawH,
@@ -355,7 +355,7 @@ static gboolean draw_pebble(GtkWidget* widget, cairo_t* cr, gpointer data) {
 // present_idle applies one frame on the GTK main thread: the shared Go runtime
 // already eased the position (x,y) and bumped the frame tick; we just push
 // state/tick/text and move + redraw. Bridged from the frame-loop goroutine via
-// zoyaPebblePresent -> g_idle_add (GTK is main-thread only).
+// jarvisPebblePresent -> g_idle_add (GTK is main-thread only).
 typedef struct {
     int x, y, state;
     unsigned long long tick;
@@ -433,15 +433,15 @@ static gboolean close_idle(gpointer user_data) {
     return G_SOURCE_REMOVE;
 }
 
-// zoyaPebbleSpawn creates the window only — the shared Go loop drives motion
-// + repaint via zoyaPebblePresent.
-void zoyaPebbleSpawn(void) {
+// jarvisPebbleSpawn creates the window only — the shared Go loop drives motion
+// + repaint via jarvisPebblePresent.
+void jarvisPebbleSpawn(void) {
     g_idle_add(spawn_idle, NULL);
 }
 
-// zoyaPebblePresent pushes one eased frame from the Go runtime. text may be
+// jarvisPebblePresent pushes one eased frame from the Go runtime. text may be
 // NULL/empty (draw_pebble falls back to the per-state placeholder).
-void zoyaPebblePresent(int x, int y, int state, unsigned long long tick,
+void jarvisPebblePresent(int x, int y, int state, unsigned long long tick,
                          int eye, int blinded, int answerOverflow, const char* text) {
     PresentArgs* a = (PresentArgs*)malloc(sizeof(PresentArgs));
     a->x = x; a->y = y; a->state = state; a->tick = tick;
@@ -450,7 +450,7 @@ void zoyaPebblePresent(int x, int y, int state, unsigned long long tick,
     g_idle_add(present_idle, a);
 }
 
-void zoyaPebbleClose(void) {
+void jarvisPebbleClose(void) {
     g_idle_add(close_idle, NULL);
 }
 */
@@ -538,7 +538,7 @@ func (s *pebbleServiceLinux) Spawn(spec PebbleSpec) error {
 
 // ─── pebblePlatform primitives (all GTK work marshals to the main loop) ──────
 
-func (s *pebbleServiceLinux) createWindow() error { C.zoyaPebbleSpawn(); return nil }
+func (s *pebbleServiceLinux) createWindow() error { C.jarvisPebbleSpawn(); return nil }
 func (s *pebbleServiceLinux) pumpMessages()       {} // gtk_main pumps for us
 
 func (s *pebbleServiceLinux) present() error {
@@ -551,7 +551,7 @@ func (s *pebbleServiceLinux) present() error {
 		defer C.free(unsafe.Pointer(cstr))
 	}
 	answerID, _ := s.answerOverflowID.Load().(string)
-	C.zoyaPebblePresent(
+	C.jarvisPebblePresent(
 		C.int(s.renderedX.Load()), C.int(s.renderedY.Load()),
 		C.int(pebbleStateToInt(state)), C.ulonglong(s.frameTick),
 		boolToCInt(s.eyeActive.Load()), boolToCInt(s.blinded.Load()),
@@ -560,7 +560,7 @@ func (s *pebbleServiceLinux) present() error {
 	return nil
 }
 
-func (s *pebbleServiceLinux) destroyWindow() { C.zoyaPebbleClose() }
+func (s *pebbleServiceLinux) destroyWindow() { C.jarvisPebbleClose() }
 
 func (s *pebbleServiceLinux) Close() error {
 	if !s.spawned.CompareAndSwap(true, false) {

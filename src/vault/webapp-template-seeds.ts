@@ -3,7 +3,7 @@
  *
  * Scans two directories for .yaml/.yml files:
  *   1. Built-in: webapp-templates/ in the package root (shipped with codebase)
- *   2. User overrides: ~/.zoya/webapp-templates/ (user-created or customized)
+ *   2. User overrides: ~/.jarvis/webapp-templates/ (user-created or customized)
  *
  * User files override built-in files when they share the same app_name.
  * Called once at startup — uses upsert so templates update without data loss.
@@ -73,7 +73,7 @@ function loadTemplatesFromDir(dir: string): Map<string, TemplateSeed> {
  *
  * Load order:
  *   1. Built-in templates from webapp-templates/ (package root)
- *   2. User overrides from ~/.zoya/webapp-templates/
+ *   2. User overrides from ~/.jarvis/webapp-templates/
  *   User files override built-in files with the same app_name.
  *
  * Safe to call multiple times — uses upsert.
@@ -84,7 +84,7 @@ export function seedWebappTemplates(): void {
   const builtinDir = join(pkgRoot, 'webapp-templates');
 
   // User override directory
-  const userDir = join(homedir(), '.zoya', 'webapp-templates');
+  const userDir = join(homedir(), '.jarvis', 'webapp-templates');
 
   // Ensure user directory exists
   mkdirSync(userDir, { recursive: true });
@@ -114,4 +114,3 @@ export function seedWebappTemplates(): void {
   const overrideNote = userCount > 0 ? ` (${userCount} user override${userCount > 1 ? 's' : ''})` : '';
   console.log(`[WebappTemplates] Seeded ${count} webapp templates${overrideNote}`);
 }
-

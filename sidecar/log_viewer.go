@@ -1,7 +1,7 @@
 package main
 
 // Local log viewer — a small webview window that shows the sidecar's own log
-// file (~/.zoya/sidecar.log) with search, copy, and export. Entirely local:
+// file (~/.jarvis/sidecar.log) with search, copy, and export. Entirely local:
 // it is NOT a dashboard room and never talks to the brain. Reuses the webview_go
 // dependency (same as the setup window / panels); the UI is plain HTML, to be
 // branded later.
@@ -23,7 +23,7 @@ func (c *SidecarClient) OpenLogViewer() {
 }
 
 func runLogViewer(logPath string) {
-	runLocalWebview("ZOYA — Logs", 900, 600, webview.HintNone, func(w webview.WebView) {
+	runLocalWebview("JARVIS — Logs", 900, 600, webview.HintNone, func(w webview.WebView) {
 
 		// loadLogs returns the current log file contents.
 		_ = w.Bind("loadLogs", func() string {

@@ -183,4 +183,3 @@ function looksLikeProfileAnswer(text: string): boolean {
 function isSkipResponse(text: string): boolean {
   return /^(skip|not now|maybe later|later|no thanks|no thank you|pass)$/i.test(text.trim());
 }
-

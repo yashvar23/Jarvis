@@ -1,5 +1,5 @@
 /**
- * Library panel: tiered list of activepieces community pieces a Zoya user
+ * Library panel: tiered list of activepieces community pieces a Jarvis user
  * can opt into installing. Rendered as two sections:
  *
  *   - Verified  -- hand-reviewed by a maintainer, no preamble needed.
@@ -11,7 +11,7 @@
  * Each row shows piece metadata, vetted version, license, source link, and
  * an Install / Uninstall button. Search filters across both tiers.
  *
- * Pieces install via npm at runtime into `~/.zoya/pieces/`; this panel
+ * Pieces install via npm at runtime into `~/.jarvis/pieces/`; this panel
  * only triggers the install/uninstall + reflects state, it doesn't bundle
  * any piece code itself.
  */
@@ -100,7 +100,7 @@ export function LibraryPanel(): React.ReactElement {
               <span className="wf-lib__section-count">{verified.length}</span>
             </h4>
             <p className="wf-lib__section-hint">
-              Hand-reviewed by Zoya maintainers and smoke-tested against the engine.
+              Hand-reviewed by Jarvis maintainers and smoke-tested against the engine.
             </p>
             {verified.length === 0 ? (
               <div className="wf-lib__empty-section">
@@ -144,7 +144,7 @@ export function LibraryPanel(): React.ReactElement {
               <>
                 <p className="wf-lib__section-hint wf-lib__section-hint--warn">
                   Community pieces are installed from npm and run inside the engine
-                  sandbox. They haven't been individually reviewed by Zoya -- check
+                  sandbox. They haven't been individually reviewed by Jarvis -- check
                   each piece's source link before opting in.
                 </p>
                 {community.length === 0 ? (

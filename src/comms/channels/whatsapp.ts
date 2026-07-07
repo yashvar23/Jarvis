@@ -58,4 +58,3 @@ export class WhatsAppAdapter implements ChannelAdapter {
     return this.connected;
   }
 }
-

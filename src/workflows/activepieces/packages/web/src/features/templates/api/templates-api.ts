@@ -29,4 +29,3 @@ export const templatesApi = {
     return api.get<Flag>(`/v1/templates/categories`);
   },
 };
-

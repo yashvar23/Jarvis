@@ -12,7 +12,6 @@
  */
 
 import { floatTo16BitPCM, pcm16ToFloat32, resampleFloat32 } from "./pcm.ts";
-import { uuid } from "./uuid.ts";
 
 const REALTIME_SAMPLE_RATE = 24000; // OpenAI realtime minimum.
 const CAPTURE_WORKLET_URL = "/audio/pcm-capture-processor.js";
@@ -71,7 +70,7 @@ export class RealtimeVoiceController {
       this.source = this.captureCtx.createMediaStreamSource(this.stream);
       this.worklet = new AudioWorkletNode(this.captureCtx, "pcm-capture-processor");
 
-      this.requestId = uuid();
+      this.requestId = crypto.randomUUID();
       ws.send(
         JSON.stringify({
           type: "voice_start",
@@ -173,4 +172,3 @@ export class RealtimeVoiceController {
     return this.playbackCtx;
   }
 }
-

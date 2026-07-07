@@ -7,8 +7,8 @@ import { RepeatBackCard } from "./RepeatBackCard";
 import { InlineCard } from "./InlineCard";
 import { RoomWindow } from "../rooms/RoomWindow";
 import {
-  ZoyaSpeechItem,
-  ZoyaThoughtItem,
+  JarvisSpeechItem,
+  JarvisThoughtItem,
   ResultItem,
   UserTextItem,
   UserVoiceItem,
@@ -313,10 +313,10 @@ function ItemRenderer({
       return <UserVoiceItem item={item} />;
     case "user-text":
       return <UserTextItem item={item} />;
-    case "zoya-speech":
-      return <ZoyaSpeechItem item={item} />;
-    case "zoya-thought":
-      return <ZoyaThoughtItem item={item} />;
+    case "jarvis-speech":
+      return <JarvisSpeechItem item={item} />;
+    case "jarvis-thought":
+      return <JarvisThoughtItem item={item} />;
     case "result":
       return <ResultItem item={item} />;
     case "approval":

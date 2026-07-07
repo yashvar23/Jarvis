@@ -42,4 +42,3 @@ export class WindowsAppController implements AppController {
     throw new Error('WindowsAppController: Not implemented. Use sidecar desktop tools with a target parameter.');
   }
 }
-

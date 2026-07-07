@@ -17,7 +17,7 @@ import type { ThreadItem } from "../thread/types";
  *
  * Strategy:
  *  - Empty thread → curated welcome set
- *  - Last item is `zoya-speech` → continuation prompts ("Tell me more",
+ *  - Last item is `jarvis-speech` → continuation prompts ("Tell me more",
  *    "Why?", "What about X?")
  *  - Last item is `card` → drill-down prompts ("Open it", "Show details",
  *    "What's its status?")
@@ -85,8 +85,8 @@ function pickSet(items: ThreadItem[]): string[] {
   if (!last) return GENERAL;
 
   switch (last.kind) {
-    case "zoya-speech":
-    case "zoya-thought":
+    case "jarvis-speech":
+    case "jarvis-thought":
       return SPEECH_FOLLOWUPS;
     case "card":
       return CARD_FOLLOWUPS;
@@ -173,10 +173,9 @@ function itemsToTurns(items: ThreadItem[]): Array<{ role: "user" | "assistant"; 
   for (const item of items.slice(-12)) {
     if (item.kind === "user-text" || item.kind === "user-voice") {
       out.push({ role: "user", text: item.text });
-    } else if (item.kind === "zoya-speech") {
+    } else if (item.kind === "jarvis-speech") {
       out.push({ role: "assistant", text: item.text });
     }
   }
   return out.slice(-5);
 }
-

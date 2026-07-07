@@ -370,4 +370,3 @@ export function groupTreeItemsByFolder(items: TreeItem[]): TreeRow[] {
     return rows;
   }, []);
 }
-

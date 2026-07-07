@@ -1,5 +1,5 @@
 /**
- * Example: Integrating LLM Providers into ZOYA Daemon
+ * Example: Integrating LLM Providers into J.A.R.V.I.S. Daemon
  *
  * This example demonstrates how to:
  * 1. Load configuration from YAML
@@ -17,7 +17,7 @@ import {
   type LLMMessage,
 } from '../src/llm/index.ts';
 
-class ZoyaLLMService {
+class JarvisLLMService {
   private manager: LLMManager;
   private config: any;
 
@@ -26,7 +26,7 @@ class ZoyaLLMService {
   }
 
   async initialize(configPath?: string): Promise<void> {
-    console.log('Loading ZOYA configuration...');
+    console.log('Loading J.A.R.V.I.S. configuration...');
     this.config = await loadConfig(configPath);
 
     console.log('Initializing LLM providers...');
@@ -99,7 +99,7 @@ class ZoyaLLMService {
 
 // Example usage in daemon
 async function main() {
-  const llm = new ZoyaLLMService();
+  const llm = new JarvisLLMService();
 
   try {
     await llm.initialize();
@@ -109,7 +109,7 @@ async function main() {
     const messages: LLMMessage[] = [
       {
         role: 'system',
-        content: 'You are ZOYA, a helpful AI assistant.',
+        content: 'You are J.A.R.V.I.S., a helpful AI assistant.',
       },
       {
         role: 'user',
@@ -125,12 +125,12 @@ async function main() {
 
     // Example 2: Streaming response
     console.log('=== Example 2: Streaming Response ===');
-    process.stdout.write('ZOYA: ');
+    process.stdout.write('J.A.R.V.I.S.: ');
 
     const streamMessages: LLMMessage[] = [
       {
         role: 'system',
-        content: 'You are ZOYA Respond concisely.',
+        content: 'You are J.A.R.V.I.S. Respond concisely.',
       },
       {
         role: 'user',
@@ -229,5 +229,4 @@ if (import.meta.main) {
   main().catch(console.error);
 }
 
-export { ZoyaLLMService };
-
+export { JarvisLLMService };

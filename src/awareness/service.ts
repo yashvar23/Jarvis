@@ -9,7 +9,7 @@
  */
 
 import type { Service, ServiceStatus } from '../daemon/services.ts';
-import type { ZoyaConfig, AwarenessConfig } from '../config/types.ts';
+import type { JarvisConfig, AwarenessConfig } from '../config/types.ts';
 import type { LLMManager } from '../llm/manager.ts';
 import type { AwarenessEvent, LiveContext, DailyReport, Suggestion, SessionSummary, WeeklyReport, BehavioralInsight } from './types.ts';
 import type { SuggestionType, SuggestionRow } from './types.ts';
@@ -53,14 +53,14 @@ export class AwarenessService implements Service {
   private cleanupTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor(
-    zoyaConfig: ZoyaConfig,
+    jarvisConfig: JarvisConfig,
     llm: LLMManager,
     eventCallback?: (event: AwarenessEvent) => void,
     googleAuth?: { isAuthenticated(): boolean; getAccessToken(): Promise<string> } | null,
     fetchCapture?: (sidecarId: string, path: string) => Promise<Buffer | null>,
     cleanupSidecarCaptures?: (cutoffMs: number) => Promise<void>
   ) {
-    const cfg = zoyaConfig.awareness!;
+    const cfg = jarvisConfig.awareness!;
     this.config = cfg;
     this.llm = llm;
     this.eventCallback = eventCallback ?? null;
@@ -477,4 +477,3 @@ export class AwarenessService implements Service {
     }
   }
 }
-

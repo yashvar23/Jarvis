@@ -9,7 +9,7 @@ type Props = {
   content: string;
 };
 
-const DOC_MARKER_RE = /<!-- zoya:document id="([^"]+)" title="([^"]+)" format="([^"]+)" size="([^"]+)" -->/g;
+const DOC_MARKER_RE = /<!-- jarvis:document id="([^"]+)" title="([^"]+)" format="([^"]+)" size="([^"]+)" -->/g;
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);

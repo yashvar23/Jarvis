@@ -107,4 +107,3 @@ export class EmailSync implements Observer {
     }
   }
 }
-

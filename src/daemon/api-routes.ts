@@ -7,7 +7,7 @@
 
 import type { HealthMonitor } from './health.ts';
 import type { AgentService } from './agent-service.ts';
-import type { ZoyaConfig } from '../config/types.ts';
+import type { JarvisConfig } from '../config/types.ts';
 import { resolveRealtimeVoice, DEFAULT_BLOCKED_CATEGORIES } from '../config/realtime.ts';
 import type { EntityType } from '../vault/entities.ts';
 import type { CommitmentPriority, CommitmentStatus } from '../vault/commitments.ts';
@@ -122,13 +122,13 @@ export type ApiContext = {
    * the daemon is still in setup-mode and needs a restart for
    * background services (heartbeat / commitments / awareness) to
    * spin up. Until those services can construct in-process at setup
-   * completion, the dashboard renders a "Restart Zoya" banner when
+   * completion, the dashboard renders a "Restart Jarvis" banner when
    * `setup_completed_at > daemon_started_at`. (See also issue F2.)
    */
   daemonStartedAt: number;
   healthMonitor: HealthMonitor;
   agentService: AgentService;
-  config: ZoyaConfig;
+  config: JarvisConfig;
   wsService?: WebSocketService;
   channelService?: ChannelService;
   authorityEngine?: AuthorityEngine;
@@ -155,7 +155,7 @@ export type ApiContext = {
   /**
    * Reports whether the post-setup services have come online. Used by
    * the onboarding status endpoint so the dashboard knows whether to
-   * show the "Restart Zoya" fallback banner.
+   * show the "Restart Jarvis" fallback banner.
    */
   isPostSetupServicesReady?: () => boolean;
 };
@@ -899,7 +899,7 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
       },
     },
 
-    // Pebble long-answer panel — when a ZOYA response overflows the
+    // Pebble long-answer panel — when a JARVIS response overflows the
     // speaking bubble, the daemon registers it in the answer store and
     // the sidecar shows an "open full ↗" button. Click spawns a panel
     // at `#/_answer_<id>` which fetches from this endpoint.
@@ -961,15 +961,14 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
     // Status + reset endpoints powering the v2 onboarding gate. See
     // `docs/ONBOARDING_PLAN.md`. Reset is intentionally available on
     // demand (not behind a build flag) so users can replay the tour
-    // after a Zoya update or when swapping LLM providers.
+    // after a Jarvis update or when swapping LLM providers.
 
     '/api/onboarding/status': {
       GET: async () => {
         try {
-          // ctx.config is the live, DB-merged config; loadConfig() would
-          // return defaults here since onboarding is a user-owned section
-          // that the file no longer carries.
-          const o = ctx.config.onboarding;
+          const { loadConfig } = await import('../config/loader.ts');
+          const cfg = await loadConfig();
+          const o = cfg.onboarding;
           // `getUserProfile` and `hasUserProfile` are already imported
           // at the top of the file. Use `hasUserProfile()` so the
           // check counts wizard answers AND Phase B interview facts —
@@ -1016,8 +1015,8 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
             return error(`Invalid scope "${scope}".`, 400);
           }
 
-          const { saveUserSection } = await import('./user-settings.ts');
-          const fresh = ctx.config;
+          const { loadConfig, saveConfig } = await import('../config/loader.ts');
+          const fresh = await loadConfig();
           const o = fresh.onboarding ?? {
             setup_completed_at: null,
             tutorial_completed_at: null,
@@ -1041,7 +1040,7 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
           }
           o.last_reset_at = Date.now();
           fresh.onboarding = o;
-          saveUserSection('onboarding', fresh.onboarding);
+          await saveConfig(fresh);
 
           // Mirror to in-memory config so the next /status read is
           // immediately consistent (don't wait for daemon restart).
@@ -1050,10 +1049,10 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
           // localStorage keys the client should also clear after this
           // call. Returned in the response so the UI handler doesn't
           // have to know about cache layers it didn't write.
-          const clientCacheKeys = ['zoya:notif-read', 'zoya:palette-recent'];
+          const clientCacheKeys = ['jarvis:notif-read', 'jarvis:palette-recent'];
           if (scope === 'all') {
-            clientCacheKeys.push('zoya:v2:workspaces-ui');
-            clientCacheKeys.push('zoya:room-layout');
+            clientCacheKeys.push('jarvis:v2:workspaces-ui');
+            clientCacheKeys.push('jarvis:room-layout');
           }
 
           return json({
@@ -1081,8 +1080,8 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
     '/api/onboarding/skip': {
       POST: async () => {
         try {
-          const { saveUserSection } = await import('./user-settings.ts');
-          const fresh = ctx.config;
+          const { loadConfig, saveConfig } = await import('../config/loader.ts');
+          const fresh = await loadConfig();
           const now = Date.now();
           fresh.onboarding = {
             ...fresh.onboarding,
@@ -1091,10 +1090,10 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
             tutorial_dismissed_at: fresh.onboarding?.tutorial_dismissed_at ?? now,
             setup_skipped_profile: true,
           };
-          saveUserSection('onboarding', fresh.onboarding);
+          await saveConfig(fresh);
           ctx.config.onboarding = fresh.onboarding;
 
-          // Best-effort service start so the "Restart Zoya" banner
+          // Best-effort service start so the "Restart Jarvis" banner
           // doesn't nag after a skip. Failure is non-fatal — services
           // that need an LLM just stay idle until one is configured.
           let postSetupStarted = false;
@@ -1131,15 +1130,15 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
     '/api/onboarding/profile/skip': {
       POST: async () => {
         try {
-          const { saveUserSection } = await import('./user-settings.ts');
-          const fresh = ctx.config;
+          const { loadConfig, saveConfig } = await import('../config/loader.ts');
+          const fresh = await loadConfig();
           fresh.onboarding = {
             setup_completed_at: fresh.onboarding?.setup_completed_at ?? null,
             tutorial_completed_at: fresh.onboarding?.tutorial_completed_at ?? null,
             ...fresh.onboarding,
             setup_skipped_profile: true,
           };
-          saveUserSection('onboarding', fresh.onboarding);
+          await saveConfig(fresh);
           ctx.config.onboarding = fresh.onboarding;
           return json({ ok: true, setup_skipped_profile: true });
         } catch (err) {
@@ -1152,15 +1151,15 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
     // Three small endpoints powering the spotlight walkthrough's
     // persistence: complete (user finished), dismiss (user skipped),
     // progress (resume-from-step support). All three write through
-    // the same mutate-then-saveUserSection pattern as the rest
+    // the same loadConfig → mutate → saveConfig pattern as the rest
     // of the onboarding routes; the existing reset endpoint with
     // `scope: "tutorial"` already clears all three fields.
 
     '/api/onboarding/tutorial/complete': {
       POST: async () => {
         try {
-          const { saveUserSection } = await import('./user-settings.ts');
-          const fresh = ctx.config;
+          const { loadConfig, saveConfig } = await import('../config/loader.ts');
+          const fresh = await loadConfig();
           const now = Date.now();
           fresh.onboarding = {
             setup_completed_at: fresh.onboarding?.setup_completed_at ?? null,
@@ -1168,7 +1167,7 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
             tutorial_completed_at: now,
             tutorial_progress_step: undefined,
           };
-          saveUserSection('onboarding', fresh.onboarding);
+          await saveConfig(fresh);
           ctx.config.onboarding = fresh.onboarding;
           return json({ ok: true, tutorial_completed_at: now });
         } catch (err) {
@@ -1180,8 +1179,8 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
     '/api/onboarding/tutorial/dismiss': {
       POST: async () => {
         try {
-          const { saveUserSection } = await import('./user-settings.ts');
-          const fresh = ctx.config;
+          const { loadConfig, saveConfig } = await import('../config/loader.ts');
+          const fresh = await loadConfig();
           const now = Date.now();
           fresh.onboarding = {
             setup_completed_at: fresh.onboarding?.setup_completed_at ?? null,
@@ -1189,7 +1188,7 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
             ...fresh.onboarding,
             tutorial_dismissed_at: now,
           };
-          saveUserSection('onboarding', fresh.onboarding);
+          await saveConfig(fresh);
           ctx.config.onboarding = fresh.onboarding;
           return json({ ok: true, tutorial_dismissed_at: now });
         } catch (err) {
@@ -1204,15 +1203,15 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
           const body = (await req.json().catch(() => ({}))) as { stepId?: string };
           const stepId = typeof body.stepId === 'string' ? body.stepId.trim() : '';
           if (!stepId) return error('Missing stepId.', 400);
-          const { saveUserSection } = await import('./user-settings.ts');
-          const fresh = ctx.config;
+          const { loadConfig, saveConfig } = await import('../config/loader.ts');
+          const fresh = await loadConfig();
           fresh.onboarding = {
             setup_completed_at: fresh.onboarding?.setup_completed_at ?? null,
             tutorial_completed_at: fresh.onboarding?.tutorial_completed_at ?? null,
             ...fresh.onboarding,
             tutorial_progress_step: stepId,
           };
-          saveUserSection('onboarding', fresh.onboarding);
+          await saveConfig(fresh);
           ctx.config.onboarding = fresh.onboarding;
           return json({ ok: true, tutorial_progress_step: stepId });
         } catch (err) {
@@ -1304,9 +1303,9 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
           //    daemon kill (or crash) between them persisted setup HALF-done
           //    — TTS saved but the completion flag lost — and the user was
           //    funneled back into onboarding on the next boot.
-          const { saveUserSection } = await import('./user-settings.ts');
+          const { loadConfig, saveConfig } = await import('../config/loader.ts');
           const { mergeSTTConfig, mergeTTSConfig } = await import('./config-merge.ts');
-          const fresh = ctx.config;
+          const fresh = await loadConfig();
           if (body.stt) {
             // Mirrors /api/config/stt POST semantics. STT is consumed at
             // the next transcription request, so no hot-swap is needed.
@@ -1324,15 +1323,13 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
             tutorial_progress_step: fresh.onboarding?.tutorial_progress_step,
             last_reset_at: fresh.onboarding?.last_reset_at,
           };
-          if (body.stt) saveUserSection('stt', fresh.stt);
-          if (body.tts) saveUserSection('tts', fresh.tts);
-          saveUserSection('onboarding', fresh.onboarding);
+          await saveConfig(fresh);
           if (body.stt) ctx.config.stt = fresh.stt;
           if (body.tts) ctx.config.tts = fresh.tts;
           ctx.config.onboarding = fresh.onboarding;
 
           // 3. Hot-reload the TTS provider when possible so the post-setup
-          //    "Welcome to Zoya" reply is spoken immediately.
+          //    "Welcome to Jarvis" reply is spoken immediately.
           if (body.tts) {
             try {
               if (ctx.config.tts && ctx.wsService) {
@@ -1368,7 +1365,7 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
             ok: true,
             setup_completed_at: now,
             post_setup_services_started: postSetupStarted,
-            message: 'Setup complete. Zoya is ready.',
+            message: 'Setup complete. Jarvis is ready.',
           });
         } catch (err) {
           return errorFromException(err);
@@ -1419,7 +1416,7 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
           return error('24/7 restart is not supported on this platform.', 400);
         }
         if (!isAutostartInstalled()) {
-          return error('ZOYA keepalive mode is not installed yet.', 400);
+          return error('JARVIS keepalive mode is not installed yet.', 400);
         }
         const scheduled = scheduleAutostartRestart();
         if (!scheduled) {
@@ -1427,7 +1424,7 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
         }
         return json({
           ok: true,
-          message: `Restarting the ZOYA 24/7 ${getAutostartName()} service.`,
+          message: `Restarting the JARVIS 24/7 ${getAutostartName()} service.`,
         });
       },
     },
@@ -1546,7 +1543,7 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
           return json(result);
         } catch (err) {
           const msg = err instanceof Error ? err.message : String(err);
-          return json({ error: msg, rows: [], total: { calls: 0, input_tokens: 0, output_tokens: 0, cache_read_input_tokens: 0, cache_creation_input_tokens: 0, total_latency_ms: 0, errors: 0 } });
+          return json({ error: msg, rows: [], total: { calls: 0, input_tokens: 0, output_tokens: 0, total_latency_ms: 0, errors: 0 } });
         }
       },
     },
@@ -1761,8 +1758,8 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
             return error('Invalid filename', 400);
           }
 
-          // Save file to ~/.zoya/content/<id>/
-          const baseDir = path.join(os.homedir(), '.zoya', 'content', contentId);
+          // Save file to ~/.jarvis/content/<id>/
+          const baseDir = path.join(os.homedir(), '.jarvis', 'content', contentId);
           if (!existsSync(baseDir)) {
             mkdirSync(baseDir, { recursive: true });
           }
@@ -1816,7 +1813,7 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
           return error('Invalid path', 400);
         }
 
-        const baseDir = path.join(os.homedir(), '.zoya', 'content');
+        const baseDir = path.join(os.homedir(), '.jarvis', 'content');
         const filePath = path.resolve(baseDir, safeContentId, safeFilename);
 
         // Verify resolved path stays within the content directory
@@ -1871,7 +1868,7 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
 
           return new Response(
             `<html><body style="font-family:system-ui;text-align:center;padding:60px">
-              <h1>ZOYA Google Authorization Complete!</h1>
+              <h1>JARVIS Google Authorization Complete!</h1>
               <p>Tokens saved. This window will close automatically.</p>
               <script>
                 if (window.opener) { window.opener.postMessage('google-auth-complete', window.location.origin); }
@@ -1927,11 +1924,10 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
             return error('Missing client_id or client_secret');
           }
 
-          const { saveUserSection } = await import('./user-settings.ts');
-          const freshConfig = ctx.config;
+          const { loadConfig, saveConfig } = await import('../config/loader.ts');
+          const freshConfig = await loadConfig();
           freshConfig.google = { client_id: body.client_id, client_secret: body.client_secret };
-          const { saveGoogleSettings } = await import('./user-settings.ts');
-          saveGoogleSettings(freshConfig.google);
+          await saveConfig(freshConfig);
 
           // Update in-memory config so callback route sees credentials immediately
           ctx.config.google = freshConfig.google;
@@ -1970,12 +1966,12 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
     '/api/auth/google/disconnect': {
       POST: async () => {
         try {
-          const tokensPath = path.join(os.homedir(), '.zoya', 'google-tokens.json');
+          const tokensPath = path.join(os.homedir(), '.jarvis', 'google-tokens.json');
           if (existsSync(tokensPath)) {
             const { unlinkSync } = await import('node:fs');
             unlinkSync(tokensPath);
           }
-          return json({ ok: true, message: 'Disconnected. Restart ZOYA to deactivate observers.' });
+          return json({ ok: true, message: 'Disconnected. Restart JARVIS to deactivate observers.' });
         } catch (err) {
           const msg = err instanceof Error ? err.message : String(err);
           return error(`Failed to disconnect: ${msg}`, 500);
@@ -2014,8 +2010,8 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
       POST: async (req: Request) => {
         try {
           const body = await req.json() as Record<string, unknown>;
-          const { saveUserSection } = await import('./user-settings.ts');
-          const freshConfig = ctx.config;
+          const { loadConfig, saveConfig } = await import('../config/loader.ts');
+          const freshConfig = await loadConfig();
 
           if (!freshConfig.channels) freshConfig.channels = {};
 
@@ -2032,10 +2028,10 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
             } as any;
           }
 
-          saveUserSection('channels', freshConfig.channels);
+          await saveConfig(freshConfig);
           ctx.config.channels = freshConfig.channels;
 
-          return json({ ok: true, message: 'Channel config saved. Restart ZOYA to apply changes.' });
+          return json({ ok: true, message: 'Channel config saved. Restart JARVIS to apply changes.' });
         } catch (err) {
           console.error('[API] Error saving channels config:', err);
           return error('Invalid request body');
@@ -2059,14 +2055,14 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
       POST: async (req: Request) => {
         try {
           const body = await req.json() as Record<string, unknown>;
-          const { saveUserSection } = await import('./user-settings.ts');
+          const { loadConfig, saveConfig } = await import('../config/loader.ts');
           const { mergeSTTConfig } = await import('./config-merge.ts');
-          const freshConfig = ctx.config;
+          const freshConfig = await loadConfig();
 
           freshConfig.stt = mergeSTTConfig(freshConfig.stt, body);
-          saveUserSection('stt', freshConfig.stt);
+          await saveConfig(freshConfig);
           ctx.config.stt = freshConfig.stt;
-          return json({ ok: true, message: 'STT config saved. Restart ZOYA to apply changes.' });
+          return json({ ok: true, message: 'STT config saved. Restart JARVIS to apply changes.' });
         } catch (err) {
           console.error('[API] Error saving STT config:', err);
           return error('Invalid request body');
@@ -2102,12 +2098,12 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
       POST: async (req: Request) => {
         try {
           const body = await req.json() as Record<string, unknown>;
-          const { saveUserSection } = await import('./user-settings.ts');
+          const { loadConfig, saveConfig } = await import('../config/loader.ts');
           const { mergeTTSConfig } = await import('./config-merge.ts');
-          const freshConfig = ctx.config;
+          const freshConfig = await loadConfig();
 
           freshConfig.tts = mergeTTSConfig(freshConfig.tts, body);
-          saveUserSection('tts', freshConfig.tts);
+          await saveConfig(freshConfig);
           ctx.config.tts = freshConfig.tts;
 
           // Hot-reload TTS provider if wsService available
@@ -2165,15 +2161,15 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
       POST: async (req: Request) => {
         try {
           const body = await req.json() as Record<string, unknown>;
-          const { saveUserSection } = await import('./user-settings.ts');
+          const { loadConfig, saveConfig } = await import('../config/loader.ts');
           const { mergeVoiceConfig, validateVoicePatch } = await import('./config-merge.ts');
 
           const validation = validateVoicePatch(body);
           if (!validation.ok) return error(validation.error, 400);
 
-          const freshConfig = ctx.config;
+          const freshConfig = await loadConfig();
           freshConfig.voice = mergeVoiceConfig(freshConfig.voice, validation.patch);
-          saveUserSection('voice', freshConfig.voice);
+          await saveConfig(freshConfig);
           // Update in-memory config so the next voice_start resolves with the
           // new settings — resolveRealtimeVoice reads ctx.config live, so no
           // provider hot-reload is needed (unlike TTS/LLM).
@@ -2796,8 +2792,8 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
           ctx.authorityEngine.updateConfig(currentConfig);
 
           // Persist to config.yaml
-          const { saveUserSection } = await import('./user-settings.ts');
-          const freshConfig = ctx.config;
+          const { loadConfig, saveConfig } = await import('../config/loader.ts');
+          const freshConfig = await loadConfig();
           freshConfig.authority = {
             ...freshConfig.authority,
             default_level: currentConfig.default_level,
@@ -2806,7 +2802,7 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
             context_rules: currentConfig.context_rules,
             learning: currentConfig.learning,
           };
-          saveUserSection('authority', freshConfig.authority);
+          await saveConfig(freshConfig);
 
           return json({ ok: true, config: currentConfig });
         } catch (err) {
@@ -2820,7 +2816,7 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
      * per-action override to the authority config without exposing the
      * full schema. Used by the Authority Room voice actions
      * "grant_access" and "revoke_access" so the user can say
-     * "grant Zoya email access" and have it persist.
+     * "grant Jarvis email access" and have it persist.
      *
      * Body: { action: ActionCategory, allow: boolean, role_id?: string }
      * Returns: { ok: true, config: AuthorityConfig }
@@ -2860,13 +2856,13 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
           ctx.authorityEngine.updateConfig(currentConfig);
 
           // Persist to config.yaml — same path as the full POST.
-          const { saveUserSection } = await import('./user-settings.ts');
-          const freshConfig = ctx.config;
+          const { loadConfig, saveConfig } = await import('../config/loader.ts');
+          const freshConfig = await loadConfig();
           freshConfig.authority = {
             ...freshConfig.authority,
             overrides: currentConfig.overrides,
           };
-          saveUserSection('authority', freshConfig.authority);
+          await saveConfig(freshConfig);
 
           return json({ ok: true, config: currentConfig });
         } catch (err) {
@@ -2902,13 +2898,13 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
           ctx.learner.markSuggestionSent(body.action, body.tool_name ?? '');
 
           // Persist
-          const { saveUserSection } = await import('./user-settings.ts');
-          const freshConfig = ctx.config;
+          const { loadConfig, saveConfig } = await import('../config/loader.ts');
+          const freshConfig = await loadConfig();
           freshConfig.authority = {
             ...freshConfig.authority,
             ...ctx.authorityEngine.getConfig(),
           };
-          saveUserSection('authority', freshConfig.authority);
+          await saveConfig(freshConfig);
 
           return json({ ok: true });
         } catch (err) {
@@ -2976,8 +2972,8 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
         // Legacy rows (pre-Phase-7) have null sidecar_id and an image_path that
         // points to brain-local disk. Serve from there as a fallback.
         if (!capture.sidecar_id) {
-          const zoyaDir = path.join(os.homedir(), '.zoya');
-          if (!isWithin(path.resolve(capture.image_path), path.resolve(zoyaDir))) {
+          const jarvisDir = path.join(os.homedir(), '.jarvis');
+          if (!isWithin(path.resolve(capture.image_path), path.resolve(jarvisDir))) {
             return error('Image not found', 404);
           }
           try {
@@ -3897,12 +3893,12 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
           const project = await ctx.siteBuilderService.projectManager.getProject(id);
           if (project?.githubUrl) {
             const meta = require('node:fs').readFileSync(
-              require('node:path').join(projectPath, '.zoya-project.json'), 'utf-8'
+              require('node:path').join(projectPath, '.jarvis-project.json'), 'utf-8'
             );
             const parsed = JSON.parse(meta);
             if (parsed.github) {
               parsed.github.lastPushedAt = Date.now();
-              await Bun.write(require('node:path').join(projectPath, '.zoya-project.json'), JSON.stringify(parsed, null, 2));
+              await Bun.write(require('node:path').join(projectPath, '.jarvis-project.json'), JSON.stringify(parsed, null, 2));
             }
           }
 
@@ -3949,4 +3945,3 @@ export function createApiRoutes(ctx: ApiContext): Record<string, unknown> {
     },
   };
 }
-

@@ -94,10 +94,10 @@ describe('runInterviewTurn — happy path', () => {
     const firstLLM = fakeLLM([textResponse('Hi! What do you do?')]);
     await runInterviewTurn(session, firstLLM, null);
 
-    const secondLLM = fakeLLM([textResponse('Got it — and what brings you to Zoya?')]);
+    const secondLLM = fakeLLM([textResponse('Got it — and what brings you to Jarvis?')]);
     const result = await runInterviewTurn(session, secondLLM, "I'm a software engineer");
 
-    expect(result.assistantText).toBe('Got it — and what brings you to Zoya?');
+    expect(result.assistantText).toBe('Got it — and what brings you to Jarvis?');
     expect(session.turnCount).toBe(2);
     // The "I'm a software engineer" message is in the log.
     const userMessages = session.messages.filter((m) => m.role === 'user');
@@ -139,7 +139,7 @@ describe('runInterviewTurn — happy path', () => {
         {
           id: 'call_wrap',
           name: 'wrap_interview',
-          arguments: { farewell: 'All set — welcome to Zoya. Talk soon!' },
+          arguments: { farewell: 'All set — welcome to Jarvis. Talk soon!' },
         },
       ]),
     ]);
@@ -147,7 +147,7 @@ describe('runInterviewTurn — happy path', () => {
     const result = await runInterviewTurn(session, llm, "I think that's everything for now");
 
     expect(result.done).toBe(true);
-    expect(result.farewell).toBe('All set — welcome to Zoya. Talk soon!');
+    expect(result.farewell).toBe('All set — welcome to Jarvis. Talk soon!');
     expect(session.done).toBe(true);
   });
 
@@ -221,4 +221,3 @@ describe('runInterviewTurn — MAX_INTERVIEW_TURNS safeguard', () => {
     expect(result.farewell!.length).toBeGreaterThan(0);
   });
 });
-

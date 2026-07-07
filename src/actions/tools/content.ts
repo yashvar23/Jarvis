@@ -132,7 +132,7 @@ export const contentPipelineTool: ToolDefinition = {
           content_type: params.content_type as ContentType | undefined,
           stage: params.stage as ContentStage | undefined,
           tags,
-          created_by: 'zoya',
+          created_by: 'jarvis',
         });
         return `Created content item: [${item.id}] "${item.title}" (${item.content_type}, stage: ${item.stage})`;
       }
@@ -193,7 +193,7 @@ export const contentPipelineTool: ToolDefinition = {
           params.id as string,
           params.stage as ContentStage,
           params.note as string,
-          'zoya',
+          'jarvis',
         );
         return `Note added to ${stageNote.stage} stage: "${stageNote.note.slice(0, 100)}${stageNote.note.length > 100 ? '...' : ''}"`;
       }
@@ -215,4 +215,3 @@ export const contentPipelineTool: ToolDefinition = {
     }
   },
 };
-

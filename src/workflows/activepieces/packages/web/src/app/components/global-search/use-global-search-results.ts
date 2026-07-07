@@ -369,4 +369,3 @@ export type SearchResultGroup = {
   items: SearchResultItem[];
   isLoading: boolean;
 };
-

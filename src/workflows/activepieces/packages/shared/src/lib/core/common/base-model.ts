@@ -34,4 +34,3 @@ export const OptionalArrayFromQuery = <T extends z.ZodType>(schema: T) =>
         (val) => (Array.isArray(val) ? val : val !== undefined ? [val] : undefined),
         z.array(schema).optional(),
     )
-

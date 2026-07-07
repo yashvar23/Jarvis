@@ -11,37 +11,37 @@ import {
 
 describe("matchesSpeechWakePhrase (strict; used during TTS playback)", () => {
   test("accepts direct wake phrases", () => {
-    expect(matchesSpeechWakePhrase("Zoya")).toBe(true);
-    expect(matchesSpeechWakePhrase("hey zoya")).toBe(true);
-    expect(matchesSpeechWakePhrase("Zoya, stop")).toBe(true);
-    expect(matchesSpeechWakePhrase("Hey Zoya, hold on")).toBe(true);
+    expect(matchesSpeechWakePhrase("Jarvis")).toBe(true);
+    expect(matchesSpeechWakePhrase("hey jarvis")).toBe(true);
+    expect(matchesSpeechWakePhrase("Jarvis, stop")).toBe(true);
+    expect(matchesSpeechWakePhrase("Hey Jarvis, hold on")).toBe(true);
   });
 
-  test("rejects longer sentences that merely mention zoya (echo protection)", () => {
-    expect(matchesSpeechWakePhrase("Zoya is already working on that")).toBe(false);
-    expect(matchesSpeechWakePhrase("Can you tell Zoya to send that")).toBe(false);
-    expect(matchesSpeechWakePhrase("I said Zoya in the middle of a sentence")).toBe(false);
-    expect(matchesSpeechWakePhrase("Hey Zoya can you help")).toBe(false);
+  test("rejects longer sentences that merely mention jarvis (echo protection)", () => {
+    expect(matchesSpeechWakePhrase("Jarvis is already working on that")).toBe(false);
+    expect(matchesSpeechWakePhrase("Can you tell Jarvis to send that")).toBe(false);
+    expect(matchesSpeechWakePhrase("I said Jarvis in the middle of a sentence")).toBe(false);
+    expect(matchesSpeechWakePhrase("Hey Jarvis can you help")).toBe(false);
   });
 });
 
 describe("matchesSpeechWakePrefix (loose; used when idle)", () => {
   test("accepts bare wake phrases", () => {
-    expect(matchesSpeechWakePrefix("Zoya")).toBe(true);
-    expect(matchesSpeechWakePrefix("hey zoya")).toBe(true);
+    expect(matchesSpeechWakePrefix("Jarvis")).toBe(true);
+    expect(matchesSpeechWakePrefix("hey jarvis")).toBe(true);
   });
 
   test("accepts wake phrase followed by any command in one utterance", () => {
-    expect(matchesSpeechWakePrefix("hey zoya turn off the lights")).toBe(true);
-    expect(matchesSpeechWakePrefix("zoya what's the weather")).toBe(true);
-    expect(matchesSpeechWakePrefix("Hey Zoya, play some music")).toBe(true);
-    expect(matchesSpeechWakePrefix("zoya can you help me")).toBe(true);
+    expect(matchesSpeechWakePrefix("hey jarvis turn off the lights")).toBe(true);
+    expect(matchesSpeechWakePrefix("jarvis what's the weather")).toBe(true);
+    expect(matchesSpeechWakePrefix("Hey Jarvis, play some music")).toBe(true);
+    expect(matchesSpeechWakePrefix("jarvis can you help me")).toBe(true);
   });
 
-  test("rejects utterances that merely contain zoya mid-sentence", () => {
-    expect(matchesSpeechWakePrefix("Can you tell Zoya to send that")).toBe(false);
-    expect(matchesSpeechWakePrefix("I said Zoya in the middle of a sentence")).toBe(false);
-    expect(matchesSpeechWakePrefix("that was Zoya talking")).toBe(false);
+  test("rejects utterances that merely contain jarvis mid-sentence", () => {
+    expect(matchesSpeechWakePrefix("Can you tell Jarvis to send that")).toBe(false);
+    expect(matchesSpeechWakePrefix("I said Jarvis in the middle of a sentence")).toBe(false);
+    expect(matchesSpeechWakePrefix("that was Jarvis talking")).toBe(false);
   });
 
   test("rejects empty or whitespace-only transcripts", () => {
@@ -52,19 +52,19 @@ describe("matchesSpeechWakePrefix (loose; used when idle)", () => {
 
 describe("matcher normalization (shared by both matchers)", () => {
   test("handles mixed case and surrounding whitespace", () => {
-    expect(matchesSpeechWakePrefix("   HEY ZOYA   ")).toBe(true);
-    expect(matchesSpeechWakePhrase("   ZOYA, STOP!   ")).toBe(true);
+    expect(matchesSpeechWakePrefix("   HEY JARVIS   ")).toBe(true);
+    expect(matchesSpeechWakePhrase("   JARVIS, STOP!   ")).toBe(true);
   });
 
   test("collapses stacked punctuation and multiple spaces", () => {
-    expect(matchesSpeechWakePhrase("Zoya... stop!!")).toBe(true);
-    expect(matchesSpeechWakePrefix("hey   zoya    play   music")).toBe(true);
+    expect(matchesSpeechWakePhrase("Jarvis... stop!!")).toBe(true);
+    expect(matchesSpeechWakePrefix("hey   jarvis    play   music")).toBe(true);
   });
 
-  test("is not fooled by mid-word 'zoya' substrings", () => {
-    // "starzoya" is one token; without a word boundary it must not match.
-    expect(matchesSpeechWakePrefix("starzoya")).toBe(false);
-    expect(matchesSpeechWakePhrase("starzoya stop")).toBe(false);
+  test("is not fooled by mid-word 'jarvis' substrings", () => {
+    // "starjarvis" is one token; without a word boundary it must not match.
+    expect(matchesSpeechWakePrefix("starjarvis")).toBe(false);
+    expect(matchesSpeechWakePhrase("starjarvis stop")).toBe(false);
   });
 });
 
@@ -211,7 +211,7 @@ describe("isWithinSpeakingTailCooldown", () => {
 
 describe("planContainsWakeFlip — regression boundary for the mid-turn cooldown stamp bug", () => {
   // Background: when a TTS turn enters `speaking` with containsWake=false
-  // and a later sentence introduces "Zoya", the daemon flips containsWake
+  // and a later sentence introduces "Jarvis", the daemon flips containsWake
   // to true via a ref write. The exit-stamp effect inside useVoice
   // registers a cleanup function based on the predicate at setup time, so
   // a flag flip via ref does NOT re-run the effect — meaning when the turn
@@ -244,4 +244,3 @@ describe("planContainsWakeFlip — regression boundary for the mid-turn cooldown
     }
   });
 });
-

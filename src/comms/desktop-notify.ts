@@ -78,7 +78,7 @@ function sendViaNotifySend(
     'notify-send',
     `--urgency=${urgency}`,
     `--expire-time=${expireMs}`,
-    '--app-name=ZOYA',
+    '--app-name=JARVIS',
     title,
     body,
   ], { stdout: 'ignore', stderr: 'ignore' });
@@ -96,7 +96,7 @@ function sendViaPowerShell(title: string, body: string): boolean {
     $xml = [Windows.Data.Xml.Dom.XmlDocument]::new()
     $xml.LoadXml('<toast><visual><binding template="ToastText02"><text id="1">${safeTitle}</text><text id="2">${safeBody}</text></binding></visual></toast>')
     $toast = [Windows.UI.Notifications.ToastNotification]::new($xml)
-    [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier('ZOYA').Show($toast)
+    [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier('JARVIS').Show($toast)
   `.trim();
 
   Bun.spawn(['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', script], {
@@ -112,4 +112,3 @@ function sendViaPowerShell(title: string, body: string): boolean {
 export function isDesktopNotifyAvailable(): boolean {
   return detectMethod() !== null;
 }
-

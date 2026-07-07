@@ -62,4 +62,3 @@ export const CountTablesRequest = z.object({
 })
 
 export type CountTablesRequest = z.infer<typeof CountTablesRequest>
-

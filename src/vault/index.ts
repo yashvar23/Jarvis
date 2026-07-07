@@ -1,5 +1,5 @@
 /**
- * Vault Module - Data Access Layer for ZOYA Knowledge Graph
+ * Vault Module - Data Access Layer for J.A.R.V.I.S. Knowledge Graph
  *
  * This module provides CRUD operations for all core data types in the knowledge graph:
  * - Entities: People, projects, tools, places, concepts, events
@@ -85,4 +85,3 @@ export {
   parseExtractionResponse,
   extractAndStore,
 } from './extractor.ts';
-

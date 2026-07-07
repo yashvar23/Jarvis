@@ -65,7 +65,7 @@ export function VoiceTab({
             {!rt.available && (
               <p className="v2-set__hint" data-tone="warn">
                 Enabled, but no OpenAI provider is configured. Add one under Settings &gt; LLM.
-                Until then ZOYA uses the standard voice pipeline.
+                Until then JARVIS uses the standard voice pipeline.
               </p>
             )}
 

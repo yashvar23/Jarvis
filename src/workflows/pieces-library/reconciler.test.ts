@@ -16,7 +16,7 @@ import { reconcilePiecesLibrary } from "./reconciler";
 let base: string;
 
 beforeEach(() => {
-  base = mkdtempSync(join(tmpdir(), "zoya-pieces-reconciler-"));
+  base = mkdtempSync(join(tmpdir(), "jarvis-pieces-reconciler-"));
 });
 
 afterEach(() => {
@@ -142,4 +142,3 @@ describe("reconcilePiecesLibrary", () => {
     expect(result.drifted[0]?.piece.resolvedVersion).toBe("0.12.3");
   });
 });
-

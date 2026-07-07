@@ -7,4 +7,3 @@ export const templatesTelemetryApi = {
     return api.post<void>(`/v1/templates-telemetry/event`, event);
   },
 };
-

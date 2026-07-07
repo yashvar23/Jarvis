@@ -46,4 +46,3 @@ export type CustomAuthProperty<
     PropertyType.CUSTOM_AUTH,
     true
   >;
-

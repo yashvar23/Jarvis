@@ -16,7 +16,7 @@ import type { LLMMessage } from '../llm/provider.ts';
 
 export type SuggestionTurn = { role: 'user' | 'assistant' | 'system'; text: string };
 
-const SYSTEM_PROMPT = `You generate 3 to 5 short voice-suggestion phrases for a ZOYA dashboard's "Try saying" panel.
+const SYSTEM_PROMPT = `You generate 3 to 5 short voice-suggestion phrases for a JARVIS dashboard's "Try saying" panel.
 
 Given a few recent conversation turns, suggest natural next-move utterances the user might want to say.
 
@@ -68,7 +68,7 @@ export async function generateVoiceSuggestions(
   }
 
   const contextLines = trimmedTurns
-    .map((t) => `${t.role === 'user' ? 'USER' : 'ZOYA'}: ${t.text.replace(/\s+/g, ' ').slice(0, 200)}`)
+    .map((t) => `${t.role === 'user' ? 'USER' : 'JARVIS'}: ${t.text.replace(/\s+/g, ' ').slice(0, 200)}`)
     .join('\n');
 
   const messages: LLMMessage[] = [
@@ -97,4 +97,3 @@ export async function generateVoiceSuggestions(
     return [];
   }
 }
-

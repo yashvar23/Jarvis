@@ -16,4 +16,3 @@ export const TableWebhook = z.object({
 })
 
 export type TableWebhook = z.infer<typeof TableWebhook>
-

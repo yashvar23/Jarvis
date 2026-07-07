@@ -9,7 +9,7 @@ import (
 )
 
 // autoStartValueName is the HKCU\...\Run value that points at this executable.
-const autoStartValueName = "ZoyaSidecar"
+const autoStartValueName = "JarvisSidecar"
 
 // platformSetAutoStart registers (or removes) the sidecar in the per-user
 // Windows "Run" key so it launches at login.

@@ -42,19 +42,19 @@ extern void goRegionCancel(void);
 #define REG_ACC_G (58.0/255.0)
 #define REG_ACC_B (42.0/255.0)
 
-@class ZoyaRegionView;
+@class JarvisRegionView;
 
 static NSWindow*         gRegionWin  = nil;
-static ZoyaRegionView* gRegionView = nil;
+static JarvisRegionView* gRegionView = nil;
 static CGImageRef        gRegionShot = NULL;
 static CGFloat           gRegionScale = 1.0;
 static BOOL              gRegionDragging = NO;
 static int               gRsx = 0, gRsy = 0, gRcx = 0, gRcy = 0;
 
-@interface ZoyaRegionView : NSView
+@interface JarvisRegionView : NSView
 @end
 
-@implementation ZoyaRegionView
+@implementation JarvisRegionView
 
 - (BOOL)isFlipped { return YES; }      // top-left coords for drag math
 - (BOOL)acceptsFirstResponder { return YES; }
@@ -113,9 +113,9 @@ static int               gRsx = 0, gRsy = 0, gRcx = 0, gRcy = 0;
 // Borderless NSWindows return NO from canBecomeKeyWindow by default, so a plain
 // NSWindow would never become key under the accessory activation policy and
 // keyDown: (Escape-to-cancel) would never fire. Subclass to opt in.
-@interface ZoyaRegionWindow : NSWindow
+@interface JarvisRegionWindow : NSWindow
 @end
-@implementation ZoyaRegionWindow
+@implementation JarvisRegionWindow
 - (BOOL)canBecomeKeyWindow { return YES; }
 - (BOOL)canBecomeMainWindow { return YES; }
 @end
@@ -129,7 +129,7 @@ static void region_start_impl(void) {
     gRegionShot = CGWindowListCreateImage(CGRectInfinite, kCGWindowListOptionOnScreenOnly,
                                           kCGNullWindowID, kCGWindowImageDefault);
 
-    NSWindow* win = [[ZoyaRegionWindow alloc] initWithContentRect:fr
+    NSWindow* win = [[JarvisRegionWindow alloc] initWithContentRect:fr
                                                 styleMask:NSWindowStyleMaskBorderless
                                                   backing:NSBackingStoreBuffered
                                                     defer:NO];
@@ -139,7 +139,7 @@ static void region_start_impl(void) {
     [win setLevel:NSScreenSaverWindowLevel];
     [win setIgnoresMouseEvents:NO];
 
-    ZoyaRegionView* view = [[ZoyaRegionView alloc] initWithFrame:NSMakeRect(0, 0, fr.size.width, fr.size.height)];
+    JarvisRegionView* view = [[JarvisRegionView alloc] initWithFrame:NSMakeRect(0, 0, fr.size.width, fr.size.height)];
     [win setContentView:view];
     gRegionWin = win;
     gRegionView = view;
@@ -151,20 +151,20 @@ static void region_start_impl(void) {
     [[NSCursor crosshairCursor] set];
 }
 
-static void zoyaRegionStart(void) {
+static void jarvisRegionStart(void) {
     dispatch_async(dispatch_get_main_queue(), ^{ region_start_impl(); });
 }
 
-// zoyaRegionClose / zoyaRegionCrop are called from goRegionFinish/Cancel,
+// jarvisRegionClose / jarvisRegionCrop are called from goRegionFinish/Cancel,
 // which run on the main thread (invoked from the Cocoa event handlers).
-static void zoyaRegionClose(void) {
+static void jarvisRegionClose(void) {
     if (gRegionWin) { [gRegionWin orderOut:nil]; gRegionWin = nil; }
     gRegionView = nil;
     if (gRegionShot) { CGImageRelease(gRegionShot); gRegionShot = NULL; }
     gRegionDragging = NO;
 }
 
-static unsigned char* zoyaRegionCrop(int x, int y, int w, int h, int* outLen) {
+static unsigned char* jarvisRegionCrop(int x, int y, int w, int h, int* outLen) {
     *outLen = 0;
     if (!gRegionShot) return NULL;
     if (x < 0) { w += x; x = 0; }
@@ -186,7 +186,7 @@ static unsigned char* zoyaRegionCrop(int x, int y, int w, int h, int* outLen) {
     return out;
 }
 
-static void zoyaRegionFree(unsigned char* p) { if (p) free(p); }
+static void jarvisRegionFree(unsigned char* p) { if (p) free(p); }
 */
 import "C"
 
@@ -220,13 +220,13 @@ func (s *regionSelectionDarwin) Start(onCapture func([]byte, int, int), onCancel
 	s.onCancel = onCancel
 	s.mu.Unlock()
 	activeRegionDarwin.Store(s)
-	C.zoyaRegionStart()
+	C.jarvisRegionStart()
 	return nil
 }
 
 func (s *regionSelectionDarwin) cancel() {
 	cb := s.onCancel
-	C.zoyaRegionClose()
+	C.jarvisRegionClose()
 	activeRegionDarwin.Store(nil)
 	s.reset()
 	if cb != nil {
@@ -241,16 +241,16 @@ func (s *regionSelectionDarwin) finish(x0, y0, x1, y1 int) {
 		return
 	}
 	var outLen C.int
-	ptr := C.zoyaRegionCrop(C.int(x), C.int(y), C.int(w), C.int(h), &outLen)
+	ptr := C.jarvisRegionCrop(C.int(x), C.int(y), C.int(w), C.int(h), &outLen)
 	if ptr == nil || outLen <= 0 {
 		log.Printf("[region] crop failed")
 		s.cancel()
 		return
 	}
 	png := C.GoBytes(unsafe.Pointer(ptr), outLen)
-	C.zoyaRegionFree(ptr)
+	C.jarvisRegionFree(ptr)
 	cb := s.onCapture
-	C.zoyaRegionClose()
+	C.jarvisRegionClose()
 	activeRegionDarwin.Store(nil)
 	s.reset()
 	log.Printf("[region] captured %dx%d, %d PNG bytes", w, h, len(png))

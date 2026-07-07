@@ -1,9 +1,9 @@
 /**
- * Phase F end-to-end smoke: spawn the engine, load Zoya pieces from disk,
+ * Phase F end-to-end smoke: spawn the engine, load Jarvis pieces from disk,
  * run a real flow with a manual trigger + echo action, assert SUCCEEDED.
  *
  * This is the gate the proposal called out -- if this works, porting the rest
- * of the Zoya pieces is mechanical. Skipped when the engine bundle isn't on
+ * of the Jarvis pieces is mechanical. Skipped when the engine bundle isn't on
  * disk; when run, builds the pieces (idempotent) before spawning.
  */
 
@@ -23,34 +23,34 @@ import { createFlowRun, getFlowRun } from "../../db/repos/flow-run";
 import { DEFAULT_IDS } from "../../db/schema";
 import { CredentialResolver } from "../../credentials/adapter";
 import { SandboxApi } from "../../sandbox-api/server";
-import type { LlmChatFn } from "../../sandbox-api/routes/zoya-llm";
-import type { ToolsInvokeFn } from "../../sandbox-api/routes/zoya-tools";
-import type { NotifyFn } from "../../sandbox-api/routes/zoya-notify";
-import type { ZoyaContextProvider } from "../../sandbox-api/routes/zoya-context";
-import type { AgentDelegateFn } from "../../sandbox-api/routes/zoya-agent";
-import type { WorkflowsStartFn } from "../../sandbox-api/routes/zoya-workflows";
+import type { LlmChatFn } from "../../sandbox-api/routes/jarvis-llm";
+import type { ToolsInvokeFn } from "../../sandbox-api/routes/jarvis-tools";
+import type { NotifyFn } from "../../sandbox-api/routes/jarvis-notify";
+import type { JarvisContextProvider } from "../../sandbox-api/routes/jarvis-context";
+import type { AgentDelegateFn } from "../../sandbox-api/routes/jarvis-agent";
+import type { WorkflowsStartFn } from "../../sandbox-api/routes/jarvis-workflows";
 import { findCachedBundle, buildEngineBundle, ENGINE_BUILD_PATHS } from "./build";
-import { buildAllZoyaPieces } from "./build-pieces";
+import { buildAllJarvisPieces } from "./build-pieces";
 import { EngineRuntime } from "./engine-runtime";
 
-const buildOptIn = process.env.ZOYA_TEST_ENGINE_BUILD === "1";
+const buildOptIn = process.env.JARVIS_TEST_ENGINE_BUILD === "1";
 const initialCached = findCachedBundle();
 const skipBundleTests = initialCached === null && !buildOptIn;
 const piecesAlreadyBuilt = existsSync(
   resolve(
     ENGINE_BUILD_PATHS.VENDOR_PACKAGES,
-    "pieces/zoya/test/dist/src/index.js",
+    "pieces/jarvis/test/dist/src/index.js",
   ),
 );
 const skipE2eTests = skipBundleTests || (!piecesAlreadyBuilt && !buildOptIn);
 
-const PIECE_TEST_NAME = "@zoyapieces/piece-zoya-test";
-const PIECE_ASK_NAME = "@zoyapieces/piece-zoya-ask";
-const PIECE_TOOL_NAME = "@zoyapieces/piece-zoya-tool";
-const PIECE_NOTIFY_NAME = "@zoyapieces/piece-zoya-notify";
-const PIECE_CONTEXT_NAME = "@zoyapieces/piece-zoya-context";
-const PIECE_AGENT_NAME = "@zoyapieces/piece-zoya-agent";
-const PIECE_TRIGGER_NAME = "@zoyapieces/piece-zoya-trigger";
+const PIECE_TEST_NAME = "@jarvispieces/piece-jarvis-test";
+const PIECE_ASK_NAME = "@jarvispieces/piece-jarvis-ask";
+const PIECE_TOOL_NAME = "@jarvispieces/piece-jarvis-tool";
+const PIECE_NOTIFY_NAME = "@jarvispieces/piece-jarvis-notify";
+const PIECE_CONTEXT_NAME = "@jarvispieces/piece-jarvis-context";
+const PIECE_AGENT_NAME = "@jarvispieces/piece-jarvis-agent";
+const PIECE_TRIGGER_NAME = "@jarvispieces/piece-jarvis-trigger";
 const PIECE_VERSION = "0.0.1";
 
 describe("Engine end-to-end (F gate)", () => {
@@ -76,7 +76,7 @@ describe("Engine end-to-end (F gate)", () => {
     }
     if (!cached) return;
     if (buildOptIn) {
-      await buildAllZoyaPieces();
+      await buildAllJarvisPieces();
     }
     runtime = new EngineRuntime({ api, bundlePath: cached.bundlePath });
   });
@@ -149,7 +149,7 @@ describe("Engine end-to-end (F gate)", () => {
   );
 
   test.skipIf(skipE2eTests)(
-    "manual trigger + zoya-ask action calls daemon's /v1/zoya/llm/chat",
+    "manual trigger + jarvis-ask action calls daemon's /v1/jarvis/llm/chat",
     async () => {
       llmCalls = [];
       const flow = createFlow({ projectId: DEFAULT_IDS.project });
@@ -231,7 +231,7 @@ describe("Engine end-to-end (G+H pieces)", () => {
     calls.notify.push({ message: req.message });
     return { delivered: ["dashboard"], failed: [] };
   };
-  const contextProvider: ZoyaContextProvider = {
+  const contextProvider: JarvisContextProvider = {
     vaultSearch: async () => {
       calls.context.push({ method: "vaultSearch" });
       return [];
@@ -266,7 +266,7 @@ describe("Engine end-to-end (G+H pieces)", () => {
     let cached = initialCached;
     if (!cached && buildOptIn) cached = await buildEngineBundle();
     if (!cached) return;
-    if (buildOptIn) await buildAllZoyaPieces();
+    if (buildOptIn) await buildAllJarvisPieces();
     runtime = new EngineRuntime({ api, bundlePath: cached.bundlePath });
   });
 
@@ -396,4 +396,3 @@ describe("Engine end-to-end (G+H pieces)", () => {
     60_000,
   );
 });
-

@@ -155,4 +155,3 @@ export class ObserverManager {
     return Array.from(this.observers.keys());
   }
 }
-

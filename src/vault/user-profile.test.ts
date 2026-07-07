@@ -111,4 +111,3 @@ describe('Vault — User Profile', () => {
     expect(prompt).toContain('    - not a list item');
   });
 });
-

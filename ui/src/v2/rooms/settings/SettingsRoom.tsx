@@ -334,7 +334,7 @@ export function SettingsRoomBody({ mode }: { mode: RoomBodyMode }) {
             type="button"
             className="v2-set__banner-btn"
             onClick={async () => {
-              if (!confirm("Restart Zoya now? Your dashboard will reconnect after a few seconds.")) return;
+              if (!confirm("Restart Jarvis now? Your dashboard will reconnect after a few seconds.")) return;
               const r = await data.restartDaemon();
               showToast(r.message, r.ok ? "ok" : "warn");
             }}

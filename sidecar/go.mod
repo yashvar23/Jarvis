@@ -1,4 +1,4 @@
-module github.com/zoya/sidecar
+module github.com/jarvis/sidecar
 
 go 1.25.0
 

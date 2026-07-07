@@ -35,12 +35,9 @@ export function closeDb(): void {
 /**
  * Initialize the SQLite database with all required tables
  * @param dbPath - Path to the database file. Defaults to :memory: for testing
- * @param opts.quiet - Suppress the stdout init log. CLIs whose stdout is
- *   machine-readable (zoya enroll/sidecars/revoke) set this so the token
- *   or JSON is the ONLY thing on stdout.
  * @returns Database instance
  */
-export function initDatabase(dbPath: string = ":memory:", opts?: { quiet?: boolean }): Database {
+export function initDatabase(dbPath: string = ":memory:"): Database {
   try {
     // Close existing connection if any
     closeDb();
@@ -57,7 +54,7 @@ export function initDatabase(dbPath: string = ":memory:", opts?: { quiet?: boole
     // Create all tables
     createTables(dbInstance);
 
-    if (!opts?.quiet) console.log(`Database initialized at: ${dbPath}`);
+    console.log(`Database initialized at: ${dbPath}`);
     return dbInstance;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
@@ -308,7 +305,7 @@ function createTables(db: Database): void {
   db.run(`CREATE INDEX IF NOT EXISTS idx_content_type ON content_items(content_type)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_content_sort ON content_items(stage, sort_order)`);
 
-  // Content pipeline: per-stage notes from user or ZOYA
+  // Content pipeline: per-stage notes from user or JARVIS
   db.run(`
     CREATE TABLE IF NOT EXISTS content_stage_notes (
       id TEXT PRIMARY KEY,
@@ -674,9 +671,6 @@ function createTables(db: Database): void {
   // Sidecar's own (brain-decoupled) version, reported on register. Added later;
   // ALTER in try/catch is the migration pattern used throughout this file.
   try { db.run('ALTER TABLE sidecars ADD COLUMN version TEXT'); } catch { /* already present */ }
-  // IANA timezone reported by the sidecar on register (hosted brains run on
-  // UTC VPSs; the hosting server reads this for follow-the-night scheduling).
-  try { db.run('ALTER TABLE sidecars ADD COLUMN timezone TEXT'); } catch { /* already present */ }
 
   // Settings table: key-value store for dashboard-managed configuration
   db.run(`
@@ -687,7 +681,7 @@ function createTables(db: Database): void {
     )
   `);
 
-  // Documents table: vault-stored documents created by ZOYA
+  // Documents table: vault-stored documents created by JARVIS
   db.run(`
     CREATE TABLE IF NOT EXISTS documents (
       id TEXT PRIMARY KEY,
@@ -783,15 +777,10 @@ function createTables(db: Database): void {
       model TEXT NOT NULL,
       input_tokens INTEGER NOT NULL DEFAULT 0,
       output_tokens INTEGER NOT NULL DEFAULT 0,
-      cache_read_input_tokens INTEGER NOT NULL DEFAULT 0,
-      cache_creation_input_tokens INTEGER NOT NULL DEFAULT 0,
       latency_ms INTEGER NOT NULL DEFAULT 0,
       error_code TEXT
     )
   `);
-  // Migration: cache token columns for DBs created before prompt caching landed.
-  try { db.run(`ALTER TABLE llm_usage ADD COLUMN cache_read_input_tokens INTEGER NOT NULL DEFAULT 0`); } catch { /* already present */ }
-  try { db.run(`ALTER TABLE llm_usage ADD COLUMN cache_creation_input_tokens INTEGER NOT NULL DEFAULT 0`); } catch { /* already present */ }
   db.run(`CREATE INDEX IF NOT EXISTS idx_llm_usage_ts ON llm_usage(ts DESC)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_llm_usage_subsystem ON llm_usage(subsystem, ts DESC)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_llm_usage_tier ON llm_usage(tier, ts DESC)`);
@@ -820,4 +809,3 @@ function createTables(db: Database): void {
   db.run(`CREATE INDEX IF NOT EXISTS idx_tasks_status_updated ON tasks(status, updated_at DESC)`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_tasks_updated ON tasks(updated_at DESC)`);
 }
-

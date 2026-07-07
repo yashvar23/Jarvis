@@ -79,7 +79,7 @@ export function TutorialRoom({
   // ── Mute the AppShell's mic for the duration of the tutorial ──────
   // The narration plays through the user's speakers, gets picked up by
   // the mic, transcribed by browser SpeechRecognition, and sent to the
-  // chat agent as a "user message" — Zoya then conversationally
+  // chat agent as a "user message" — Jarvis then conversationally
   // responds to its own onboarding script. Suppress the mic entirely
   // while the overlay is mounted. AppShell subscribes via the matching
   // window CustomEvent (mirrors the sample-injection pattern).
@@ -101,7 +101,7 @@ export function TutorialRoom({
   // ── Room navigation for the per-room walkthrough block ─────────────
   // Each per-room step asks the AppShell to open that Room fullscreen
   // before the spotlight renders, so the user sees the actual surface
-  // behind the dim while Zoya explains it. The outro asks for the
+  // behind the dim while Jarvis explains it. The outro asks for the
   // open Room to be closed so the centered card lands on the thread.
   useEffect(() => {
     if (step.closeRoomBefore) {

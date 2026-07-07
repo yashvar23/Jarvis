@@ -30,7 +30,7 @@ export type ObjectType =
   | "usage"
   | "settings";
 
-export type ZoyaSpeechStatus = "speaking" | "done";
+export type JarvisSpeechStatus = "speaking" | "done";
 
 export type ThreadItem =
   | {
@@ -46,14 +46,14 @@ export type ThreadItem =
       t: string;
     }
   | {
-      kind: "zoya-speech";
+      kind: "jarvis-speech";
       id: string;
       text: string;
       t: string;
-      status: ZoyaSpeechStatus;
+      status: JarvisSpeechStatus;
     }
   | {
-      kind: "zoya-thought";
+      kind: "jarvis-thought";
       id: string;
       text: string;
       t: string;
@@ -147,5 +147,3 @@ export type VoiceIntentLite = {
 };
 
 export type ThreadItemKind = ThreadItem["kind"];
-
-

@@ -19,4 +19,3 @@ export const TriggerStatusReport = z.object({
 })
 
 export type TriggerStatusReport = z.infer<typeof TriggerStatusReport>
-

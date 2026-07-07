@@ -1,6 +1,6 @@
 # Vault Extractor
 
-The Vault Extractor is an LLM-powered knowledge extraction system that automatically extracts entities, facts, relationships, and commitments from conversations and stores them in the ZOYA knowledge graph.
+The Vault Extractor is an LLM-powered knowledge extraction system that automatically extracts entities, facts, relationships, and commitments from conversations and stores them in the J.A.R.V.I.S. knowledge graph.
 
 ## Features
 
@@ -336,4 +336,3 @@ Assistant: "I'll remember that Anna's birthday is March 15th!"
 - [ ] Streaming extraction for long conversations
 - [ ] Multi-language support
 - [ ] Fact expiration and staleness tracking
-

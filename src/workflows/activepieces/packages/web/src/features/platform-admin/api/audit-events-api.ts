@@ -11,4 +11,3 @@ export const auditEventsApi = {
     return api.get<SeekPage<ApplicationEvent>>('/v1/audit-events', request);
   },
 };
-

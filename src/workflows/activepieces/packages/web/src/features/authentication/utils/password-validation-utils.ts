@@ -61,4 +61,3 @@ const passwordValidation = {
 };
 
 export { passwordValidation, passwordRules };
-

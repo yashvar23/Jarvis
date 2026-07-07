@@ -256,4 +256,3 @@ export function getActiveGoalsSummary(): string {
     return '';
   }
 }
-

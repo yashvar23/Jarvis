@@ -131,4 +131,3 @@ export function updatePersonality(updates: DeepPartial<PersonalityModel>): Perso
   savePersonality(updated);
   return updated;
 }
-

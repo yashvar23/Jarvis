@@ -182,9 +182,9 @@ async function findDistPackageJsonFiles(dirPath: string): Promise<string[]> {
 async function traverseAllParentFoldersToFindPiece(packageName: string): Promise<string | null> {
     const customPaths = (process.env.AP_CUSTOM_PIECES_PATHS ?? '').split(':').filter(Boolean)
     for (const customPath of customPaths) {
-        // Zoya layout: pieces installed via the pieces-library catalog live
+        // Jarvis layout: pieces installed via the pieces-library catalog live
         // in a shared node_modules tree at `<customPath>/node_modules/<pkg>`.
-        // This branch is checked first because Zoya bun-installs every
+        // This branch is checked first because Jarvis bun-installs every
         // piece into one dedup'd tree rather than activepieces' per-piece
         // isolated layout below.
         const sharedPath = path.resolve(customPath, 'node_modules', trimVersionFromAlias(packageName))
@@ -254,5 +254,4 @@ type GetPackageAliasParams = {
     devPieces: string[]
     pieceVersion: string
 }
-
 

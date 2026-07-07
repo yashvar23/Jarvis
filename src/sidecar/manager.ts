@@ -27,9 +27,6 @@ import { SidecarConnection } from './connection.ts';
 import { classifySidecarVersion, SIDECAR_MIN_VERSION, SIDECAR_RECOMMENDED_VERSION } from './compat.ts';
 import { chmodWithWarning, secureDirectory, secureWriteFile } from '../util/fs-secure.ts';
 import { computeAnonId } from '../telemetry/anon-id.ts';
-import { loadOrGenerateSidecarKeys, enrollDevice, buildEnrollmentUrls, isLocalhostBrainUrl } from './enrollment.ts';
-
-export { buildEnrollmentUrls, isLocalhostBrainUrl } from './enrollment.ts';
 
 const ALG = 'ES256';
 const KEY_DIR_NAME = 'sidecar-keys';
@@ -46,17 +43,49 @@ const PUBLIC_KEY_FILE = 'public.pem';
 const ACCESS_TOKEN_AUDIENCE = 'brain-api';
 const ACCESS_TOKEN_TTL_SECONDS = 600; // 10 minutes
 
-/**
- * Accept only strings shaped like IANA zone names ("Area/City", up to three
- * segments, "UTC"), max 64 chars. Mirrors the Go sidecar's ianaNameRe.
- */
-const IANA_TZ_RE = /^[A-Za-z_+-]+(\/[A-Za-z0-9_+-]+){0,2}$/;
+// Localhost host check anchored: matches `localhost`, `localhost:PORT`, but
+// not e.g. `notlocalhost.example.com`. Used both for enrollment URL scheme
+// inference and for startup warnings.
+const LOCALHOST_HOST_RE = /^(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\])(:\d+)?$/;
 
-export function sanitizeIanaTimezone(value: unknown): string | undefined {
-  if (typeof value !== 'string') return undefined;
-  const trimmed = value.trim();
-  if (trimmed.length === 0 || trimmed.length > 64) return undefined;
-  return IANA_TZ_RE.test(trimmed) ? trimmed : undefined;
+export function isLocalhostBrainUrl(brainBase: string): boolean {
+  const normalized = brainBase.trim();
+  if (/^(https?|wss?):\/\//.test(normalized)) {
+    try {
+      return LOCALHOST_HOST_RE.test(new URL(normalized).host);
+    } catch {
+      return false;
+    }
+  }
+  return LOCALHOST_HOST_RE.test(normalized);
+}
+
+// Build the JWT-bound enrollment URLs from a single canonical brain base —
+// either a full URL (`https://brain.example.com`, `wss://...`) or a bare
+// host[:port] (`brain.example.com`, `10.0.0.5:3142`). Pure function: no
+// request input, no env, no class state. The single source of truth is
+// whatever the brain operator configured at startup.
+export function buildEnrollmentUrls(brainBase: string): { brainWs: string; jwksUrl: string } {
+  const normalized = brainBase.trim();
+
+  if (/^(https?|wss?):\/\//.test(normalized)) {
+    const parsed = new URL(normalized);
+    const isSecure = parsed.protocol === 'https:' || parsed.protocol === 'wss:';
+    return {
+      brainWs: `${isSecure ? 'wss' : 'ws'}://${parsed.host}/sidecar/connect`,
+      jwksUrl: `${isSecure ? 'https' : 'http'}://${parsed.host}/api/sidecars/.well-known/jwks.json`,
+    };
+  }
+
+  // Bare host: assume insecure only for explicit local hosts. A remote
+  // host with an explicit port (`brain.example.com:443`) used to be
+  // misclassified as insecure by a `:\d+$` heuristic; require a known
+  // local host instead so production deployments default to wss/https.
+  const isSecure = !LOCALHOST_HOST_RE.test(normalized);
+  return {
+    brainWs: `${isSecure ? 'wss' : 'ws'}://${normalized}/sidecar/connect`,
+    jwksUrl: `${isSecure ? 'https' : 'http'}://${normalized}/api/sidecars/.well-known/jwks.json`,
+  };
 }
 
 export class SidecarManager implements Service {
@@ -77,7 +106,6 @@ export class SidecarManager implements Service {
   private scheduler: EventScheduler;
   private rpcTracker: RPCTracker;
   private sidecarConnections = new Map<string, SidecarConnection>();
-  private revocationSweepTimer: ReturnType<typeof setInterval> | null = null;
   private progressListeners = new Set<(sidecarId: string, rpcId: string, progress: number, message?: string) => void>();
   private eventListeners = new Set<(sidecarId: string, event: SidecarEvent) => void>();
   // Two parallel notify APIs:
@@ -109,9 +137,9 @@ export class SidecarManager implements Service {
     this.brainUrl = url;
     if (source) {
       const { brainWs } = buildEnrollmentUrls(url);
-      const sourceLabel = source === 'env' ? 'ZOYA_BRAIN_DOMAIN env var'
+      const sourceLabel = source === 'env' ? 'JARVIS_BRAIN_DOMAIN env var'
         : source === 'config' ? 'config.yaml daemon.brain_domain'
-        : `default fallback — set daemon.brain_domain in config.yaml or ZOYA_BRAIN_DOMAIN env to override`;
+        : `default fallback — set daemon.brain_domain in config.yaml or JARVIS_BRAIN_DOMAIN env to override`;
       console.log(`[SidecarManager] Brain URL: ${brainWs} (source: ${sourceLabel})`);
       if (isLocalhostBrainUrl(url)) {
         console.warn(
@@ -127,16 +155,6 @@ export class SidecarManager implements Service {
     this._status = 'starting';
     try {
       await this.loadOrGenerateKeys();
-
-      // CLI revocations happen in another process; sweep so they take
-      // effect on live sessions within ~30s, not only at the next connect.
-      this.revocationSweepTimer = setInterval(() => {
-        try {
-          this.sweepRevokedConnections();
-        } catch (err) {
-          console.error('[SidecarManager] Revocation sweep failed:', err);
-        }
-      }, 30_000);
 
       // Wire scheduler handlers
       this.scheduler.on('rpc_result', async (sidecarId, event) => {
@@ -192,11 +210,6 @@ export class SidecarManager implements Service {
   async stop(): Promise<void> {
     this._status = 'stopping';
 
-    if (this.revocationSweepTimer) {
-      clearInterval(this.revocationSweepTimer);
-      this.revocationSweepTimer = null;
-    }
-
     // Stop scheduler
     this.scheduler.stop();
 
@@ -234,13 +247,49 @@ export class SidecarManager implements Service {
   }
 
   private async loadOrGenerateKeys(): Promise<void> {
-    const keys = await loadOrGenerateSidecarKeys(this.dataDir, (msg) =>
-      console.log(`[SidecarManager] ${msg}`),
-    );
-    this.privateKey = keys.privateKey;
-    this.publicKey = keys.publicKey;
-    this.publicJwk = keys.publicJwk;
-    this.keyId = keys.keyId;
+    if (existsSync(this.privateKeyPath) && existsSync(this.publicKeyPath)) {
+      await this.loadKeys();
+      await this.secureKeyFilePermissions();
+      console.log('[SidecarManager] Loaded existing ES256 key pair');
+    } else {
+      await this.generateKeys();
+      console.log('[SidecarManager] Generated new ES256 key pair');
+    }
+
+    // Export public key as JWK for the JWKS endpoint
+    this.publicJwk = await exportJWK(this.publicKey!);
+    this.keyId = this.publicJwk.x ?? 'default'; // use x-coordinate as kid (stable, unique)
+  }
+
+  private async generateKeys(): Promise<void> {
+    await secureDirectory(this.keysDir, 0o700);
+
+    const { privateKey, publicKey } = await generateKeyPair(ALG, { extractable: true });
+    this.privateKey = privateKey;
+    this.publicKey = publicKey;
+
+    // Export to PEM and write to disk
+    const pkcs8 = await exportPKCS8(privateKey);
+    const spki = await exportSPKI(publicKey);
+
+    await secureWriteFile(this.privateKeyPath, pkcs8, 0o600, 'SidecarManager');
+    // public.pem contains the SPKI public key, so world-readable 0644 is intentional.
+    await secureWriteFile(this.publicKeyPath, spki, 0o644, 'SidecarManager');
+    await this.secureKeyFilePermissions();
+  }
+
+  private async loadKeys(): Promise<void> {
+    const privatePem = await Bun.file(this.privateKeyPath).text();
+    const publicPem = await Bun.file(this.publicKeyPath).text();
+
+    this.privateKey = await importPKCS8(privatePem, ALG, { extractable: true });
+    this.publicKey = await importSPKI(publicPem, ALG, { extractable: true });
+  }
+
+  private async secureKeyFilePermissions(): Promise<void> {
+    await chmodWithWarning(this.keysDir, 0o700, 'SidecarManager');
+    await chmodWithWarning(this.privateKeyPath, 0o600, 'SidecarManager');
+    await chmodWithWarning(this.publicKeyPath, 0o644, 'SidecarManager');
   }
 
   // --------------- JWKS ---------------
@@ -269,23 +318,58 @@ export class SidecarManager implements Service {
 
   /**
    * Enroll a new sidecar. Returns the signed JWT enrollment token.
-   * Delegates to the standalone enrollment module (shared with the
-   * `zoya enroll` CLI); the dashboard API keeps reject-on-duplicate.
    */
   async enrollSidecar(name: string): Promise<{ token: string; sidecar: SidecarRecord }> {
-    if (!this.privateKey || !this.publicJwk) throw new Error('SidecarManager not started');
+    if (!this.privateKey) throw new Error('SidecarManager not started');
     if (!this.brainUrl) throw new Error('Brain URL not configured — call setBrainUrl() first');
 
-    const { token, sidecar } = await enrollDevice(this.dataDir, this.brainUrl, name, {
-      onExisting: 'reject',
-      keys: {
-        privateKey: this.privateKey,
-        publicKey: this.publicKey!,
-        publicJwk: this.publicJwk,
-        keyId: this.keyId,
-      },
-    });
-    console.log(`[SidecarManager] Enrolled sidecar "${sidecar.name}" (${sidecar.id})`);
+    // Validate name
+    const trimmed = name.trim();
+    if (!trimmed || trimmed.length > 64) {
+      throw new Error('Sidecar name must be 1-64 characters');
+    }
+    if (!/^[a-zA-Z0-9_-]+$/.test(trimmed)) {
+      throw new Error('Sidecar name may only contain letters, numbers, hyphens, and underscores');
+    }
+
+    // Check uniqueness
+    const db = getDb();
+    const existing = db.query('SELECT id FROM sidecars WHERE name = ? AND status = ?').get(trimmed, 'enrolled') as { id: string } | null;
+    if (existing) {
+      throw new Error(`Sidecar "${trimmed}" is already enrolled`);
+    }
+
+    const id = generateId();
+    const tokenId = generateId();
+
+    const { brainWs, jwksUrl } = buildEnrollmentUrls(this.brainUrl);
+
+    // Sign JWT. `bid` is the brain's anonymous telemetry id so the sidecar can
+    // report which brain it belongs to (for the sidecars-per-brain analytics);
+    // it is the same digest the brain reports in its own telemetry, never the
+    // raw hostname/username.
+    const token = await new SignJWT({
+      sid: id,
+      name: trimmed,
+      brain: brainWs,
+      jwks: jwksUrl,
+      bid: computeAnonId(),
+    } satisfies Omit<SidecarTokenClaims, 'sub' | 'jti' | 'iat'>)
+      .setProtectedHeader({ alg: ALG, kid: this.keyId })
+      .setSubject(`sidecar:${id}`)
+      .setJti(tokenId)
+      .setIssuedAt()
+      .sign(this.privateKey);
+
+    // Store in database
+    db.run(
+      'INSERT INTO sidecars (id, name, token_id) VALUES (?, ?, ?)',
+      [id, trimmed, tokenId],
+    );
+
+    const sidecar = db.query('SELECT * FROM sidecars WHERE id = ?').get(id) as SidecarRecord;
+    console.log(`[SidecarManager] Enrolled sidecar "${trimmed}" (${id})`);
+
     return { token, sidecar };
   }
 
@@ -310,35 +394,11 @@ export class SidecarManager implements Service {
     const db = getDb();
     const result = db.run('DELETE FROM sidecars WHERE id = ? AND status = ?', [id, 'enrolled']);
     if (result.changes > 0) {
-      // Sever any LIVE session too - deleting the row alone only blocks the
-      // next connect, and a revoked-but-connected sidecar would keep routing
-      // RPCs indefinitely (stolen-device scenario).
-      this.handleSidecarDisconnect(id);
       this.connected.delete(id);
       console.log(`[SidecarManager] Revoked and removed sidecar ${id}`);
       return true;
     }
     return false;
-  }
-
-  /**
-   * Disconnect any live session whose enrollment row is gone. Covers
-   * revocations the daemon cannot observe directly: `zoya revoke` runs in
-   * a SEPARATE process and deletes the row in the shared (WAL) DB, so the
-   * daemon re-checks periodically. Runs every 30s from start(); public so
-   * tests (and ops surfaces) can force a sweep.
-   */
-  sweepRevokedConnections(): number {
-    let severed = 0;
-    for (const id of [...this.sidecarConnections.keys()]) {
-      if (!this.isEnrolled(id)) {
-        console.log(`[SidecarManager] Severing revoked sidecar session: ${id}`);
-        this.handleSidecarDisconnect(id);
-        this.connected.delete(id);
-        severed++;
-      }
-    }
-    return severed;
   }
 
   /** Check if a sidecar ID is enrolled (not revoked) */
@@ -358,17 +418,12 @@ export class SidecarManager implements Service {
 
   /** Register a connected sidecar (called after WS handshake + registration message) */
   registerConnection(sidecar: ConnectedSidecar): void {
-    // The reported timezone is untrusted sidecar input headed for sensitive
-    // sinks: `zoya sidecars list --json` (read by the hosting server) and,
-    // downstream, the root-owned system config the server writes. Persist it
-    // only when it LOOKS like an IANA zone name; anything else becomes null.
-    const timezone = sanitizeIanaTimezone(sidecar.timezone);
-    this.connected.set(sidecar.id, { ...sidecar, timezone });
+    this.connected.set(sidecar.id, sidecar);
     // Persist connection details to DB so they're available even when offline
     const db = getDb();
     db.run(
-      `UPDATE sidecars SET last_seen_at = datetime('now'), hostname = ?, os = ?, platform = ?, capabilities = ?, version = ?, timezone = COALESCE(?, timezone) WHERE id = ?`,
-      [sidecar.hostname, sidecar.os, sidecar.platform, JSON.stringify(sidecar.capabilities), sidecar.version, timezone ?? null, sidecar.id],
+      `UPDATE sidecars SET last_seen_at = datetime('now'), hostname = ?, os = ?, platform = ?, capabilities = ?, version = ? WHERE id = ?`,
+      [sidecar.hostname, sidecar.os, sidecar.platform, JSON.stringify(sidecar.capabilities), sidecar.version, sidecar.id],
     );
     console.log(`[SidecarManager] Sidecar connected: ${sidecar.name} (${sidecar.id})`);
     // Fire both listener flavours — main uses onConnect(id) for routing,
@@ -585,7 +640,6 @@ export class SidecarManager implements Service {
             updateStatus: verdict,
             capabilities: parsed.capabilities ?? [],
             unavailableCapabilities: parsed.unavailable_capabilities ?? [],
-            timezone: typeof parsed.timezone === 'string' ? parsed.timezone : undefined,
             connectedAt: new Date(),
           });
           return;
@@ -698,4 +752,3 @@ export class SidecarManager implements Service {
     };
   }
 }
-

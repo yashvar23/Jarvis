@@ -320,7 +320,7 @@ func handleSetClipboard(params map[string]any) (*RPCResult, error) {
 // Both the RPC handler and the ScreenObserver use this to skip a base64
 // round-trip on the in-process path.
 func captureScreenBytes() ([]byte, error) {
-	tmpFile := filepath.Join(os.TempDir(), fmt.Sprintf("zoya-screenshot-%d.png", time.Now().UnixNano()))
+	tmpFile := filepath.Join(os.TempDir(), fmt.Sprintf("jarvis-screenshot-%d.png", time.Now().UnixNano()))
 	defer os.Remove(tmpFile)
 
 	if err := platformCaptureScreen(tmpFile); err != nil {

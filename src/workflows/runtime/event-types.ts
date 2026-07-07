@@ -92,7 +92,7 @@ export const WORKFLOW_EVENT_TYPES: ReadonlyArray<WorkflowEventTypeMeta> = [
     type: "awareness.context_changed",
     description:
       "User switched between meaningful contexts (project / app / task). Active app at `payload.app` ({{trigger.payload.app}}); project at `payload.project`.",
-    payloadExample: { app: "VS Code", project: "zoya" },
+    payloadExample: { app: "VS Code", project: "jarvis" },
   },
   {
     type: "awareness.error_detected",
@@ -121,7 +121,7 @@ export const WORKFLOW_EVENT_TYPES: ReadonlyArray<WorkflowEventTypeMeta> = [
     type: "awareness.session_ended",
     description:
       "An awareness session ended. Inferred topic at `payload.topic` ({{trigger.payload.topic}}); duration ms at `payload.durationMs`; session id at `payload.sessionId`.",
-    payloadExample: { sessionId: "sess_abc", topic: "zoya workflows", durationMs: 1800000 },
+    payloadExample: { sessionId: "sess_abc", topic: "jarvis workflows", durationMs: 1800000 },
   },
   {
     type: "awareness.suggestion_ready",
@@ -182,4 +182,3 @@ function buildIndex(): void {
   _index = new Map(WORKFLOW_EVENT_TYPES.map((m) => [m.type, m]));
   _indexBuilt = true;
 }
-

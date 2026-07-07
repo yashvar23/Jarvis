@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ZOYA Awareness</title>
+<title>JARVIS Awareness</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -158,7 +158,7 @@
 <body>
 <div class="overlay" id="app">
   <div class="header">
-    <span class="logo">ZOYA</span>
+    <span class="logo">JARVIS</span>
     <span>
       <span class="status-dot" id="statusDot"></span>
       <span id="statusText">connecting...</span>
@@ -236,7 +236,7 @@
     };
   }
 
-  // --- Send a chat message to ZOYA ---
+  // --- Send a chat message to JARVIS ---
   function sendChat(text) {
     if (!ws || ws.readyState !== WebSocket.OPEN) return;
     const msg = {
@@ -424,7 +424,7 @@
 
   function extractTitle(text) {
     const match = text.match(/\*\*(.+?)\*\*/);
-    return match ? match[1] : 'ZOYA Tip';
+    return match ? match[1] : 'JARVIS Tip';
   }
 
   function extractBody(text) {

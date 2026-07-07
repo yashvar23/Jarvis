@@ -172,4 +172,3 @@ function extractOutput(steps: Record<string, StepOutput>): Record<string, unknow
         return acc
     }, {} as Record<string, unknown>)
 }
-

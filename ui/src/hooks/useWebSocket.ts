@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { uuid } from "../lib/uuid";
 
 export type MessageRole = "user" | "assistant" | "system";
 
@@ -87,10 +86,10 @@ export type AgentActivityEvent = {
 export type VoiceCallbacks = {
   onTTSBinary: (data: ArrayBuffer) => void;
   /** `containsWake` — true if the TTS sentence about to play contains
-   *  "Zoya". UI uses it to suppress the wake-word recognizer for the
+   *  "Jarvis". UI uses it to suppress the wake-word recognizer for the
    *  duration of the playback so TTS doesn't self-trigger via mic echo. */
   onTTSStart: (requestId: string, containsWake: boolean) => void;
-  /** Mid-turn flip: a later sentence in the same turn contains "Zoya". */
+  /** Mid-turn flip: a later sentence in the same turn contains "Jarvis". */
   onTTSContainsWake?: () => void;
   /** `bargeIn` — realtime voice sends tts_end{bargeIn:true} when the user
    *  starts speaking, so the player can flush queued output immediately. */
@@ -180,16 +179,16 @@ type SidecarEventPayload = {
 function createSidecarNotice(payload: SidecarEventPayload, timestamp?: number): ChatMessage & { notice?: SystemNotice } {
   const reason = payload.event?.reason?.trim();
   const notice: SystemNotice = {
-    id: uuid(),
+    id: crypto.randomUUID(),
     title: "Sidecar offline",
     text: reason
-      ? `Zoya sidecar disconnected: ${reason}. Dashboard features may be delayed until it reconnects.`
-      : "Zoya sidecar disconnected. Dashboard features may be delayed until it reconnects.",
+      ? `Jarvis sidecar disconnected: ${reason}. Dashboard features may be delayed until it reconnects.`
+      : "Jarvis sidecar disconnected. Dashboard features may be delayed until it reconnects.",
     level: "warning",
   };
 
   return {
-    id: uuid(),
+    id: crypto.randomUUID(),
     role: "system",
     content: notice.text,
     timestamp: timestamp ?? Date.now(),
@@ -484,7 +483,7 @@ export function useWebSocket() {
           return;
         }
         if (msg.type === "tts_text") {
-          // Mid-turn signal that an upcoming sentence contains "Zoya" —
+          // Mid-turn signal that an upcoming sentence contains "Jarvis" —
           // UI must suppress the wake recognizer so TTS playback doesn't
           // self-trigger.
           if (msg.payload?.containsWake) {
@@ -506,7 +505,7 @@ export function useWebSocket() {
             setMessages((prev) => [
               ...prev,
               {
-                id: uuid(),
+                id: crypto.randomUUID(),
                 role: "system" as MessageRole,
                 content: msg.payload.message,
                 timestamp: msg.timestamp,
@@ -524,7 +523,7 @@ export function useWebSocket() {
             setMessages((prev) => [
               ...prev,
               {
-                id: uuid(),
+                id: crypto.randomUUID(),
                 role: (msg.payload.role === "assistant" ? "assistant" : "user") as MessageRole,
                 content: msg.payload.text,
                 timestamp: msg.timestamp,
@@ -547,7 +546,7 @@ export function useWebSocket() {
           setMessages((prev) => [
             ...prev,
             {
-              id: msg.id ?? uuid(),
+              id: msg.id ?? crypto.randomUUID(),
               role: "user" as MessageRole,
               content: msg.payload.text,
               timestamp: msg.timestamp,
@@ -572,7 +571,7 @@ export function useWebSocket() {
       setMessages((prev) => [
         ...prev,
         {
-          id: uuid(),
+          id: crypto.randomUUID(),
           role: "system" as MessageRole,
           content: msg.payload.text,
           timestamp: msg.timestamp,
@@ -593,7 +592,7 @@ export function useWebSocket() {
 
         // Add to agent activity feed
         const activityEvent: AgentActivityEvent = {
-          id: uuid(),
+          id: crypto.randomUUID(),
           agentName: msg.payload.agentName,
           agentId: msg.payload.agentId,
           eventType: msg.payload.type,
@@ -636,7 +635,7 @@ export function useWebSocket() {
 
         if (!streamIdRef.current) {
           // Start a new assistant message
-          const id = uuid();
+          const id = crypto.randomUUID();
           streamIdRef.current = id;
           setMessages((prev) => [
             ...prev,
@@ -701,7 +700,7 @@ export function useWebSocket() {
         setMessages((prev) => [
           ...prev,
           {
-            id: uuid(),
+            id: crypto.randomUUID(),
             role: "system" as MessageRole,
             content: String(wfEvent.data.message),
             timestamp: wfEvent.timestamp,
@@ -753,7 +752,7 @@ export function useWebSocket() {
         setMessages((prev) => [
           ...prev,
           {
-            id: msg.id ?? uuid(),
+            id: msg.id ?? crypto.randomUUID(),
             role: "assistant",
             content: String(payload.text),
             timestamp: msg.timestamp,
@@ -922,7 +921,7 @@ export function useWebSocket() {
       setMessages((prev) => [
         ...prev,
         {
-          id: uuid(),
+          id: crypto.randomUUID(),
           role: "system",
           content,
           detail,
@@ -949,7 +948,7 @@ export function useWebSocket() {
     (text: string, options?: { projectId?: string; currentRoom?: string }) => {
       if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
 
-      const id = uuid();
+      const id = crypto.randomUUID();
 
       // Add user message to local state
       setMessages((prev) => [
@@ -980,21 +979,7 @@ export function useWebSocket() {
         id,
         timestamp: Date.now(),
       };
-      try {
-        wsRef.current.send(JSON.stringify(msg));
-      } catch (err) {
-        // Never fail a submit silently (issue #260): surface a notice so the
-        // composer doesn't look alive while nothing reaches the daemon.
-        console.error("Failed to send chat message:", err);
-        pendingChatIdsRef.current.delete(id);
-        const notice: SystemNotice = {
-          id: uuid(),
-          title: "Message not sent",
-          text: `Could not send your message: ${err instanceof Error ? err.message : String(err)}`,
-          level: "warning",
-        };
-        setNotices((prev) => [notice, ...prev.filter((item) => item.text !== notice.text)].slice(0, 3));
-      }
+      wsRef.current.send(JSON.stringify(msg));
     },
     []
   );
@@ -1048,5 +1033,3 @@ function buildIntentLabel(
   const trimmed = transcript.trim();
   return trimmed.length > 0 ? `${head}: "${trimmed}"` : head;
 }
-
-

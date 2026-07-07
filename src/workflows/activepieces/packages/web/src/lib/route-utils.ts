@@ -31,4 +31,3 @@ export const determineDefaultRoute = (
 
 export const NEW_FLOW_QUERY_PARAM = 'newFlow';
 export const NEW_TABLE_QUERY_PARAM = 'newTable';
-

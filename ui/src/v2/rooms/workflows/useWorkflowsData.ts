@@ -348,4 +348,3 @@ async function safeJson(res: Response): Promise<{ error?: string } | null> {
     return null;
   }
 }
-

@@ -1,6 +1,6 @@
-# ZOYA LLM Providers Documentation
+# J.A.R.V.I.S. LLM Providers Documentation
 
-Complete guide to the LLM provider abstraction layer for Project ZOYA
+Complete guide to the LLM provider abstraction layer for Project J.A.R.V.I.S.
 
 ## Table of Contents
 
@@ -17,7 +17,7 @@ Complete guide to the LLM provider abstraction layer for Project ZOYA
 
 ## Overview
 
-The ZOYA LLM provider system provides a unified abstraction layer for multiple Large Language Model providers, enabling seamless switching between Anthropic Claude, OpenAI GPT, and local Ollama models with automatic fallback support.
+The J.A.R.V.I.S. LLM provider system provides a unified abstraction layer for multiple Large Language Model providers, enabling seamless switching between Anthropic Claude, OpenAI GPT, and local Ollama models with automatic fallback support.
 
 ### Key Features
 
@@ -38,12 +38,12 @@ The ZOYA LLM provider system provides a unified abstraction layer for multiple L
 
 ## Quick Start
 
-See [QUICKSTART.md](~/zoya/QUICKSTART.md) for detailed setup instructions.
+See [QUICKSTART.md](~/jarvis/QUICKSTART.md) for detailed setup instructions.
 
 ### 1. Install
 
 ```bash
-cd ~/zoya
+cd ~/jarvis
 bun install
 ```
 
@@ -54,7 +54,7 @@ bun run setup
 ```
 
 This will:
-- Create `~/.zoya/` directory
+- Create `~/.jarvis/` directory
 - Copy example config
 - Test provider connections
 
@@ -123,7 +123,7 @@ console.log(response.content);
 
 ### Anthropic (Claude)
 
-**Implementation**: `~/zoya/src/llm/anthropic.ts`
+**Implementation**: `~/jarvis/src/llm/anthropic.ts`
 
 ```typescript
 import { AnthropicProvider } from './llm/index.ts';
@@ -149,7 +149,7 @@ const provider = new AnthropicProvider(
 
 ### OpenAI (GPT)
 
-**Implementation**: `~/zoya/src/llm/openai.ts`
+**Implementation**: `~/jarvis/src/llm/openai.ts`
 
 ```typescript
 import { OpenAIProvider } from './llm/index.ts';
@@ -175,7 +175,7 @@ const provider = new OpenAIProvider(
 
 ### Ollama (Local Models)
 
-**Implementation**: `~/zoya/src/llm/ollama.ts`
+**Implementation**: `~/jarvis/src/llm/ollama.ts`
 
 ```typescript
 import { OllamaProvider } from './llm/index.ts';
@@ -210,13 +210,13 @@ ollama serve
 
 ### Configuration File
 
-Location: `~/.zoya/config.yaml`
+Location: `~/.jarvis/config.yaml`
 
 ```yaml
 daemon:
   port: 7777
-  data_dir: "~/.zoya"
-  db_path: "~/.zoya/zoya.db"
+  data_dir: "~/.jarvis"
+  db_path: "~/.jarvis/jarvis.db"
 
 llm:
   primary: "anthropic"
@@ -267,7 +267,7 @@ config.daemon.port = 8888;
 await saveConfig(config);
 ```
 
-See [~/zoya/src/config/README.md](~/zoya/src/config/README.md) for complete config documentation.
+See [~/jarvis/src/config/README.md](~/jarvis/src/config/README.md) for complete config documentation.
 
 ## Usage Examples
 
@@ -463,7 +463,7 @@ bun run examples
 ### Common Issues
 
 **"No LLM providers configured"**
-- Add at least one API key to `~/.zoya/config.yaml`
+- Add at least one API key to `~/.jarvis/config.yaml`
 
 **"Provider 'X' not registered"**
 - Ensure provider is registered before setting as primary
@@ -507,22 +507,6 @@ console.log('Response:', response);
 ```
 
 ## Advanced Topics
-
-### Prompt Caching
-
-Provider-side prompt caching is enabled by default and controlled by the `llm.prompt_cache` setting (DB/dashboard-managed like the tier map; set `prompt_cache: false` via the LLM settings API to disable). Only an explicit `false` disables it.
-
-How it works per provider:
-
-- **Anthropic**: system prompts are sent as a block array with `cache_control` breakpoints. One breakpoint sits on the cache-marked static system block (caching tools + static prompt), a second on the last message of conversational requests (incremental caching across ReAct loop iterations and chat turns). Cache reads bill at ~0.1x input price, writes at 1.25x, with a 5-minute TTL. One-shot requests (no assistant turn) get no message breakpoint, so they never pay the write premium. Prefixes below the model's minimum cacheable size (1024-4096 tokens) silently don't cache and cost nothing extra.
-- **OpenAI**: caching is automatic server-side (~50% discount on cached prefixes over 1024 tokens); Zoya just keeps stable content first in the prompt. Reported `cached_tokens` are surfaced in telemetry.
-- **Other providers**: the cache markers are ignored; no behavior change.
-
-Internals for callers: `LLMMessage.cache: true` marks a system message as a stable cache boundary. System prompts are built split into a static (byte-stable per role/channel) prefix and a dynamic per-turn suffix (`buildSystemPromptParts` in `src/roles/prompt-builder.ts`); volatile content (current time, observations, goals) must stay in the dynamic half or it invalidates the cache every turn. History trimming (`compactHistory`) uses page-aligned eviction so the retained prefix stays byte-stable between eviction events.
-
-Note: as part of this work, the rendered system prompt's section order changed slightly - the channel personality block now renders before `# Current Context` (previously after), and the conversation tier's task-state sections moved after its static instructions. Content is unchanged.
-
-Telemetry: `usage` on every response (and the `llm_usage` table / `/api/usage` route / Usage room) reports `cache_read_input_tokens` and `cache_creation_input_tokens`. `input_tokens` is normalized across providers to count only uncached, full-price tokens - the full prompt size is `input + cache_read + cache_creation`.
 
 ### Custom Provider Implementation
 
@@ -636,16 +620,16 @@ class Conversation {
 
 ### Documentation
 
-- [LLM Provider README](~/zoya/src/llm/README.md)
-- [Config System README](~/zoya/src/config/README.md)
-- [Quick Start Guide](~/zoya/QUICKSTART.md)
-- [Implementation Summary](~/zoya/IMPLEMENTATION_SUMMARY.md)
+- [LLM Provider README](~/jarvis/src/llm/README.md)
+- [Config System README](~/jarvis/src/config/README.md)
+- [Quick Start Guide](~/jarvis/QUICKSTART.md)
+- [Implementation Summary](~/jarvis/IMPLEMENTATION_SUMMARY.md)
 
 ### Examples
 
-- [Integration Example](~/zoya/examples/llm-integration.ts)
-- [Test Suite](~/zoya/src/llm/test.ts)
-- [Setup Script](~/zoya/scripts/setup-config.ts)
+- [Integration Example](~/jarvis/examples/llm-integration.ts)
+- [Test Suite](~/jarvis/src/llm/test.ts)
+- [Setup Script](~/jarvis/scripts/setup-config.ts)
 
 ### External Resources
 
@@ -656,5 +640,4 @@ class Conversation {
 
 ---
 
-Built for Project ZOYA with ❤️
-
+Built for Project J.A.R.V.I.S. with ❤️

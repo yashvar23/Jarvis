@@ -47,7 +47,7 @@ const (
 	pebbleBubbleX1      = 448
 	pebbleBubbleBodyX0  = 26  // body text left, with 14 px inner pad from the card
 	pebbleBubbleBodyX1  = 434 // body text right, with 14 px inner pad
-	pebbleBubbleBodyY0  = 84  // body text top, after the ZOYA eyebrow row
+	pebbleBubbleBodyY0  = 84  // body text top, after the JARVIS eyebrow row
 	pebbleBubbleBottomP = 12  // padding under the body text before the bubble border
 	pebbleBubbleY1Min   = 108 // bubble bottom for a single short line — keeps the card from looking pinched
 	pebbleBubbleY1Max   = 440 // window-imposed cap — keeps card inside the layered window
@@ -155,7 +155,7 @@ func (s *pebbleServiceWindows) computeBubbleBottom(memDC uintptr, state PebbleSt
 	return bottom
 }
 
-// drawBubbleText renders the riso "ZOYA" eyebrow + state-specific body
+// drawBubbleText renders the riso "JARVIS" eyebrow + state-specific body
 // line into the bubble area. Called from paint() after drawBubble has
 // painted the rounded card background at alpha=255 — text writes opaque
 // RGB onto those pixels, which is correct for pre-multiplied ARGB at α=255.
@@ -202,7 +202,7 @@ func (s *pebbleServiceWindows) drawBubbleText(memDC uintptr, state PebbleState, 
 	// paper bg → ink text + vermilion eyebrow.
 	var bodyCol, eyebrowCol uint32
 	if state == PebbleSpeaking {
-		// Dark card: paper-tone text + paper eyebrow (so the ZOYA label
+		// Dark card: paper-tone text + paper eyebrow (so the JARVIS label
 		// reads clearly against the ink background).
 		bodyCol = colorRef(pebblePaperR, pebblePaperG, pebblePaperB)
 		eyebrowCol = colorRef(pebblePaperR, pebblePaperG, pebblePaperB)
@@ -215,7 +215,7 @@ func (s *pebbleServiceWindows) drawBubbleText(memDC uintptr, state PebbleState, 
 	procSelectObject.Call(memDC, eyebrowFont)
 	procSetTextColor.Call(memDC, uintptr(eyebrowCol))
 	nullTerm := int32(-1) // DrawText sentinel for null-terminated string
-	eyebrowStr, _ := syscall.UTF16PtrFromString("ZOYA")
+	eyebrowStr, _ := syscall.UTF16PtrFromString("JARVIS")
 	eyebrowRect := pblRect{Left: pebbleBubbleBodyX0, Top: 62, Right: pebbleBubbleBodyX1, Bottom: 80}
 	procDrawTextW.Call(
 		memDC,
@@ -262,7 +262,7 @@ func (s *pebbleServiceWindows) drawBubbleText(memDC uintptr, state PebbleState, 
 func repairBubbleTextAlpha(pixels []uint32, bubbleY1 int32) {
 	// Insets larger than the corner radius (6 px) so we don't accidentally
 	// turn the transparent rounded-corner pixels opaque. Top inset starts
-	// just above the eyebrow row (62) so the ZOYA label is repaired too.
+	// just above the eyebrow row (62) so the JARVIS label is repaired too.
 	// Derive x1 from the bubble width: it used to be hardcoded to 332, which
 	// (after the card grew to pebbleBubbleX1=448) left the right ~100 px of body
 	// text — which lays out to pebbleBubbleBodyX1=434 — with alpha=0, i.e.

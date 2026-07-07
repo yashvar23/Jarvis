@@ -17,18 +17,18 @@ describe('resolveTelemetryEnabled', () => {
     expect(d.reason).toContain('config');
   });
 
-  test('ZOYA_TELEMETRY opt-out overrides an enabled config', () => {
+  test('JARVIS_TELEMETRY opt-out overrides an enabled config', () => {
     for (const v of ['0', 'false', 'no', 'off', '']) {
-      expect(resolveTelemetryEnabled(ON, { ZOYA_TELEMETRY: v }).enabled).toBe(false);
+      expect(resolveTelemetryEnabled(ON, { JARVIS_TELEMETRY: v }).enabled).toBe(false);
     }
   });
 
-  test('ZOYA_TELEMETRY opt-in overrides a disabled config', () => {
-    expect(resolveTelemetryEnabled(OFF, { ZOYA_TELEMETRY: '1' }).enabled).toBe(true);
+  test('JARVIS_TELEMETRY opt-in overrides a disabled config', () => {
+    expect(resolveTelemetryEnabled(OFF, { JARVIS_TELEMETRY: '1' }).enabled).toBe(true);
   });
 
   test('DO_NOT_TRACK takes precedence over everything', () => {
-    const d = resolveTelemetryEnabled(ON, { DO_NOT_TRACK: '1', ZOYA_TELEMETRY: '1' });
+    const d = resolveTelemetryEnabled(ON, { DO_NOT_TRACK: '1', JARVIS_TELEMETRY: '1' });
     expect(d.enabled).toBe(false);
     expect(d.reason).toContain('DO_NOT_TRACK');
   });
@@ -37,4 +37,3 @@ describe('resolveTelemetryEnabled', () => {
     expect(resolveTelemetryEnabled(ON, { DO_NOT_TRACK: '0' }).enabled).toBe(true);
   });
 });
-

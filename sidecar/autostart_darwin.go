@@ -16,7 +16,7 @@ func platformSetAutoStart(enabled bool) error {
 		return err
 	}
 	dir := filepath.Join(home, "Library", "LaunchAgents")
-	plist := filepath.Join(dir, "com.zoya.sidecar.plist")
+	plist := filepath.Join(dir, "com.jarvis.sidecar.plist")
 
 	if !enabled {
 		if err := os.Remove(plist); err != nil && !os.IsNotExist(err) {
@@ -36,7 +36,7 @@ func platformSetAutoStart(enabled bool) error {
 <plist version="1.0">
 <dict>
 	<key>Label</key>
-	<string>com.zoya.sidecar</string>
+	<string>com.jarvis.sidecar</string>
 	<key>ProgramArguments</key>
 	<array>
 		<string>%s</string>

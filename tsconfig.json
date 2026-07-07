@@ -25,4 +25,3 @@
   "include": ["src/**/*.ts", "ui/**/*.ts", "ui/**/*.tsx"],
   "exclude": ["src/workflows/activepieces/**"]
 }
-

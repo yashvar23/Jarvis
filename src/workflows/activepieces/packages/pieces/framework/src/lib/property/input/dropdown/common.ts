@@ -23,4 +23,3 @@ export type DropdownState<T> = {
     options: DropdownOption<T>[];
 }
 
-

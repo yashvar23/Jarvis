@@ -63,4 +63,3 @@ if (exitCode !== 0) {
   process.exit(1);
 }
 console.log("Smoke test PASS");
-

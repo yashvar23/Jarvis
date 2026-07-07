@@ -12,7 +12,7 @@ package main
 // Show a native warning alert. NSAlert must run on the main thread; we marshal
 // onto the main queue (the tray's [NSApp run] loop pumps it) and run it modally
 // there. Fire-and-forget so the caller's goroutine isn't blocked.
-static void zoyaShowAlert(const char* title, const char* message) {
+static void jarvisShowAlert(const char* title, const char* message) {
     NSString* t = [NSString stringWithUTF8String:title];
     NSString* m = [NSString stringWithUTF8String:message];
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -34,5 +34,5 @@ func platformShowAlert(title, message string) {
 	cm := C.CString(message)
 	defer C.free(unsafe.Pointer(ct))
 	defer C.free(unsafe.Pointer(cm))
-	C.zoyaShowAlert(ct, cm)
+	C.jarvisShowAlert(ct, cm)
 }

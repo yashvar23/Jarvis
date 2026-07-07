@@ -5,7 +5,7 @@
  * The Activepieces project is dual-licensed. Files under any `/ee/` path
  * (e.g. `packages/ee/**`, `packages/server/api/src/app/ee/**`) are covered by
  * the Activepieces Enterprise License, which forbids redistribution without a
- * paid per-seat subscription. Zoya only vendors the MIT-licensed subset, so
+ * paid per-seat subscription. Jarvis only vendors the MIT-licensed subset, so
  * any `/ee/` path or `/ee/` import in this repo is a license violation.
  *
  * Fails (exit 1) on:
@@ -128,4 +128,3 @@ console.error(
 );
 console.error("See: src/workflows/activepieces/UPSTREAM.md");
 process.exit(1);
-

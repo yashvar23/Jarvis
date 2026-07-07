@@ -45,7 +45,7 @@ static unsigned long hk_keysym(const char* name) {
     return (unsigned long)XStringToKeysym(name);
 }
 
-static Hotkey* zoyaHotkeyCreate(unsigned int mods, unsigned long keysym, unsigned long long id) {
+static Hotkey* jarvisHotkeyCreate(unsigned int mods, unsigned long keysym, unsigned long long id) {
     Display* dpy = XOpenDisplay(NULL);
     if (!dpy) return NULL;
     Window root = DefaultRootWindow(dpy);
@@ -66,8 +66,8 @@ static Hotkey* zoyaHotkeyCreate(unsigned int mods, unsigned long keysym, unsigne
     return hk;
 }
 
-// zoyaHotkeyRun blocks until stopped, firing the Go callback on each KeyPress.
-static void zoyaHotkeyRun(Hotkey* hk) {
+// jarvisHotkeyRun blocks until stopped, firing the Go callback on each KeyPress.
+static void jarvisHotkeyRun(Hotkey* hk) {
     int xfd = ConnectionNumber(hk->dpy);
     for (;;) {
         fd_set fds; FD_ZERO(&fds);
@@ -85,15 +85,15 @@ static void zoyaHotkeyRun(Hotkey* hk) {
     }
 }
 
-// zoyaHotkeyStop unblocks the run loop (write to the self-pipe — thread-safe,
-// no XLib). Safe to call from a different goroutine than zoyaHotkeyRun.
-static void zoyaHotkeyStop(Hotkey* hk) {
+// jarvisHotkeyStop unblocks the run loop (write to the self-pipe — thread-safe,
+// no XLib). Safe to call from a different goroutine than jarvisHotkeyRun.
+static void jarvisHotkeyStop(Hotkey* hk) {
     if (hk && hk->stopfd[1] >= 0) { char c = 1; ssize_t n = write(hk->stopfd[1], &c, 1); (void)n; }
 }
 
-// zoyaHotkeyFree ungrabs + closes. Must run on the same goroutine as
-// zoyaHotkeyRun (after it returns), since it touches XLib.
-static void zoyaHotkeyFree(Hotkey* hk) {
+// jarvisHotkeyFree ungrabs + closes. Must run on the same goroutine as
+// jarvisHotkeyRun (after it returns), since it touches XLib.
+static void jarvisHotkeyFree(Hotkey* hk) {
     if (!hk) return;
     if (hk->dpy) {
         XUngrabKey(hk->dpy, hk->keycode, AnyModifier, hk->root);
@@ -147,15 +147,15 @@ func startHotkeyListener(keyspec string, onFire func()) (func(), error) {
 		// all happen here. Stop only writes a pipe (thread-safe) from elsewhere.
 		runtime.LockOSThread()
 		defer runtime.UnlockOSThread()
-		hk := C.zoyaHotkeyCreate(C.uint(mods), C.ulong(keysym), C.ulonglong(id))
+		hk := C.jarvisHotkeyCreate(C.uint(mods), C.ulong(keysym), C.ulonglong(id))
 		if hk == nil {
 			ch <- created{nil, fmt.Errorf("XGrabKey failed for %q (no display or key unavailable)", keyspec)}
 			close(done)
 			return
 		}
 		ch <- created{hk, nil}
-		C.zoyaHotkeyRun(hk)
-		C.zoyaHotkeyFree(hk)
+		C.jarvisHotkeyRun(hk)
+		C.jarvisHotkeyFree(hk)
 		close(done)
 	}()
 
@@ -166,7 +166,7 @@ func startHotkeyListener(keyspec string, onFire func()) (func(), error) {
 	}
 	hk := res.hk
 	stop := func() {
-		C.zoyaHotkeyStop(hk)
+		C.jarvisHotkeyStop(hk)
 		<-done
 		hotkeyReg.Delete(id)
 	}

@@ -9,8 +9,8 @@ import {
 } from './lifecycle.ts';
 import { acquireLock, releaseLock, writeLockedPort } from '../daemon/pid.ts';
 
-const TEST_CONFIG_PATH = '/tmp/zoya-cli-lifecycle-config.yaml';
-const MISSING_CONFIG_PATH = '/tmp/zoya-cli-lifecycle-missing.yaml';
+const TEST_CONFIG_PATH = '/tmp/jarvis-cli-lifecycle-config.yaml';
+const MISSING_CONFIG_PATH = '/tmp/jarvis-cli-lifecycle-missing.yaml';
 
 async function cleanupConfig(): Promise<void> {
   if (existsSync(TEST_CONFIG_PATH)) await unlink(TEST_CONFIG_PATH);
@@ -52,7 +52,7 @@ describe('resolveStopPort precedence', () => {
     const result = resolveStopPort({
       cliPort: 8000,
       configPath: TEST_CONFIG_PATH,
-      env: { ZOYA_PORT: '7000' },
+      env: { JARVIS_PORT: '7000' },
     });
     expect(result).toEqual({ port: 9000, source: 'lockfile' });
   });
@@ -62,7 +62,7 @@ describe('resolveStopPort precedence', () => {
     const result = resolveStopPort({
       cliPort: 8000,
       configPath: TEST_CONFIG_PATH,
-      env: { ZOYA_PORT: '7000' },
+      env: { JARVIS_PORT: '7000' },
     });
     expect(result).toEqual({ port: 7000, source: 'env' });
   });
@@ -92,7 +92,7 @@ describe('resolveStopPort precedence', () => {
     await Bun.write(TEST_CONFIG_PATH, 'daemon:\n  port: 5000\n');
     const result = resolveStopPort({
       configPath: TEST_CONFIG_PATH,
-      env: { ZOYA_PORT: 'not-a-port' },
+      env: { JARVIS_PORT: 'not-a-port' },
     });
     expect(result).toEqual({ port: 5000, source: 'config' });
   });
@@ -113,4 +113,3 @@ describe('resolveStopPort precedence', () => {
     expect(result).toEqual({ port: DEFAULT_DAEMON_PORT, source: 'config' });
   });
 });
-

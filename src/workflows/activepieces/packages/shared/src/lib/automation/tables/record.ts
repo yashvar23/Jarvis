@@ -17,4 +17,3 @@ export const PopulatedRecord = Record.extend({
 })
 
 export type PopulatedRecord = z.infer<typeof PopulatedRecord>
-

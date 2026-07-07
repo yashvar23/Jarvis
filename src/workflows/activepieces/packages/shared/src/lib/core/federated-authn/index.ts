@@ -49,4 +49,3 @@ export const FederatedAuthnProviderConfigWithoutSensitiveData = z.object({
 })
 
 export type FederatedAuthnProviderConfigWithoutSensitiveData = z.infer<typeof FederatedAuthnProviderConfigWithoutSensitiveData>
-

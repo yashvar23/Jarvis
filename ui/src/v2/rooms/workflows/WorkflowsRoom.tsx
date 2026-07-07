@@ -122,7 +122,7 @@ export function WorkflowsRoomBody(): React.ReactElement {
       if (prompt) {
         setActionMessage({
           tone: "ok",
-          text: `Empty workflow created. To have Zoya build "${prompt}" for you, ask in chat: "Make a workflow that ${prompt}".`,
+          text: `Empty workflow created. To have Jarvis build "${prompt}" for you, ask in chat: "Make a workflow that ${prompt}".`,
         });
         window.setTimeout(() => setActionMessage(null), 6000);
       }

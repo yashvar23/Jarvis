@@ -73,7 +73,7 @@ instructions: |
   3. **URL navigation beats clicking** in Drive: every view (My Drive, Shared with me, Recent, Starred, Trash, specific folder, search results) has a stable URL. ALWAYS ask "is there a URL for this?" before clicking.
   4. **Files and folders ARE DOM elements**: unlike Sheets/Slides/Docs canvas, Drive lists are real interactive elements. You CAN click them by `[id]`.
   5. **Google Drive is LOCALE-DEPENDENT**: button labels (New, Share, Rename, etc.) are translated. Match by role, by position, by URL when possible, or by `(Ctrl+…)` / `(⌘+…)` hints in aria-labels. NEVER match by English text alone.
-  6. **Single-click selects, double-click opens**: in ZOYA snapshots, `browser_click` fires ONE click. To open a file, either double-click equivalent (click + Enter) or click once + `desktop_press_keys("enter")`.
+  6. **Single-click selects, double-click opens**: in JARVIS snapshots, `browser_click` fires ONE click. To open a file, either double-click equivalent (click + Enter) or click once + `desktop_press_keys("enter")`.
   7. **Keyboard shortcuts need focus to NOT be in an input**: if the search box or a dialog has focus, single-letter shortcuts like `r` (rename) will just type the letter. When shortcuts misfire, first press Escape to release input focus.
   8. **Upload uses `browser_upload_file`**: Drive's "File upload" button reveals a hidden `<input type="file">` element. Target that element's `[id]` with `browser_upload_file(id, "/absolute/path")`.
 

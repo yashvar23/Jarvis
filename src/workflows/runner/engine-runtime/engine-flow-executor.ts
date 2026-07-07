@@ -67,10 +67,10 @@ const NON_SUCCESS_STATUSES = new Set<FlowRunStatus>([
  * any reasonable flush delay; runs that genuinely hang for that long are
  * stuck somewhere else and should fail loudly.
  *
- * Override via `ZOYA_WORKFLOW_TERMINAL_TIMEOUT_MS` for unusual environments.
+ * Override via `JARVIS_WORKFLOW_TERMINAL_TIMEOUT_MS` for unusual environments.
  */
 const DEFAULT_TERMINAL_TIMEOUT_MS = parsePositiveIntEnv(
-  process.env["ZOYA_WORKFLOW_TERMINAL_TIMEOUT_MS"],
+  process.env["JARVIS_WORKFLOW_TERMINAL_TIMEOUT_MS"],
   60_000,
 );
 const DEFAULT_TERMINAL_POLL_INTERVAL_MS = 25;
@@ -93,8 +93,8 @@ export interface EngineFlowExecutorOptions {
   /**
    * Override the directory the RESUME path reads zstd-compressed
    * execution-state backups from. Defaults to `workflowLogsBase()`
-   * (`~/.zoya/workflow-logs/`). Tests pass a per-test temp dir to avoid
-   * mutating `process.env.ZOYA_WORKFLOW_DATA_DIR`.
+   * (`~/.jarvis/workflow-logs/`). Tests pass a per-test temp dir to avoid
+   * mutating `process.env.JARVIS_WORKFLOW_DATA_DIR`.
    */
   loaderBaseDir?: string;
 }
@@ -127,20 +127,20 @@ export class EngineFlowExecutor implements FlowExecutor {
       // results in real time.
       //
       // Cost: one socket.io message + one DB UPDATE per step executed.
-      // On Zoya's local-first, single-user scale this is negligible
+      // On Jarvis's local-first, single-user scale this is negligible
       // (SQLite WAL handles thousands of writes/sec). We use WEBSOCKET
       // for both TESTING (manual / run-from-here) and PRODUCTION
       // (cron/webhook/event-fired) runs so a user inspecting a past
       // cron-fired run gets the same visibility as a manual run.
       //
-      // Override via `ZOYA_WORKFLOW_STREAM_STEP_PROGRESS=NONE` for
+      // Override via `JARVIS_WORKFLOW_STREAM_STEP_PROGRESS=NONE` for
       // setups that genuinely need to skip the per-step bookkeeping
       // (e.g. high-frequency polling triggers where the DB churn is
       // measurable on the operator's profile).
       const env: "PRODUCTION" | "TESTING" =
         ctx.run.environment === "TESTING" ? "TESTING" : "PRODUCTION";
       const streamStepProgress: "WEBSOCKET" | "NONE" =
-        process.env["ZOYA_WORKFLOW_STREAM_STEP_PROGRESS"] === "NONE"
+        process.env["JARVIS_WORKFLOW_STREAM_STEP_PROGRESS"] === "NONE"
           ? "NONE"
           : "WEBSOCKET";
       // Apply per-step sample input overrides BEFORE building flowOpts.
@@ -333,4 +333,3 @@ function applyInputOverrides(
   };
   return visit(root);
 }
-

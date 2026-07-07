@@ -165,7 +165,7 @@ describe('scheduleSystemdRestart', () => {
       return ok;
     };
     expect(scheduleSystemdRestart(spawn)).toBe(true);
-    expect(calls[0]).toEqual(['systemctl', '--user', '--no-block', 'restart', 'zoya.service']);
+    expect(calls[0]).toEqual(['systemctl', '--user', '--no-block', 'restart', 'jarvis.service']);
   });
 
   test('returns false when systemctl exits non-zero', () => {
@@ -200,4 +200,3 @@ describe('decodeLaunchctlOutput', () => {
     expect(decodeLaunchctlOutput(undefined)).toBe('');
   });
 });
-

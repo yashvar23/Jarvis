@@ -127,7 +127,7 @@ function simulateAgentActions(agent: AgentState) {
  */
 async function main() {
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-  console.log('  ZOYA Role Engine - Usage Example');
+  console.log('  J.A.R.V.I.S. Role Engine - Usage Example');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 
   // 1. Initialize role system
@@ -196,4 +196,3 @@ async function main() {
 }
 
 main().catch(console.error);
-

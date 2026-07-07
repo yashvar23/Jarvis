@@ -188,4 +188,3 @@ function parseTime(input: string): { h: number; m: number } | null {
   }
   return null;
 }
-

@@ -1,6 +1,6 @@
 # Personality Engine
 
-The Personality Engine enables ZOYA to learn and adapt its communication style based on user interactions. It maintains a dynamic personality model that evolves over time, adapts to different communication channels, and can be used to generate personalized LLM prompts.
+The Personality Engine enables J.A.R.V.I.S. to learn and adapt its communication style based on user interactions. It maintains a dynamic personality model that evolves over time, adapts to different communication channels, and can be used to generate personalized LLM prompts.
 
 ## Features
 
@@ -223,7 +223,7 @@ import { personalityToPrompt } from '@/personality';
 const systemMessage = {
   role: 'system',
   content: `
-You are ZOYA, an AI assistant.
+You are J.A.R.V.I.S., an AI assistant.
 
 ${personalityToPrompt(personality)}
 
@@ -267,4 +267,3 @@ updatePersonality({
 - [ ] Personality rollback/versioning
 - [ ] Advanced signal detection using LLMs
 - [ ] User satisfaction scoring
-

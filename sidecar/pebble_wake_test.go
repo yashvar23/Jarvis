@@ -45,7 +45,7 @@ func TestWakeOnChunkCountsSpeech(t *testing.T) {
 }
 
 // TestWakeEmitGate verifies maybeEmitSegment discards a too-short segment but
-// ships one with enough speech chunks — catching a clipped "Zoya" that the
+// ships one with enough speech chunks — catching a clipped "Jarvis" that the
 // old span-based gate would have dropped. State is set directly and lastSpeechAt
 // is backdated so silence exceeds the cutoff without needing a clock.
 func TestWakeEmitGate(t *testing.T) {

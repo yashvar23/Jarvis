@@ -48,7 +48,7 @@ export type PaletteNavEntry = {
 
 export const ROOM_NAV_ENTRIES: PaletteNavEntry[] = [
   { key: "workflows", label: "Workflows", hint: "Run or edit saved agent flows" },
-  { key: "memory", label: "Memory", hint: "Recall what Zoya knows" },
+  { key: "memory", label: "Memory", hint: "Recall what Jarvis knows" },
   { key: "agents", label: "Agents", hint: "Roster, status, last run" },
   { key: "authority", label: "Authority", hint: "Scopes, allowlists, approvals" },
   { key: "tools", label: "Tools", hint: "Catalog + capability flags" },
@@ -95,4 +95,3 @@ export function navKeyToObjectType(
       return key;
   }
 }
-

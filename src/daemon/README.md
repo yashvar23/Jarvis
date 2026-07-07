@@ -1,6 +1,6 @@
-# ZOYA Daemon
+# J.A.R.V.I.S. Daemon
 
-Core daemon infrastructure for the ZOYA system.
+Core daemon infrastructure for the JARVIS system.
 
 ## Overview
 
@@ -24,11 +24,11 @@ src/daemon/
 ### Running the Daemon
 
 ```bash
-# Run with defaults (port 3142, ~/.zoya data directory)
+# Run with defaults (port 3142, ~/.jarvis data directory)
 bun run src/daemon/index.ts
 
 # Run with custom configuration
-bun run src/daemon/index.ts --port 3142 --data-dir ~/my-zoya-data
+bun run src/daemon/index.ts --port 3142 --data-dir ~/my-jarvis-data
 
 # See all options
 bun run src/daemon/index.ts --help
@@ -42,7 +42,7 @@ import { startDaemon } from './src/daemon/index.ts';
 await startDaemon({
   port: 3142,
   dataDir: '/path/to/data',
-  dbPath: '/path/to/zoya.db',
+  dbPath: '/path/to/jarvis.db',
   healthCheckInterval: 30000, // 30 seconds
 });
 ```
@@ -123,8 +123,8 @@ console.log(monitor.formatHealth());
 | Option | Default | Description |
 |--------|---------|-------------|
 | `--port` | 3142 | WebSocket server port |
-| `--data-dir` | `~/.zoya` | Data directory |
-| `--db-path` | `~/.zoya/zoya.db` | Database file path |
+| `--data-dir` | `~/.jarvis` | Data directory |
+| `--db-path` | `~/.jarvis/jarvis.db` | Database file path |
 | `--health-interval` | 30000 | Health check interval (ms) |
 
 ## Graceful Shutdown
@@ -190,7 +190,7 @@ registry.register(new FileObserver());
 All logs include timestamps and component prefixes:
 
 ```
-[2026-02-22T22:17:03.230Z] Initializing database at /home/user/.zoya/zoya.db
+[2026-02-22T22:17:03.230Z] Initializing database at /home/user/.jarvis/jarvis.db
 [ServiceRegistry] Starting core...
 [ServiceRegistry] ✓ core started
 [HealthMonitor] Starting health checks (every 30000ms)
@@ -201,9 +201,9 @@ All logs include timestamps and component prefixes:
 The daemon uses `bun:sqlite` with:
 - **WAL mode**: Better concurrency
 - **Foreign keys**: Enabled
-- **Location**: `~/.zoya/zoya.db` (configurable)
+- **Location**: `~/.jarvis/jarvis.db` (configurable)
 
-Schema is managed by `~/zoya/src/vault/schema.ts`.
+Schema is managed by `~/jarvis/src/vault/schema.ts`.
 
 ## Testing
 
@@ -211,7 +211,7 @@ Run a quick test:
 
 ```bash
 # Start daemon and let it run for 3 seconds
-timeout 3 bun run src/daemon/index.ts --data-dir /tmp/test-zoya
+timeout 3 bun run src/daemon/index.ts --data-dir /tmp/test-jarvis
 ```
 
 Expected output:
@@ -230,4 +230,3 @@ Replace placeholder services with real implementations:
 - WebSocket server for external communication
 - Commitment scheduler
 - Vector embedding service
-

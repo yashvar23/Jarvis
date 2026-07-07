@@ -35,4 +35,3 @@ export const StaticDropdownEmptyOption = {
     label: '',
     value: '',
 }
-

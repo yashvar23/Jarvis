@@ -17,7 +17,7 @@
  * Type of a single input field on a piece action or trigger. Drives the
  * typed widget the dashboard renders (text input, dropdown, toggle, etc.).
  *
- * Kept Zoya-native rather than mirroring upstream's full Property API --
+ * Kept Jarvis-native rather than mirroring upstream's full Property API --
  * our UI only needs to discriminate widget kinds, not preserve every
  * upstream affordance.
  *
@@ -54,7 +54,7 @@ export interface PieceInputField {
    * optional; when present, the editor renders matching options inside
    * a labelled <optgroup>. Used to keep wide option lists scannable
    * (e.g. `observer.*` / `awareness.*` / `commitment.*` for the
-   * zoya-trigger:on_event eventType dropdown).
+   * jarvis-trigger:on_event eventType dropdown).
    */
   options?: ReadonlyArray<{ value: string; label: string; description?: string; group?: string }>;
   /** Suggested default. Used by the UI when the field is first revealed. */
@@ -64,4 +64,3 @@ export interface PieceInputField {
 export interface PieceInputSchema {
   fields: ReadonlyArray<PieceInputField>;
 }
-

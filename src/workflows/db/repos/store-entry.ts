@@ -153,4 +153,3 @@ export function _clearStoreForTests(): void {
 }
 
 export const _DEFAULT_PROJECT_ID = DEFAULT_IDS.project;
-

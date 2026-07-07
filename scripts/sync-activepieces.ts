@@ -141,13 +141,13 @@ if (checkOnly) {
   process.exit(0);
 }
 
-// 5. Wipe vendor tree except Zoya-authored docs
+// 5. Wipe vendor tree except Jarvis-authored docs
 mkdirSync(VENDOR_DIR, { recursive: true });
 const PRESERVE = new Set([
   "UPSTREAM.md",
   "SPIKE-SANDBOXING.md",
   "LICENSE.activepieces",
-  // Zoya-added stub. Vendored package tsconfigs all `extends` this file
+  // Jarvis-added stub. Vendored package tsconfigs all `extends` this file
   // relative to here; upstream's real one lives at their repo root which
   // we don't vendor. Without it, esbuild warns on every piece rebuild.
   "tsconfig.base.json",
@@ -163,7 +163,7 @@ const TEST_DIR_NAMES = new Set(["test", "tests", "__tests__"]);
 const TEST_FILE_RE = /\.(test|spec)\.(ts|tsx|js|jsx)$/;
 
 /**
- * Files we overwrite with a Zoya-specific stub after copy. The original
+ * Files we overwrite with a Jarvis-specific stub after copy. The original
  * file's import path is preserved so vendored loaders that conditionally
  * import these paths still resolve, but the stub yells loudly if reached.
  *
@@ -174,20 +174,20 @@ const TEST_FILE_RE = /\.(test|spec)\.(ts|tsx|js|jsx)$/;
  * native addon while keeping the import path resolvable.
  */
 const STUB_FILES: Record<string, string> = {
-  "packages/server/engine/src/lib/core/code/v8-isolate-code-sandbox.ts": `// THIS FILE IS A ZOYA STUB.
+  "packages/server/engine/src/lib/core/code/v8-isolate-code-sandbox.ts": `// THIS FILE IS A JARVIS STUB.
 // The upstream activepieces engine uses \`isolated-vm\` (a Node N-API native
-// addon) to run user code in a V8 isolate. Zoya runs the engine exclusively
+// addon) to run user code in a V8 isolate. Jarvis runs the engine exclusively
 // in SANDBOX_PROCESS mode (see src/workflows/activepieces/SPIKE-SANDBOXING.md),
 // which never reaches this file. The original implementation has been removed
 // to drop the transitive native-addon dependency.
 //
 // If this stub is ever reached, AP_EXECUTION_MODE is set to SANDBOX_CODE_ONLY
-// or SANDBOX_CODE_AND_PROCESS -- neither of which Zoya supports. Reset
+// or SANDBOX_CODE_AND_PROCESS -- neither of which Jarvis supports. Reset
 // AP_EXECUTION_MODE to SANDBOX_PROCESS.
 
 import type { CodeSandbox } from '../../core/code/code-sandbox-common'
 
-const message = 'v8-isolate-code-sandbox is not available in Zoya. Use AP_EXECUTION_MODE=SANDBOX_PROCESS.'
+const message = 'v8-isolate-code-sandbox is not available in Jarvis. Use AP_EXECUTION_MODE=SANDBOX_PROCESS.'
 
 export const v8IsolateCodeSandbox: CodeSandbox = {
     async runCodeModule() {
@@ -228,7 +228,7 @@ const STRIP_LINES: Record<string, RegExp[]> = {
   // Upstream's HTTP client sets process.env.NODE_TLS_REJECT_UNAUTHORIZED='0'
   // on every request, which disables TLS verification process-wide (not just
   // for that one call). Webhook-triggered workflows make this an MITM hole
-  // on every outbound HTTPS request ZOYA makes. Strip it; if a user
+  // on every outbound HTTPS request JARVIS makes. Strip it; if a user
   // genuinely needs to talk to self-signed endpoints they can set the env
   // var at the daemon level themselves.
   "packages/pieces/common/src/lib/http/axios/axios-http-client.ts": [
@@ -237,13 +237,13 @@ const STRIP_LINES: Record<string, RegExp[]> = {
 };
 
 /**
- * Zoya-specific source patches re-applied after each sync. Each entry names
+ * Jarvis-specific source patches re-applied after each sync. Each entry names
  * a file in the vendor tree, an `anchor` regex that must match exactly one
  * line, and an `insert` payload spliced in immediately after the anchor line.
  *
  * Use sparingly: every patch here is a maintenance cost on upstream syncs.
  * Patches must be self-describing (the inserted block carries its own
- * `// Zoya: ...` comment) so the rationale survives even without this
+ * `// Jarvis: ...` comment) so the rationale survives even without this
  * script in scope.
  */
 const PATCH_INSERTIONS: Record<
@@ -251,7 +251,7 @@ const PATCH_INSERTIONS: Record<
   Array<{ anchor: RegExp; insert: string; position?: "before" | "after" }>
 > = {
   // Polling triggers need `server.{token,apiUrl}` to call back into the
-  // daemon's /v1/zoya/* endpoints with the engineToken. The engine
+  // daemon's /v1/jarvis/* endpoints with the engineToken. The engine
   // runtime sets this unconditionally (trigger-helper.ts:137-141) but
   // upstream's TS type omitted it for POLLING; we add it here so trigger
   // code can call back without unsafe casts.
@@ -259,14 +259,14 @@ const PATCH_INSERTIONS: Record<
     {
       anchor: /^\s*setSchedule\(schedule: \{ cronExpression: string; timezone\?: string \}\): void;\s*$/,
       insert:
-        "  // Zoya: the engine runtime (trigger-helper.ts) sets `server` unconditionally\n" +
+        "  // Jarvis: the engine runtime (trigger-helper.ts) sets `server` unconditionally\n" +
         "  // on every trigger context regardless of strategy. Upstream's type omitted it\n" +
         "  // for POLLING; we surface it here so polling triggers can call back to the\n" +
-        "  // daemon's `/v1/zoya/*` endpoints with the engineToken without unsafe casts.\n" +
+        "  // daemon's `/v1/jarvis/*` endpoints with the engineToken without unsafe casts.\n" +
         "  server: ServerContext;",
     },
   ],
-  // Zoya-only extension: optional `outputSample` declaration on actions.
+  // Jarvis-only extension: optional `outputSample` declaration on actions.
   // Mirrors the long-standing `sampleData` on triggers; lets the visual
   // editor's variable picker offer `{{step.field}}` references without
   // first running the action. See the patch notes inside the inserted
@@ -276,7 +276,7 @@ const PATCH_INSERTIONS: Record<
     {
       anchor: /^\s*errorHandlingOptions\?: ErrorHandlingOptionsParam\s*$/,
       insert:
-        "  // === ZOYA PATCH: optional outputSample declaration ===\n" +
+        "  // === JARVIS PATCH: optional outputSample declaration ===\n" +
         "  // Optional declaration of the action's output shape: the same JSON\n" +
         "  // the action would return on a successful run. The visual editor's\n" +
         "  // variable picker reads this so users can wire `{{step.field}}`\n" +
@@ -284,25 +284,25 @@ const PATCH_INSERTIONS: Record<
         "  // Mirrors `createTrigger().sampleData`. Leave undefined when output is\n" +
         "  // dynamic (HTTP request piece, SQL piece, LLM with parseJson).\n" +
         "  outputSample?: unknown\n" +
-        "  // === END ZOYA PATCH ===",
+        "  // === END JARVIS PATCH ===",
     },
     {
       anchor: /^\s*public readonly errorHandlingOptions: ErrorHandlingOptionsParam,\s*$/,
       insert:
-        "    // === ZOYA PATCH: outputSample (see CreateActionParams) ===\n" +
+        "    // === JARVIS PATCH: outputSample (see CreateActionParams) ===\n" +
         "    public readonly outputSample: unknown,\n" +
-        "    // === END ZOYA PATCH ===",
+        "    // === END JARVIS PATCH ===",
     },
     {
       anchor: /^\s*\)\s*$/,
       position: "before",
       insert:
-        "    // === ZOYA PATCH: forward outputSample to the IAction instance ===\n" +
+        "    // === JARVIS PATCH: forward outputSample to the IAction instance ===\n" +
         "    params.outputSample,\n" +
-        "    // === END ZOYA PATCH ===",
+        "    // === END JARVIS PATCH ===",
     },
   ],
-  // Zoya-only extension: outputSample on ActionBase metadata too, so the
+  // Jarvis-only extension: outputSample on ActionBase metadata too, so the
   // piece catalog (which reads PieceMetadata.actions) can surface the
   // declared sample. Two insertions cover the zod schema and the TS type.
   "packages/pieces/framework/src/lib/piece-metadata.ts": [
@@ -314,19 +314,19 @@ const PATCH_INSERTIONS: Record<
       // doesn't change the runtime schema.
       anchor: /^\s*requireAuth: z\.boolean\(\),\s*$/,
       insert:
-        "  // === ZOYA PATCH: outputSample (see action.ts) ===\n" +
+        "  // === JARVIS PATCH: outputSample (see action.ts) ===\n" +
         "  outputSample: z.unknown().optional(),\n" +
-        "  // === END ZOYA PATCH ===",
+        "  // === END JARVIS PATCH ===",
     },
     {
       anchor: /^\s*errorHandlingOptions\?: ErrorHandlingOptionsParam;\s*$/,
       insert:
-        "  // === ZOYA PATCH: outputSample (see action.ts) ===\n" +
+        "  // === JARVIS PATCH: outputSample (see action.ts) ===\n" +
         "  outputSample?: unknown;\n" +
-        "  // === END ZOYA PATCH ===",
+        "  // === END JARVIS PATCH ===",
     },
   ],
-  // Zoya-only: TEXT_MATCHES_REGEX + TEXT_DOES_NOT_MATCH_REGEX added
+  // Jarvis-only: TEXT_MATCHES_REGEX + TEXT_DOES_NOT_MATCH_REGEX added
   // to the BranchOperator enum + the textConditions array + the zod
   // literal list. Anchored on the last upstream text operator so the
   // pair lands immediately after.
@@ -334,33 +334,33 @@ const PATCH_INSERTIONS: Record<
     {
       anchor: /^\s*TEXT_DOES_NOT_END_WITH = 'TEXT_DOES_NOT_END_WITH',\s*$/,
       insert:
-        "    // === ZOYA PATCH: regex condition operators ===\n" +
+        "    // === JARVIS PATCH: regex condition operators ===\n" +
         "    // Inline regex test on a text value (firstValue against secondValue\n" +
         "    // as a JS pattern). Inline regex flags via `(?i)` etc.; caseSensitive\n" +
         "    // is ignored. Negation is a separate operator to mirror the rest of\n" +
         "    // the family.\n" +
         "    TEXT_MATCHES_REGEX = 'TEXT_MATCHES_REGEX',\n" +
         "    TEXT_DOES_NOT_MATCH_REGEX = 'TEXT_DOES_NOT_MATCH_REGEX',\n" +
-        "    // === END ZOYA PATCH ===",
+        "    // === END JARVIS PATCH ===",
     },
     {
       anchor: /^\s*BranchOperator\.TEXT_DOES_NOT_END_WITH,\s*$/,
       insert:
-        "    // === ZOYA PATCH: regex operators (see BranchOperator enum) ===\n" +
+        "    // === JARVIS PATCH: regex operators (see BranchOperator enum) ===\n" +
         "    BranchOperator.TEXT_MATCHES_REGEX,\n" +
         "    BranchOperator.TEXT_DOES_NOT_MATCH_REGEX,\n" +
-        "    // === END ZOYA PATCH ===",
+        "    // === END JARVIS PATCH ===",
     },
     {
       anchor: /^\s*z\.literal\(BranchOperator\.TEXT_DOES_NOT_END_WITH\),\s*$/,
       insert:
-        "    // === ZOYA PATCH: regex operators (see BranchOperator enum) ===\n" +
+        "    // === JARVIS PATCH: regex operators (see BranchOperator enum) ===\n" +
         "    z.literal(BranchOperator.TEXT_MATCHES_REGEX),\n" +
         "    z.literal(BranchOperator.TEXT_DOES_NOT_MATCH_REGEX),\n" +
-        "    // === END ZOYA PATCH ===",
+        "    // === END JARVIS PATCH ===",
     },
   ],
-  // Zoya-only: case branches for the two regex operators added above.
+  // Jarvis-only: case branches for the two regex operators added above.
   // Anchored on the closing brace of TEXT_DOES_NOT_END_WITH; insert
   // pushes the new cases right before LIST_CONTAINS so the family
   // stays grouped.
@@ -369,7 +369,7 @@ const PATCH_INSERTIONS: Record<
       anchor: /^\s*case BranchOperator\.LIST_CONTAINS: \{\s*$/,
       position: "before",
       insert:
-        "                // === ZOYA PATCH: regex operators ===\n" +
+        "                // === JARVIS PATCH: regex operators ===\n" +
         "                // firstValue is the input string; secondValue is the JS\n" +
         "                // regex pattern (no slashes, no flags suffix). Use inline\n" +
         "                // (?i) for case-insensitive etc. -- the condition-level\n" +
@@ -397,7 +397,7 @@ const PATCH_INSERTIONS: Record<
         "                    andGroup = andGroup && !re.test(String(castedCondition.firstValue ?? ''))\n" +
         "                    break\n" +
         "                }\n" +
-        "                // === END ZOYA PATCH ===",
+        "                // === END JARVIS PATCH ===",
     },
   ],
   // Upstream's `flow-executor.executeFromTrigger` always calls
@@ -411,7 +411,7 @@ const PATCH_INSERTIONS: Record<
     {
       anchor: /^\s*if \(input\.executionType === ExecutionType\.BEGIN\) \{\s*$/,
       insert:
-        "            // === ZOYA PATCH: short-circuit for manual (EMPTY) triggers ===\n" +
+        "            // === JARVIS PATCH: short-circuit for manual (EMPTY) triggers ===\n" +
         "            // Upstream unconditionally calls `triggerHelper.executeOnStart`,\n" +
         "            // which throws `TriggerNameNotSetError` whenever the trigger has\n" +
         "            // no piece (i.e. type === 'EMPTY' -- our user-facing \"Manual\"\n" +
@@ -436,7 +436,7 @@ const PATCH_INSERTIONS: Record<
         "                    constants,\n" +
         "                })\n" +
         "            }\n" +
-        "            // === END ZOYA PATCH ===",
+        "            // === END JARVIS PATCH ===",
     },
   ],
 };
@@ -477,7 +477,7 @@ for (const p of VENDOR_PATHS) {
   info(`copied ${p} (${n} files)`);
 }
 
-// 7. Apply Zoya-specific stubs and dependency scrubs.
+// 7. Apply Jarvis-specific stubs and dependency scrubs.
 for (const [relPath, contents] of Object.entries(STUB_FILES)) {
   const dst = join(VENDOR_DIR, relPath);
   if (!existsSync(dst)) {
@@ -594,4 +594,3 @@ rmSync(work, { recursive: true, force: true });
 
 info(`Done. Vendored ${totalFiles} files into ${relative(REPO_ROOT, VENDOR_DIR)}/.`);
 info("Next: run `bun run check:no-ee` to confirm the EE guard is still green.");
-

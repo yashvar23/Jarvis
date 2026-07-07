@@ -27,11 +27,10 @@ describe('buildPayload', () => {
 });
 
 describe('telemetryEndpoint', () => {
-  test('resolves to the configured Supabase collector', () => {
+  test('resolves to the configured Firebase collector', () => {
     const ep = telemetryEndpoint();
     expect(ep).not.toBeNull();
-    expect(ep?.url).toMatch(/^https:\/\/.+\.supabase\.co\/rest\/v1\/telemetry_pings$/);
-    expect(ep?.key.length).toBeGreaterThan(0);
+    expect(ep?.url).toMatch(/^https:\/\/.+\.firebaseio\.co(m)?\/telemetry_pings\.json$/);
   });
 });
 
@@ -108,4 +107,3 @@ describe('sendPing failure handling (never throws)', () => {
     expect(out.reason).toBe('network');
   });
 });
-

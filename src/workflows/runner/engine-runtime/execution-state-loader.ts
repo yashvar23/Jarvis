@@ -49,7 +49,7 @@ export interface LoadExecutionStateOptions {
 const RUN_ID_PATTERN = /^[A-Za-z0-9_-]{1,64}$/;
 
 /**
- * Read + decompress + parse `~/.zoya/workflow-logs/<runId>.bin`. Returns
+ * Read + decompress + parse `~/.jarvis/workflow-logs/<runId>.bin`. Returns
  * `null` when the file is missing (engine never produced a backup); throws
  * when the file exists but is unreadable / corrupt -- we'd rather surface
  * decompression / parse errors than silently lose iteration state on RESUME.
@@ -111,4 +111,3 @@ export async function loadExecutionStateFromLog(
     : [];
   return { steps, tags };
 }
-

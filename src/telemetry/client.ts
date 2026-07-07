@@ -63,4 +63,3 @@ export async function sendPing(
     clearTimeout(timer);
   }
 }
-

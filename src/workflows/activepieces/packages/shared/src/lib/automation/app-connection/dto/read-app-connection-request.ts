@@ -30,4 +30,3 @@ export const ListAppConnectionOwnersRequestQuery = z.object({
     projectId: z.string(),
 })
 export type ListAppConnectionOwnersRequestQuery = z.infer<typeof ListAppConnectionOwnersRequestQuery>
-

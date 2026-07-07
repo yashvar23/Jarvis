@@ -1,47 +1,28 @@
-# ZOYA Configuration Example
-# Copy to ~/.zoya/config.yaml and customize
+# J.A.R.V.I.S. Configuration Example
+# Copy to ~/.jarvis/config.yaml and customize
 
 daemon:
   port: 3142
-  data_dir: "~/.zoya"
-  db_path: "~/.zoya/zoya.db"
+  data_dir: "~/.jarvis"
+  db_path: "~/.jarvis/jarvis.db"
   # Public origin written into sidecar enrollment JWTs (`brain` + `jwks`).
   # For remote sidecars, set this to the externally reachable URL/host they
   # can actually reach, not localhost or a private/container-only hostname.
-  # Env override: ZOYA_BRAIN_DOMAIN="https://brain.example.com"
+  # Env override: JARVIS_BRAIN_DOMAIN="https://brain.example.com"
   # brain_domain: "https://brain.example.com"
-  # Bind a unix domain socket INSTEAD of a TCP port (for a reverse proxy on
-  # the same host). When set, nothing listens on TCP. See docs/SELF_HOSTING.md.
-  # listen: "unix:/run/zoya/zoya.sock"
 
-# IANA timezone for cron triggers and morning/evening routines. Set this when
-# the server clock is not your local time (e.g. a UTC-hosted VPS).
-# timezone: "Europe/Rome"
-
-# Set local: false on headless servers (no display): the brain never launches
-# a local Chromium; browser actions route to a connected sidecar's browser.
-# browser:
-#   local: false
-
-# Authentication — JWT-only by DEFAULT. The dashboard, API, and WebSocket
-# require a token from an enrolled device. Correct setup order:
-#   1. zoya enroll "my-desktop"     (prints the device's enrollment token)
-#   2. paste the token into the sidecar (desktop app) — it connects and the
-#      dashboard is reached through it.
-#
-# ESCAPE HATCH (first-time setup only): open the dashboard WITHOUT auth.
-# Anyone who can reach this machine can then use your Zoya. The daemon
-# logs a loud warning while this is on — remove it as soon as enrollment
-# is done.
+# Authentication — protects dashboard, API, and WebSocket.
+# If unset, the application is open (no auth).
+# Can also be set via JARVIS_AUTH_TOKEN env var.
 # auth:
-#   insecure_open_access: true
+#   token: "your-secret-token-here"
 
 # Anonymous usage metrics (opt-out, enabled by default).
 # Sends a tiny anonymous ping at startup and every hour so the project can
 # count unique installs and retention. No personal data, config, or content —
 # just a hashed machine id, app version, install method, and OS.
 # See docs/TELEMETRY.md for exactly what is collected.
-# Disable here, or via ZOYA_TELEMETRY=0, or DO_NOT_TRACK=1.
+# Disable here, or via JARVIS_TELEMETRY=0, or DO_NOT_TRACK=1.
 telemetry:
   enabled: true
 
@@ -50,7 +31,7 @@ telemetry:
 # default, and per-tier routing are all configured from the settings dashboard
 # (http://localhost:3142, Settings > LLM) and stored in the database +
 # encrypted keychain. Any `llm:` block added here is ignored on load and
-# stripped on save. Env vars (ZOYA_OPENAI_KEY, etc.) are no longer read for
+# stripped on save. Env vars (JARVIS_OPENAI_KEY, etc.) are no longer read for
 # LLM config either.
 
 personality:

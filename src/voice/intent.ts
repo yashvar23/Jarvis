@@ -1,7 +1,7 @@
 /**
  * Voice Intent — the schema produced by the voice intent classifier.
  *
- * Mirrors `design_handoff_zoya_redesign/VOICE_SCHEMA.md`. The classifier
+ * Mirrors `design_handoff_jarvis_redesign/VOICE_SCHEMA.md`. The classifier
  * runs on every final STT transcript and routes downstream by `confidence`:
  *
  *   confidence ≥ 0.85 → act per impact routing (forward to chat agent)
@@ -180,4 +180,3 @@ export function intentToRoomKey(intent: Intent): RoomKey | null {
 export function intentIsBackToThread(intent: Intent): boolean {
   return intent.verb === "show" && intent.object?.type === "thread";
 }
-

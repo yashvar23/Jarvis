@@ -194,4 +194,3 @@ function getTrustDescription(level: number): string {
   if (level <= 8) return 'high';
   return 'very high';
 }
-

@@ -29,4 +29,3 @@ export type ValidateAgentMcpToolResponse = {
     error?: string
 }
 
-

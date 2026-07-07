@@ -75,7 +75,7 @@ export function buildToolGuide(hasSidecars: boolean): string {
   // --- Browser ---
   lines.push('## Browser');
   lines.push('');
-  lines.push('Control a Chrome browser for web research and interaction. Chrome auto-launches on first use. A persistent profile at ~/.zoya/browser/profile retains login sessions.');
+  lines.push('Control a Chrome browser for web research and interaction. Chrome auto-launches on first use. A persistent profile at ~/.jarvis/browser/profile retains login sessions.');
   lines.push('');
   lines.push('Workflow:');
   lines.push('1. `browser_navigate` to a URL — returns page text + interactive elements with [id] numbers');
@@ -170,7 +170,7 @@ export function buildToolGuide(hasSidecars: boolean): string {
   lines.push('OKR-style goal management (create, list, score, decompose, morning plan, evening review).');
   lines.push('');
   lines.push('### manage_workflow');
-  lines.push('Create, run, and manage Zoya workflows (automations).');
+  lines.push('Create, run, and manage Jarvis workflows (automations).');
   lines.push('When the user says "make a workflow that ...", "automate X", "set up a flow for Y", reach for this tool.');
   lines.push('');
   lines.push('Primary action: `compose { name, description }` builds a draft flow from a plain-English description.');
@@ -219,4 +219,3 @@ export function buildToolGuide(hasSidecars: boolean): string {
 
   return lines.join('\n');
 }
-

@@ -358,7 +358,7 @@ describe("buildVariableRows", () => {
             displayName: "On event",
             description: "",
             inputSchema: null,
-            // Mirrors zoya-trigger:on_event's actual envelope.
+            // Mirrors jarvis-trigger:on_event's actual envelope.
             sampleData: {
               id: "evt_1",
               eventType: "observer.clipboard_changed",
@@ -438,8 +438,8 @@ describe("buildVariableRows", () => {
       // the step configures eventType=observer.clipboard_changed, the picker
       // must surface the clipboard payload (content/length), not the static one.
       const onEventCatalog: PieceCatalogEntry = {
-        name: "@zoyapieces/piece-zoya-trigger",
-        displayName: "Zoya Trigger",
+        name: "@jarvispieces/piece-jarvis-trigger",
+        displayName: "Jarvis Trigger",
         description: "",
         actions: [],
         triggers: [
@@ -466,7 +466,7 @@ describe("buildVariableRows", () => {
                 "awareness.context_changed": {
                   id: "evt_sample",
                   eventType: "awareness.context_changed",
-                  payload: { app: "vscode", project: "zoya" },
+                  payload: { app: "vscode", project: "jarvis" },
                   timestamp: 0,
                 },
               },
@@ -479,7 +479,7 @@ describe("buildVariableRows", () => {
         type: "PIECE_TRIGGER",
         displayName: "trigger",
         settings: {
-          pieceName: "@zoyapieces/piece-zoya-trigger",
+          pieceName: "@jarvispieces/piece-jarvis-trigger",
           triggerName: "on_event",
           input: { eventType: "observer.clipboard_changed" },
         },
@@ -501,8 +501,8 @@ describe("buildVariableRows", () => {
 
     test("on_event trigger falls back to static sampleData when eventType isn't set", () => {
       const onEventCatalog: PieceCatalogEntry = {
-        name: "@zoyapieces/piece-zoya-trigger",
-        displayName: "Zoya Trigger",
+        name: "@jarvispieces/piece-jarvis-trigger",
+        displayName: "Jarvis Trigger",
         description: "",
         actions: [],
         triggers: [
@@ -537,7 +537,7 @@ describe("buildVariableRows", () => {
         displayName: "trigger",
         // No `input.eventType` configured yet.
         settings: {
-          pieceName: "@zoyapieces/piece-zoya-trigger",
+          pieceName: "@jarvispieces/piece-jarvis-trigger",
           triggerName: "on_event",
         },
       } as unknown as FlowStepNode;
@@ -582,4 +582,3 @@ describe("buildVariableRows", () => {
     });
   });
 });
-

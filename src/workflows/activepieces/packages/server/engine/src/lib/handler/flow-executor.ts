@@ -39,7 +39,7 @@ export const flowExecutor = {
     }): Promise<FlowExecutorContext> {
         const trigger = input.flowVersion.trigger
         if (input.executionType === ExecutionType.BEGIN) {
-            // === ZOYA PATCH: short-circuit for manual (EMPTY) triggers ===
+            // === JARVIS PATCH: short-circuit for manual (EMPTY) triggers ===
             // Upstream unconditionally calls `triggerHelper.executeOnStart`,
             // which throws `TriggerNameNotSetError` whenever the trigger has
             // no piece (i.e. type === 'EMPTY' — our user-facing "Manual"
@@ -67,7 +67,7 @@ export const flowExecutor = {
                     constants,
                 })
             }
-            // === END ZOYA PATCH ===
+            // === END JARVIS PATCH ===
             void runProgressService.backup({
                 engineConstants: constants,
                 flowExecutorContext: executionState,
@@ -174,4 +174,3 @@ const applyLogSizeLimitIfExceeded = (
             },
         })
 }
-

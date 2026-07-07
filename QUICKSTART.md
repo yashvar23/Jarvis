@@ -1,6 +1,6 @@
-# ZOYA LLM Providers - Quick Start Guide
+# J.A.R.V.I.S. LLM Providers - Quick Start Guide
 
-Get up and running with ZOYA LLM providers in 5 minutes.
+Get up and running with J.A.R.V.I.S. LLM providers in 5 minutes.
 
 ## Prerequisites
 
@@ -13,7 +13,7 @@ Get up and running with ZOYA LLM providers in 5 minutes.
 ## Step 1: Install Dependencies
 
 ```bash
-cd ~/zoya
+cd ~/jarvis
 bun install
 ```
 
@@ -21,19 +21,19 @@ bun install
 
 ```bash
 # Create config directory
-mkdir -p ~/.zoya
+mkdir -p ~/.jarvis
 
 # Copy example config
-cp config.example.yaml ~/.zoya/config.yaml
+cp config.example.yaml ~/.jarvis/config.yaml
 
 # Edit config with your API keys
-nano ~/.zoya/config.yaml
+nano ~/.jarvis/config.yaml
 ```
 
 ### Option A: Using Anthropic Claude (Recommended)
 
 1. Get API key from: https://console.anthropic.com/
-2. Edit `~/.zoya/config.yaml`:
+2. Edit `~/.jarvis/config.yaml`:
 
 ```yaml
 llm:
@@ -47,7 +47,7 @@ llm:
 ### Option B: Using OpenAI
 
 1. Get API key from: https://platform.openai.com/
-2. Edit `~/.zoya/config.yaml`:
+2. Edit `~/.jarvis/config.yaml`:
 
 ```yaml
 llm:
@@ -65,7 +65,7 @@ llm:
    ```bash
    ollama pull llama3
    ```
-3. Edit `~/.zoya/config.yaml`:
+3. Edit `~/.jarvis/config.yaml`:
 
 ```yaml
 llm:
@@ -143,7 +143,7 @@ console.log(response.content);
 
 ### "No LLM providers configured"
 
-**Solution**: Add at least one API key to `~/.zoya/config.yaml`
+**Solution**: Add at least one API key to `~/.jarvis/config.yaml`
 
 ### "Ollama not available"
 
@@ -154,9 +154,9 @@ ollama serve
 
 ### "Config file not found"
 
-**Solution**: Ensure config exists at `~/.zoya/config.yaml`
+**Solution**: Ensure config exists at `~/.jarvis/config.yaml`
 ```bash
-cp config.example.yaml ~/.zoya/config.yaml
+cp config.example.yaml ~/.jarvis/config.yaml
 ```
 
 ### "API key invalid"
@@ -169,12 +169,12 @@ cp config.example.yaml ~/.zoya/config.yaml
 ## Next Steps
 
 1. **Read the Documentation**:
-   - `~/zoya/src/llm/README.md` - LLM providers
-   - `~/zoya/src/config/README.md` - Configuration
+   - `~/jarvis/src/llm/README.md` - LLM providers
+   - `~/jarvis/src/config/README.md` - Configuration
 
 2. **Explore Examples**:
-   - `~/zoya/examples/llm-integration.ts`
-   - `~/zoya/src/llm/test.ts`
+   - `~/jarvis/examples/llm-integration.ts`
+   - `~/jarvis/src/llm/test.ts`
 
 3. **Integrate into Daemon**:
    - Import `LLMManager` in your daemon code
@@ -192,8 +192,8 @@ cp config.example.yaml ~/.zoya/config.yaml
 # Daemon settings
 daemon:
   port: 7777
-  data_dir: "~/.zoya"
-  db_path: "~/.zoya/zoya.db"
+  data_dir: "~/.jarvis"
+  db_path: "~/.jarvis/jarvis.db"
 
 # LLM provider settings
 llm:
@@ -284,18 +284,18 @@ const response = await manager.chat(messages);
 
 ## Security Best Practices
 
-1. **Never commit API keys**: Keep them in `~/.zoya/config.yaml` only
+1. **Never commit API keys**: Keep them in `~/.jarvis/config.yaml` only
 2. **Use environment variables**: For production deployments
-3. **Restrict config permissions**: `chmod 600 ~/.zoya/config.yaml`
+3. **Restrict config permissions**: `chmod 600 ~/.jarvis/config.yaml`
 4. **Monitor usage**: Track token usage to control costs
 5. **Use fallbacks**: Always configure backup providers
 
 ## Getting Help
 
-- Check `~/zoya/src/llm/README.md` for detailed docs
-- Review `~/zoya/IMPLEMENTATION_SUMMARY.md` for architecture
+- Check `~/jarvis/src/llm/README.md` for detailed docs
+- Review `~/jarvis/IMPLEMENTATION_SUMMARY.md` for architecture
 - Run test file to verify setup: `bun run src/llm/test.ts`
-- Check config: `cat ~/.zoya/config.yaml`
+- Check config: `cat ~/.jarvis/config.yaml`
 
 ## Resources
 
@@ -304,5 +304,4 @@ const response = await manager.chat(messages);
 - **Ollama**: https://ollama.ai/
 - **Bun Runtime**: https://bun.sh/
 
-You're all set! Start building with ZOYA 🚀
-
+You're all set! Start building with J.A.R.V.I.S. 🚀

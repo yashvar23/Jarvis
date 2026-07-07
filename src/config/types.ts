@@ -46,13 +46,13 @@ export type RealtimeReasoningEffort = 'minimal' | 'low' | 'medium' | 'high' | 'x
  * Premium opt-in speech-to-speech voice via OpenAI's Realtime API
  * (`gpt-realtime-2`). When enabled, the realtime session reuses the OpenAI
  * provider configured under `llm.providers` (matched by `kind: 'openai'`) -
- * there is no separate realtime key. When disabled (default) ZOYA uses the
+ * there is no separate realtime key. When disabled (default) JARVIS uses the
  * standard STT -> text LLM -> TTS pipeline.
  *
  * See docs/GPT_REALTIME_2_INTEGRATION.md.
  */
 export type RealtimeVoiceConfig = {
-  /** Master opt-in. Default false. Env: ZOYA_REALTIME_VOICE. */
+  /** Master opt-in. Default false. Env: JARVIS_REALTIME_VOICE. */
   enabled: boolean;
   /** Realtime model id. Default 'gpt-realtime-2'. */
   model?: string;
@@ -82,7 +82,7 @@ export type VoiceConfig = {
    *  - "webspeech":    browser SpeechRecognition (Chromium only; streams audio
    *                    to the browser vendor's cloud for transcription).
    *  - "auto":         prefer webspeech when available, fall back to openwakeword.
-   * Env: ZOYA_WAKE_ENGINE
+   * Env: JARVIS_WAKE_ENGINE
    */
   wake_engine: WakeEngine;
   /** Premium opt-in realtime speech-to-speech voice (gpt-realtime-2). */
@@ -193,15 +193,8 @@ export type GoalConfig = {
 };
 
 export type AuthConfig = {
-  /**
-   * DANGEROUS - allow dashboard/API access WITHOUT an enrolled-device token.
-   * The brain is JWT-only by default: enroll a device (`zoya enroll`) and
-   * connect through the sidecar. Set this ONLY for first-time self-host
-   * setup before any device is enrolled, and remove it as soon as
-   * enrollment is done. The daemon logs a loud warning while it is on.
-   * SYSTEM-owned (config.yaml); there is no shared auth token anymore.
-   */
-  insecure_open_access?: boolean;
+  /** Shared secret token. If unset, auth is disabled (open access). Env: JARVIS_AUTH_TOKEN */
+  token?: string;
 };
 
 export type UserConfig = {
@@ -211,7 +204,7 @@ export type UserConfig = {
 /**
  * Anonymous usage telemetry. Opt-out model: enabled by default so the
  * project can measure unique installs and retention. Disable with
- * `enabled: false`, the `ZOYA_TELEMETRY=0` env var, or the community
+ * `enabled: false`, the `JARVIS_TELEMETRY=0` env var, or the community
  * standard `DO_NOT_TRACK=1`.
  */
 export type TelemetryConfig = {
@@ -219,9 +212,9 @@ export type TelemetryConfig = {
 };
 
 /**
- * Onboarding completion state — persists in the vault DB settings store
- * (user-owned section) so the dashboard knows which phase (setup / profile
- * interview / tutorial) to show on next load. Each `*_completed_at` is a `Date.now()` stamp;
+ * Onboarding completion state — persists in `~/.jarvis/config.yaml` so
+ * the dashboard knows which phase (setup / profile interview / tutorial)
+ * to show on next load. Each `*_completed_at` is a `Date.now()` stamp;
  * `null` means not yet done. Reset endpoint clears subsets per scope.
  *
  * See `docs/ONBOARDING_PLAN.md` for the gate logic and reset semantics.
@@ -316,29 +309,14 @@ export type LLMConfig = {
    * (low/medium/high) without an explicit assignment fall up.
    */
   tiers?: LLMTiersConfig;
-
-  /**
-   * Provider-side prompt caching (Anthropic cache_control; OpenAI caching is
-   * automatic). DB/dashboard-sourced like `tiers` - never read from
-   * config.yaml. Absent means enabled; only an explicit false disables it.
-   */
-  prompt_cache?: boolean;
 };
 
-export type ZoyaConfig = {
+export type JarvisConfig = {
   user?: UserConfig;
   onboarding?: OnboardingConfig;
   telemetry?: TelemetryConfig;
   daemon: {
     port: number;
-    /**
-     * SYSTEM-owned listen address. When set to `unix:/absolute/path.sock`
-     * the daemon binds a unix-domain socket INSTEAD of the TCP port (no
-     * port is opened at all). Hosted instances use this so Caddy is the
-     * only way in: `listen: unix:/run/zoya/u_<id>.sock`. Omit for the
-     * self-host default (TCP on `port`).
-     */
-    listen?: string;
     data_dir: string;
     db_path: string;
     /**
@@ -355,7 +333,7 @@ export type ZoyaConfig = {
      * (`brain.example.com`, `10.0.0.5:3142`). Bare local hosts default to
      * ws/http; everything else defaults to wss/https.
      *
-     * Precedence: `ZOYA_BRAIN_DOMAIN` env var > this field > internal
+     * Precedence: `JARVIS_BRAIN_DOMAIN` env var > this field > internal
      * `localhost:<port>` fallback (with a startup warning).
      *
      * Sidecars must be able to reach both derived endpoints from the
@@ -365,16 +343,6 @@ export type ZoyaConfig = {
     brain_domain?: string;
   };
   auth?: AuthConfig;
-  /**
-   * SYSTEM-owned (config.yaml, not the DB): whether a LOCAL Chrome may be
-   * launched on this machine. Hosted instances set `local: false` so no CDP
-   * ports ever open on the VPS; browser actions route to a connected
-   * sidecar's browser instead (the tools already prefer a `browser`-capable
-   * sidecar and only fall back to local).
-   */
-  browser?: {
-    local?: boolean;
-  };
   google?: GoogleConfig;
   channels?: ChannelConfig;
   stt?: STTConfig;
@@ -401,17 +369,9 @@ export type ZoyaConfig = {
   heartbeat: HeartbeatConfig;
   cron?: SystemCronConfig;
   active_role: string;  // role file name
-  /**
-   * SYSTEM-owned: the user's IANA timezone (e.g. "America/New_York").
-   * Hosted brains run on UTC VPSs; the hosting server writes this (from the
-   * sidecar-reported value) so morning/evening crons, workflow triggers and
-   * goal windows fire at the user's wall-clock times. Self-host: omit to use
-   * the machine's local time.
-   */
-  timezone?: string;
 };
 
-export const DEFAULT_CONFIG: ZoyaConfig = {
+export const DEFAULT_CONFIG: JarvisConfig = {
   user: {
     name: '',
   },
@@ -420,11 +380,8 @@ export const DEFAULT_CONFIG: ZoyaConfig = {
   },
   daemon: {
     port: 3142,
-    data_dir: '~/.zoya',
-    db_path: '~/.zoya/zoya.db',
-  },
-  browser: {
-    local: true,
+    data_dir: '~/.jarvis',
+    db_path: '~/.jarvis/jarvis.db',
   },
   channels: {
     telegram: { enabled: false, bot_token: '', allowed_users: [] },
@@ -484,11 +441,11 @@ export const DEFAULT_CONFIG: ZoyaConfig = {
       'respectful',
       'adaptive',
     ],
-    assistant_name: 'Zoya',
+    assistant_name: 'Jarvis',
   },
   sites: {
     enabled: true,
-    projects_dir: '~/.zoya/projects',
+    projects_dir: '~/.jarvis/projects',
     port_range_start: 4000,
     port_range_end: 4999,
     auto_commit: true,
@@ -512,34 +469,3 @@ export const DEFAULT_CONFIG: ZoyaConfig = {
   },
   active_role: 'personal-assistant',
 };
-
-/**
- * Config sections that are USER-OWNED: they live in the vault DB settings
- * store (managed from the dashboard), never in config.yaml. loadConfig
- * discards any such section found in the file (after a one-time legacy
- * import at daemon boot; see daemon/user-settings.ts), exactly like the
- * `llm` block. config.yaml keeps only network/system/hosting keys:
- * daemon.*, auth, google (system-owned when present in the file).
- */
-export const USER_OWNED_SECTIONS = [
-  'user',
-  'onboarding',
-  'telemetry',
-  'personality',
-  'active_role',
-  'authority',
-  'heartbeat',
-  'cron',
-  'stt',
-  'tts',
-  'voice',
-  'channels',
-  'desktop',
-  'awareness',
-  'sites',
-  'goals',
-  'workflows',
-] as const satisfies readonly (keyof ZoyaConfig)[];
-
-export type UserOwnedSection = (typeof USER_OWNED_SECTIONS)[number];
-

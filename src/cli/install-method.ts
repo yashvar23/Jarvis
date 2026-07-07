@@ -1,9 +1,9 @@
 /**
  * Install-method detection.
  *
- * ZOYA ships through three install paths — a published bun/npm package,
+ * JARVIS ships through three install paths — a published bun/npm package,
  * a git-clone installer script, and a Docker image — plus a fourth "developer
- * checkout" case. `zoya update` and `zoya uninstall` need different
+ * checkout" case. `jarvis update` and `jarvis uninstall` need different
  * behavior for each, so they both call detectInstallMethod() to decide.
  *
  * Resolution order:
@@ -77,7 +77,7 @@ function readMarker(packageRoot: string): { content: MarkerContent; path: string
 }
 
 /**
- * Detect how ZOYA was installed. Pure function — all environmental inputs
+ * Detect how JARVIS was installed. Pure function — all environmental inputs
  * can be injected via options for testing.
  */
 export function detectInstallMethod(
@@ -91,8 +91,8 @@ export function detectInstallMethod(
 
   // 1. Docker takes precedence — a container may carry a stale marker from
   //    the source checkout baked into the image at build time.
-  if (env.ZOYA_INSTALL_METHOD === 'docker') {
-    return { method: 'docker', reason: 'ZOYA_INSTALL_METHOD=docker' };
+  if (env.JARVIS_INSTALL_METHOD === 'docker') {
+    return { method: 'docker', reason: 'JARVIS_INSTALL_METHOD=docker' };
   }
   if (existsSync(dockerEnvPath)) {
     return { method: 'docker', reason: `${dockerEnvPath} present` };
@@ -117,7 +117,7 @@ export function detectInstallMethod(
     };
   }
 
-  const scriptInstallRoot = join(home, '.zoya', 'daemon');
+  const scriptInstallRoot = join(home, '.jarvis', 'daemon');
   const hasGit = existsSync(join(resolvedRoot, '.git'));
   if (normalize(resolvedRoot) === normalize(scriptInstallRoot) && hasGit) {
     return {
@@ -140,13 +140,13 @@ export function detectInstallMethod(
 }
 
 /**
- * Human-readable one-liner for the given method. Used by `zoya doctor`.
+ * Human-readable one-liner for the given method. Used by `jarvis doctor`.
  */
 export function describeInstallMethod(info: InstallMethodInfo): string {
   const labels: Record<InstallMethod, string> = {
     docker: 'Docker container',
-    'bun-global': 'Bun global install (zoya)',
-    script: 'install.sh (git clone under ~/.zoya/daemon)',
+    'bun-global': 'Bun global install (@usejarvis/brain)',
+    script: 'install.sh (git clone under ~/.jarvis/daemon)',
     dev: 'Developer checkout',
     unknown: 'Unknown',
   };
@@ -160,7 +160,7 @@ export interface MethodCommands {
 
 /**
  * Canonical update and uninstall commands for the given install method.
- * `zoya update` / `zoya uninstall` delegate to these internally — the
+ * `jarvis update` / `jarvis uninstall` delegate to these internally — the
  * point of surfacing them here is so users can run them directly (e.g.
  * from a doctor report) and understand what the CLI would do on their
  * behalf.
@@ -169,29 +169,28 @@ export function getMethodCommands(method: InstallMethod): MethodCommands {
   switch (method) {
     case 'docker':
       return {
-        update: 'docker pull <image> && docker rm -f zoya && docker run -d ... <image>',
-        uninstall: 'docker rm -f zoya   # and `docker volume rm zoya-data` to delete data',
+        update: 'docker pull <image> && docker rm -f jarvis && docker run -d ... <image>',
+        uninstall: 'docker rm -f jarvis   # and `docker volume rm jarvis-data` to delete data',
       };
     case 'bun-global':
       return {
-        update: 'zoya update   # runs `bun update -g zoya`',
-        uninstall: 'zoya uninstall   # runs `bun uninstall -g zoya` and cleans up',
+        update: 'jarvis update   # runs `bun update -g @usejarvis/brain`',
+        uninstall: 'jarvis uninstall   # runs `bun uninstall -g @usejarvis/brain` and cleans up',
       };
     case 'script':
       return {
-        update: 'zoya update   # checks out the latest release tag + `bun install`',
-        uninstall: 'zoya uninstall   # removes ~/.zoya and the CLI wrapper',
+        update: 'jarvis update   # checks out the latest release tag + `bun install`',
+        uninstall: 'jarvis uninstall   # removes ~/.jarvis and the CLI wrapper',
       };
     case 'dev':
       return {
         update: 'git pull && bun install   # manage your dev checkout yourself',
-        uninstall: 'rm -rf <your checkout>   # `zoya uninstall` only cleans side effects',
+        uninstall: 'rm -rf <your checkout>   # `jarvis uninstall` only cleans side effects',
       };
     case 'unknown':
       return {
-        update: '(install method unknown — see `zoya doctor`)',
-        uninstall: '(install method unknown — see `zoya doctor`)',
+        update: '(install method unknown — see `jarvis doctor`)',
+        uninstall: '(install method unknown — see `jarvis doctor`)',
       };
   }
 }
-

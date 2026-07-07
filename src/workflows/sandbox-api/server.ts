@@ -11,7 +11,7 @@
  *   - HTTP `/v1/logs/:runId`                            (execution-state backup)
  *   - WS   `/worker/ws`                                 (socket.io RPC bridge — added in B4)
  *
- * Plus a parallel set of `/v1/zoya/*` endpoints for our own ported pieces
+ * Plus a parallel set of `/v1/jarvis/*` endpoints for our own ported pieces
  * (added in F-H).
  *
  * This file is the skeleton: route table, auth middleware, lifecycle. Real
@@ -44,36 +44,36 @@ import {
 import { createWaitpointsRoute } from "./routes/waitpoints";
 import { logsUploadRoute } from "./routes/logs";
 import {
-  createZoyaLlmChatRoute,
+  createJarvisLlmChatRoute,
   type LlmChatFn,
-} from "./routes/zoya-llm";
+} from "./routes/jarvis-llm";
 import {
-  createZoyaToolsInvokeRoute,
+  createJarvisToolsInvokeRoute,
   type ToolsInvokeFn,
-} from "./routes/zoya-tools";
+} from "./routes/jarvis-tools";
 import {
-  createZoyaNotifyRoute,
+  createJarvisNotifyRoute,
   type NotifyFn,
-} from "./routes/zoya-notify";
+} from "./routes/jarvis-notify";
 import {
-  createZoyaContextVaultSearchRoute,
-  createZoyaContextVaultGetEntityRoute,
-  createZoyaContextAwarenessRecentRoute,
-  createZoyaContextCommitmentsListRoute,
-  type ZoyaContextProvider,
-} from "./routes/zoya-context";
+  createJarvisContextVaultSearchRoute,
+  createJarvisContextVaultGetEntityRoute,
+  createJarvisContextAwarenessRecentRoute,
+  createJarvisContextCommitmentsListRoute,
+  type JarvisContextProvider,
+} from "./routes/jarvis-context";
 import {
-  createZoyaAgentDelegateRoute,
+  createJarvisAgentDelegateRoute,
   type AgentDelegateFn,
-} from "./routes/zoya-agent";
+} from "./routes/jarvis-agent";
 import {
-  createZoyaEventsPollRoute,
+  createJarvisEventsPollRoute,
   type EventsPollFn,
-} from "./routes/zoya-events";
+} from "./routes/jarvis-events";
 import {
-  createZoyaWorkflowsStartRoute,
+  createJarvisWorkflowsStartRoute,
   type WorkflowsStartFn,
-} from "./routes/zoya-workflows";
+} from "./routes/jarvis-workflows";
 import { json, err, type RouteContext, type RouteHandler } from "./routes/shared";
 
 export interface SandboxApiServices {
@@ -98,36 +98,36 @@ export interface SandboxApiServices {
   /** Optional structured-log sink for per-sandbox stdout/stderr. */
   onLogLine?: (entry: import("./worker-handlers").LogLine) => void;
   /**
-   * LLM chat backend for the `zoya-ask` piece. If unset, the endpoint
+   * LLM chat backend for the `jarvis-ask` piece. If unset, the endpoint
    * returns 503; the daemon wires this in at startup with the LLMManager.
    */
   llmChat?: LlmChatFn;
   /**
-   * Tool invocation backend for the `zoya-tool` piece. If unset, the
+   * Tool invocation backend for the `jarvis-tool` piece. If unset, the
    * endpoint returns 503. The daemon wires this in with `ToolRegistry`.
    */
   toolsInvoke?: ToolsInvokeFn;
   /**
-   * Notification backend for the `zoya-notify` piece. If unset, returns 503.
+   * Notification backend for the `jarvis-notify` piece. If unset, returns 503.
    */
   notify?: NotifyFn;
   /**
-   * Read-only Zoya state provider for the `zoya-context` piece. If unset,
+   * Read-only Jarvis state provider for the `jarvis-context` piece. If unset,
    * each context route returns 503.
    */
-  contextProvider?: ZoyaContextProvider;
+  contextProvider?: JarvisContextProvider;
   /**
-   * Sub-agent delegation backend for the `zoya-agent` piece. If unset, the
+   * Sub-agent delegation backend for the `jarvis-agent` piece. If unset, the
    * endpoint returns 503.
    */
   agentDelegate?: AgentDelegateFn;
   /**
-   * Recent-events poll backend for the `zoya-trigger` `on_event` trigger.
+   * Recent-events poll backend for the `jarvis-trigger` `on_event` trigger.
    * If unset, returns 503.
    */
   eventsPoll?: EventsPollFn;
   /**
-   * Workflow start backend for the `zoya-trigger` `run_workflow` action.
+   * Workflow start backend for the `jarvis-trigger` `run_workflow` action.
    * If unset, returns 503.
    */
   workflowsStart?: WorkflowsStartFn;
@@ -198,7 +198,7 @@ export class SandboxApi {
   }
 
   /**
-   * Patch service backends after construction. Each `/v1/zoya/*` route's
+   * Patch service backends after construction. Each `/v1/jarvis/*` route's
    * deps object IS `this.services` (passed by reference, not copied), so
    * route handlers observe these mutations on the next request. Used by the
    * daemon to wire backends that depend on services not ready at SandboxApi
@@ -238,60 +238,60 @@ export class SandboxApi {
         }),
       },
       { path: "/v1/logs/:runId", method: "PUT", handler: logsUploadRoute },
-      // /v1/zoya/* routes pass `this.services` itself (not a snapshot) so
+      // /v1/jarvis/* routes pass `this.services` itself (not a snapshot) so
       // each handler reads the live backend on every request. This lets the
       // daemon wire backends after construction via `setServices` -- e.g.
       // ToolRegistry isn't ready until `registry.startAll()` completes, but
       // we want the SandboxApi started earlier so catalog extraction can run.
       {
-        path: "/v1/zoya/llm/chat",
+        path: "/v1/jarvis/llm/chat",
         method: "POST",
-        handler: createZoyaLlmChatRoute(this.services),
+        handler: createJarvisLlmChatRoute(this.services),
       },
       {
-        path: "/v1/zoya/tools/invoke",
+        path: "/v1/jarvis/tools/invoke",
         method: "POST",
-        handler: createZoyaToolsInvokeRoute(this.services),
+        handler: createJarvisToolsInvokeRoute(this.services),
       },
       {
-        path: "/v1/zoya/notify",
+        path: "/v1/jarvis/notify",
         method: "POST",
-        handler: createZoyaNotifyRoute(this.services),
+        handler: createJarvisNotifyRoute(this.services),
       },
       {
-        path: "/v1/zoya/context/vault-search",
+        path: "/v1/jarvis/context/vault-search",
         method: "POST",
-        handler: createZoyaContextVaultSearchRoute(this.services),
+        handler: createJarvisContextVaultSearchRoute(this.services),
       },
       {
-        path: "/v1/zoya/context/vault-get-entity",
+        path: "/v1/jarvis/context/vault-get-entity",
         method: "POST",
-        handler: createZoyaContextVaultGetEntityRoute(this.services),
+        handler: createJarvisContextVaultGetEntityRoute(this.services),
       },
       {
-        path: "/v1/zoya/context/awareness-recent",
+        path: "/v1/jarvis/context/awareness-recent",
         method: "POST",
-        handler: createZoyaContextAwarenessRecentRoute(this.services),
+        handler: createJarvisContextAwarenessRecentRoute(this.services),
       },
       {
-        path: "/v1/zoya/context/commitments-list",
+        path: "/v1/jarvis/context/commitments-list",
         method: "POST",
-        handler: createZoyaContextCommitmentsListRoute(this.services),
+        handler: createJarvisContextCommitmentsListRoute(this.services),
       },
       {
-        path: "/v1/zoya/agent/delegate",
+        path: "/v1/jarvis/agent/delegate",
         method: "POST",
-        handler: createZoyaAgentDelegateRoute(this.services),
+        handler: createJarvisAgentDelegateRoute(this.services),
       },
       {
-        path: "/v1/zoya/events/poll",
+        path: "/v1/jarvis/events/poll",
         method: "POST",
-        handler: createZoyaEventsPollRoute(this.services),
+        handler: createJarvisEventsPollRoute(this.services),
       },
       {
-        path: "/v1/zoya/workflows/start",
+        path: "/v1/jarvis/workflows/start",
         method: "POST",
-        handler: createZoyaWorkflowsStartRoute(this.services),
+        handler: createJarvisWorkflowsStartRoute(this.services),
       },
     );
   }
@@ -406,4 +406,3 @@ export class SandboxApi {
     return err("not found", 404);
   }
 }
-

@@ -14,11 +14,11 @@ import {
   getLogDir,
 } from './pid.ts';
 
-const ZOYA_DIR = join(homedir(), '.zoya');
-const LOCK_PATH = join(ZOYA_DIR, 'zoya.pid');
+const JARVIS_DIR = join(homedir(), '.jarvis');
+const LOCK_PATH = join(JARVIS_DIR, 'jarvis.pid');
 const PID_MODULE = join(import.meta.dir, 'pid.ts');
-const READY_SIGNAL = join(tmpdir(), 'zoya-test-lock-ready');
-const HOLDER_SCRIPT = join(tmpdir(), 'zoya-test-lock-holder.ts');
+const READY_SIGNAL = join(tmpdir(), 'jarvis-test-lock-ready');
+const HOLDER_SCRIPT = join(tmpdir(), 'jarvis-test-lock-holder.ts');
 
 function cleanup(): void {
   releaseLock();
@@ -80,7 +80,7 @@ describe('Process Lock Manager', () => {
       expect(content).toBe(String(process.pid));
     });
 
-    test('creates ~/.zoya dir if missing', () => {
+    test('creates ~/.jarvis dir if missing', () => {
       // Dir almost certainly exists already, but acquireLock should not fail
       expect(acquireLock(process.pid)).toBe(true);
     });
@@ -100,7 +100,7 @@ describe('Process Lock Manager', () => {
     });
 
     test('returns null for stale file (file exists, no lock held)', () => {
-      mkdirSync(ZOYA_DIR, { recursive: true });
+      mkdirSync(JARVIS_DIR, { recursive: true });
       writeFileSync(LOCK_PATH, '99999');
       // No flock held — probe should succeed → not locked
       expect(isLocked()).toBeNull();
@@ -156,37 +156,37 @@ describe('Process Lock Manager', () => {
     });
 
     test('returns PID from file', () => {
-      mkdirSync(ZOYA_DIR, { recursive: true });
+      mkdirSync(JARVIS_DIR, { recursive: true });
       writeFileSync(LOCK_PATH, '12345');
       expect(readPid()).toBe(12345);
     });
 
     test('trims whitespace', () => {
-      mkdirSync(ZOYA_DIR, { recursive: true });
+      mkdirSync(JARVIS_DIR, { recursive: true });
       writeFileSync(LOCK_PATH, '  42\n');
       expect(readPid()).toBe(42);
     });
 
     test('returns null for non-numeric content', () => {
-      mkdirSync(ZOYA_DIR, { recursive: true });
+      mkdirSync(JARVIS_DIR, { recursive: true });
       writeFileSync(LOCK_PATH, 'not-a-pid');
       expect(readPid()).toBeNull();
     });
 
     test('returns null for empty file', () => {
-      mkdirSync(ZOYA_DIR, { recursive: true });
+      mkdirSync(JARVIS_DIR, { recursive: true });
       writeFileSync(LOCK_PATH, '');
       expect(readPid()).toBeNull();
     });
 
     test('returns null for zero', () => {
-      mkdirSync(ZOYA_DIR, { recursive: true });
+      mkdirSync(JARVIS_DIR, { recursive: true });
       writeFileSync(LOCK_PATH, '0');
       expect(readPid()).toBeNull();
     });
 
     test('returns null for negative PID', () => {
-      mkdirSync(ZOYA_DIR, { recursive: true });
+      mkdirSync(JARVIS_DIR, { recursive: true });
       writeFileSync(LOCK_PATH, '-1');
       expect(readPid()).toBeNull();
     });
@@ -200,31 +200,31 @@ describe('Process Lock Manager', () => {
     });
 
     test('returns null for legacy PID-only lock file', () => {
-      mkdirSync(ZOYA_DIR, { recursive: true });
+      mkdirSync(JARVIS_DIR, { recursive: true });
       writeFileSync(LOCK_PATH, '12345');
       expect(readLockedPort()).toBeNull();
     });
 
     test('returns the port from a two-line lock file', () => {
-      mkdirSync(ZOYA_DIR, { recursive: true });
+      mkdirSync(JARVIS_DIR, { recursive: true });
       writeFileSync(LOCK_PATH, '12345\n9000\n');
       expect(readLockedPort()).toBe(9000);
     });
 
     test('returns null for out-of-range port', () => {
-      mkdirSync(ZOYA_DIR, { recursive: true });
+      mkdirSync(JARVIS_DIR, { recursive: true });
       writeFileSync(LOCK_PATH, '12345\n99999\n');
       expect(readLockedPort()).toBeNull();
     });
 
     test('returns null for non-numeric port line', () => {
-      mkdirSync(ZOYA_DIR, { recursive: true });
+      mkdirSync(JARVIS_DIR, { recursive: true });
       writeFileSync(LOCK_PATH, '12345\nabc\n');
       expect(readLockedPort()).toBeNull();
     });
 
     test('readPid still works for two-line format', () => {
-      mkdirSync(ZOYA_DIR, { recursive: true });
+      mkdirSync(JARVIS_DIR, { recursive: true });
       writeFileSync(LOCK_PATH, '12345\n9000\n');
       expect(readPid()).toBe(12345);
     });
@@ -266,18 +266,18 @@ describe('Process Lock Manager', () => {
   // ── path getters ─────────────────────────────────────────────────
 
   describe('path getters', () => {
-    test('getPidPath returns ~/.zoya/zoya.pid', () => {
-      expect(getPidPath()).toBe(join(homedir(), '.zoya', 'zoya.pid'));
+    test('getPidPath returns ~/.jarvis/jarvis.pid', () => {
+      expect(getPidPath()).toBe(join(homedir(), '.jarvis', 'jarvis.pid'));
     });
 
     test('getLogPath returns path and creates logs dir', () => {
       const logPath = getLogPath();
-      expect(logPath).toBe(join(ZOYA_DIR, 'logs', 'zoya.log'));
-      expect(existsSync(join(ZOYA_DIR, 'logs'))).toBe(true);
+      expect(logPath).toBe(join(JARVIS_DIR, 'logs', 'jarvis.log'));
+      expect(existsSync(join(JARVIS_DIR, 'logs'))).toBe(true);
     });
 
     test('getLogDir returns logs directory', () => {
-      expect(getLogDir()).toBe(join(ZOYA_DIR, 'logs'));
+      expect(getLogDir()).toBe(join(JARVIS_DIR, 'logs'));
     });
   });
 
@@ -363,8 +363,8 @@ describe('Process Lock Manager', () => {
   // low-level TinyCC `sys/file.h not found` error.
 
   describe('native Windows guard', () => {
-    const PROBE_SCRIPT = join(tmpdir(), 'zoya-test-win32-probe.ts');
-    const PROBE_HOME = join(tmpdir(), 'zoya-test-win32-home');
+    const PROBE_SCRIPT = join(tmpdir(), 'jarvis-test-win32-probe.ts');
+    const PROBE_HOME = join(tmpdir(), 'jarvis-test-win32-home');
 
     afterEach(() => {
       try { unlinkSync(PROBE_SCRIPT); } catch {}
@@ -379,7 +379,7 @@ ${body}
 `);
       const proc = Bun.spawn(['bun', PROBE_SCRIPT], {
         stdio: ['ignore', 'pipe', 'pipe'],
-        // Isolate from the real ~/.zoya so the probe can't touch a live lock.
+        // Isolate from the real ~/.jarvis so the probe can't touch a live lock.
         env: { ...process.env, HOME: PROBE_HOME, USERPROFILE: PROBE_HOME },
       });
       const [stdout, stderr] = await Promise.all([
@@ -420,4 +420,3 @@ console.log('ACQUIRE=' + ok);
     }, { timeout: 15000 });
   });
 });
-

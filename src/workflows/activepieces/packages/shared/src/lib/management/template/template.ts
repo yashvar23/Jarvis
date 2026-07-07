@@ -93,4 +93,3 @@ export type Template = z.infer<typeof Template>
 
 export const SharedTemplate = Template.omit({ platformId: true, id: true, created: true, updated: true })
 export type SharedTemplate = z.infer<typeof SharedTemplate>
-

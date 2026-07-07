@@ -4,12 +4,12 @@ package main
 //
 // Mirrors the brain's telemetry (src/telemetry) but is INDEPENDENT: it has its
 // own anon-id namespace, its own collector table (sidecar_pings), and its own
-// opt-out. It deliberately does NOT honor the brain's ZOYA_TELEMETRY /
+// opt-out. It deliberately does NOT honor the brain's JARVIS_TELEMETRY /
 // DO_NOT_TRACK env vars — the sidecar is opted out only via its own Settings >
-// Privacy toggle (sidecar.yaml telemetry.enabled) or ZOYA_SIDECAR_TELEMETRY=0.
+// Privacy toggle (sidecar.yaml telemetry.enabled) or JARVIS_SIDECAR_TELEMETRY=0.
 //
 // Sends are fire-and-forget and total-failure-safe: nothing here may crash or
-// block the sidecar. Set ZOYA_SIDECAR_TELEMETRY_DEBUG=1 to log each outcome.
+// block the sidecar. Set JARVIS_SIDECAR_TELEMETRY_DEBUG=1 to log each outcome.
 
 import (
 	"bytes"
@@ -30,12 +30,12 @@ import (
 // INSERT-only RLS policy on sidecar_pings (it can write pings, never read).
 // Vars (not consts) so tests can point sendTelemetryPing at a local server.
 var (
-	telemetryURL     = "https://wmrxnfhghycxyabdhczn.supabase.co/rest/v1/sidecar_pings"
-	telemetryAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndtcnhuZmhnaHljeHlhYmRoY3puIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5OTQ4OTgsImV4cCI6MjA5NjU3MDg5OH0.phREIq3UEKPUyTNT077q-LWBqCw16wajIoTC50Z0J0E"
+	telemetryURL     = "https://jarvis-6a52f-default-rtdb.firebaseio.com/telemetry_pings.json"
+	telemetryAnonKey = ""
 )
 
 const (
-	sidecarAnonNamespace = "zoya-sidecar-telemetry-v1"
+	sidecarAnonNamespace = "jarvis-sidecar-telemetry-v1"
 	telemetryInterval    = time.Hour
 )
 
@@ -66,7 +66,7 @@ func isFalsy(v string) bool {
 }
 
 // resolveTelemetryEnabled decides if telemetry runs. Precedence:
-// ZOYA_SIDECAR_TELEMETRY env (if set) > config flag > default on.
+// JARVIS_SIDECAR_TELEMETRY env (if set) > config flag > default on.
 // configEnabled is nil when the config key is absent.
 func resolveTelemetryEnabled(configEnabled *bool, sidecarEnv string) bool {
 	if strings.TrimSpace(sidecarEnv) != "" {
@@ -79,7 +79,7 @@ func resolveTelemetryEnabled(configEnabled *bool, sidecarEnv string) bool {
 }
 
 // sidecarAnonID is a deterministic, non-reversible id for this machine:
-// sha256("zoya-sidecar-telemetry-v1:"+hostname+":"+username), 128-bit hex.
+// sha256("jarvis-sidecar-telemetry-v1:"+hostname+":"+username), 128-bit hex.
 // Stable across restarts; the raw hostname/username never leave the machine.
 // Its own namespace (distinct from the brain's) so a co-located brain+sidecar
 // don't collide — brain correlation is via brain_anon_id, not id equality.
@@ -197,21 +197,21 @@ func sendTelemetryPing(ctx context.Context, url, key string, payload telemetryPa
 // startup, then hourly, until ctx is cancelled. Enablement is re-checked every
 // tick so the Settings > Privacy toggle takes effect without a restart.
 func StartTelemetry(ctx context.Context, c *SidecarClient) {
-	debug := !isFalsy(os.Getenv("ZOYA_SIDECAR_TELEMETRY_DEBUG"))
+	debug := !isFalsy(os.Getenv("JARVIS_SIDECAR_TELEMETRY_DEBUG"))
 
 	enabled := func() bool {
-		return resolveTelemetryEnabled(telemetryEnabledPtr(c), os.Getenv("ZOYA_SIDECAR_TELEMETRY"))
+		return resolveTelemetryEnabled(telemetryEnabledPtr(c), os.Getenv("JARVIS_SIDECAR_TELEMETRY"))
 	}
 
 	// A hard env opt-out skips the loop entirely. A config-only opt-out still
 	// starts an inert loop (fire() gates on enabled()) so the Settings > Privacy
 	// checkbox takes effect live in BOTH directions without a restart.
-	if envVal := strings.TrimSpace(os.Getenv("ZOYA_SIDECAR_TELEMETRY")); envVal != "" && isFalsy(envVal) {
-		log.Printf("[telemetry] sidecar telemetry disabled via ZOYA_SIDECAR_TELEMETRY")
+	if envVal := strings.TrimSpace(os.Getenv("JARVIS_SIDECAR_TELEMETRY")); envVal != "" && isFalsy(envVal) {
+		log.Printf("[telemetry] sidecar telemetry disabled via JARVIS_SIDECAR_TELEMETRY")
 		return
 	}
 	if enabled() {
-		log.Printf("[telemetry] anonymous sidecar metrics on (disable in Settings > Privacy or set ZOYA_SIDECAR_TELEMETRY=0)")
+		log.Printf("[telemetry] anonymous sidecar metrics on (disable in Settings > Privacy or set JARVIS_SIDECAR_TELEMETRY=0)")
 	} else {
 		log.Printf("[telemetry] sidecar telemetry currently off (enable in Settings > Privacy)")
 	}

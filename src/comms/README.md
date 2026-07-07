@@ -1,4 +1,4 @@
-# ZOYA Communication Layer
+# J.A.R.V.I.S. Communication Layer
 
 The communication layer provides multi-channel messaging, WebSocket-based real-time communication, LLM response streaming, and voice I/O capabilities.
 
@@ -132,7 +132,7 @@ telegram.onMessage(async (message) => {
 await telegram.connect();
 
 // Send message
-await telegram.sendMessage('CHAT_ID', 'Hello from ZOYA!');
+await telegram.sendMessage('CHAT_ID', 'Hello from J.A.R.V.I.S.!');
 ```
 
 **Setup:**
@@ -260,7 +260,7 @@ type ChannelHandler = (message: ChannelMessage) => Promise<string>;
 - Local installation needed
 - See: https://github.com/AsamK/signal-cli
 
-## Integration with ZOYA Daemon
+## Integration with J.A.R.V.I.S. Daemon
 
 ```typescript
 // In daemon/index.ts
@@ -327,4 +327,3 @@ await channels.connectAll();
 ## API Reference
 
 See inline TypeScript documentation in each module for detailed API reference.
-

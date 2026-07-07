@@ -114,7 +114,7 @@ describe('isLocalhostBrainUrl', () => {
 
 describe('SidecarManager key storage', () => {
   test('stores the enrollment private key with owner-only permissions', async () => {
-    const dataDir = await mkdtemp(join(tmpdir(), 'zoya-sidecar-manager-'));
+    const dataDir = await mkdtemp(join(tmpdir(), 'jarvis-sidecar-manager-'));
     try {
       const manager = new SidecarManager(dataDir);
 
@@ -128,7 +128,7 @@ describe('SidecarManager key storage', () => {
   });
 
   test('tightens existing enrollment key permissions on load', async () => {
-    const dataDir = await mkdtemp(join(tmpdir(), 'zoya-sidecar-manager-'));
+    const dataDir = await mkdtemp(join(tmpdir(), 'jarvis-sidecar-manager-'));
     try {
       const firstManager = new SidecarManager(dataDir);
       await firstManager.start();
@@ -152,7 +152,7 @@ describe('SidecarManager key storage', () => {
 
 describe('SidecarManager enrollment', () => {
   test('stamps the brain anonymous telemetry id (bid) into the enrollment token', async () => {
-    const dataDir = await mkdtemp(join(tmpdir(), 'zoya-sidecar-manager-'));
+    const dataDir = await mkdtemp(join(tmpdir(), 'jarvis-sidecar-manager-'));
     initDatabase(':memory:');
     try {
       const manager = new SidecarManager(dataDir);
@@ -177,7 +177,7 @@ describe('SidecarManager enrollment', () => {
 
 describe('SidecarManager access tokens', () => {
   test('mints an access token an enrolled sidecar can use, and round-trips the sid', async () => {
-    const dataDir = await mkdtemp(join(tmpdir(), 'zoya-sidecar-manager-'));
+    const dataDir = await mkdtemp(join(tmpdir(), 'jarvis-sidecar-manager-'));
     initDatabase(':memory:');
     try {
       const manager = new SidecarManager(dataDir);
@@ -207,7 +207,7 @@ describe('SidecarManager access tokens', () => {
   });
 
   test('does not mint for an unenrolled sid', async () => {
-    const dataDir = await mkdtemp(join(tmpdir(), 'zoya-sidecar-manager-'));
+    const dataDir = await mkdtemp(join(tmpdir(), 'jarvis-sidecar-manager-'));
     initDatabase(':memory:');
     try {
       const manager = new SidecarManager(dataDir);
@@ -221,7 +221,7 @@ describe('SidecarManager access tokens', () => {
   });
 
   test('the enrollment JWT is NOT accepted as an access token (and vice versa)', async () => {
-    const dataDir = await mkdtemp(join(tmpdir(), 'zoya-sidecar-manager-'));
+    const dataDir = await mkdtemp(join(tmpdir(), 'jarvis-sidecar-manager-'));
     initDatabase(':memory:');
     try {
       const manager = new SidecarManager(dataDir);
@@ -251,7 +251,7 @@ describe('SidecarManager access tokens', () => {
   });
 
   test('rejects garbage and tampered access tokens', async () => {
-    const dataDir = await mkdtemp(join(tmpdir(), 'zoya-sidecar-manager-'));
+    const dataDir = await mkdtemp(join(tmpdir(), 'jarvis-sidecar-manager-'));
     initDatabase(':memory:');
     try {
       const manager = new SidecarManager(dataDir);
@@ -273,4 +273,3 @@ describe('SidecarManager access tokens', () => {
     }
   });
 });
-

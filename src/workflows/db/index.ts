@@ -1,5 +1,5 @@
 /**
- * Workflow tables share the single Zoya SQLite database (`~/.zoya/zoya.db`)
+ * Workflow tables share the single Jarvis SQLite database (`~/.jarvis/jarvis.db`)
  * with vault, awareness, goals, etc. Backups are one file. There is no
  * separate `workflows.db`.
  *
@@ -39,7 +39,7 @@ export function initWorkflowDb(dbPath = ":memory:"): Database {
 }
 
 /**
- * Returns the shared Zoya DB (same instance as vault's `getDb`). Workflow
+ * Returns the shared Jarvis DB (same instance as vault's `getDb`). Workflow
  * code calls this anywhere it needs a `Database` handle.
  */
 export function getWorkflowDb(): Database {
@@ -47,7 +47,7 @@ export function getWorkflowDb(): Database {
 }
 
 /**
- * Closes the shared Zoya DB. Equivalent to vault's `closeDb`. Tests call
+ * Closes the shared Jarvis DB. Equivalent to vault's `closeDb`. Tests call
  * this via either entry point; the second call is a no-op.
  */
 export function closeWorkflowDb(): void {
@@ -55,4 +55,3 @@ export function closeWorkflowDb(): void {
 }
 
 export { DEFAULT_IDS };
-

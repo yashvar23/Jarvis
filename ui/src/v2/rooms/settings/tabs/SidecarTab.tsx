@@ -35,19 +35,13 @@ export function SidecarTab({
   };
 
   const handleRevoke = async (id: string, name: string) => {
-    if (!confirm(`Revoke sidecar "${name}"? It will lose access to Zoya.`)) return;
+    if (!confirm(`Revoke sidecar "${name}"? It will lose access to Jarvis.`)) return;
     const r = await data.revokeSidecar(id);
     onToast(r.message, r.ok ? "ok" : "warn");
   };
 
   const copyToken = () => {
     if (!enrollResult) return;
-    // navigator.clipboard is undefined outside secure contexts (plain-HTTP
-    // LAN dashboards), which would throw synchronously and skip the toast.
-    if (!navigator.clipboard) {
-      onToast("Clipboard unavailable over HTTP — select the token manually.", "warn");
-      return;
-    }
     navigator.clipboard.writeText(enrollResult.token).then(
       () => onToast("Token copied to clipboard.", "ok"),
       () => onToast("Copy failed — select manually.", "warn"),
@@ -62,7 +56,7 @@ export function SidecarTab({
           <div>
             <h3 className="v2-set__section-title">Enroll a new sidecar</h3>
             <div className="v2-set__section-sub">
-              Run the resulting token on the target machine to extend Zoya there.
+              Run the resulting token on the target machine to extend Jarvis there.
             </div>
           </div>
         </div>
@@ -93,7 +87,7 @@ export function SidecarTab({
               Token for "{enrollResult.name}" — copy now, this is shown only once
             </div>
             <code className="v2-set__code v2-set__code--block">
-              zoya --token {enrollResult.token}
+              jarvis --token {enrollResult.token}
             </code>
             <div style={{ display: "flex", gap: "var(--s-2)", justifyContent: "flex-end" }}>
               <button type="button" className="v2-set__btn" onClick={copyToken}>

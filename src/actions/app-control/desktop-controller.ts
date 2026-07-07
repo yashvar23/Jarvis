@@ -247,7 +247,7 @@ export class DesktopController implements AppController {
   /**
    * Take a desktop screenshot and save to file.
    */
-  async screenshotToFile(pid?: number, filePath: string = '/tmp/zoya-desktop-screenshot.png'): Promise<string> {
+  async screenshotToFile(pid?: number, filePath: string = '/tmp/jarvis-desktop-screenshot.png'): Promise<string> {
     const buffer = pid ? await this.captureWindow(pid) : await this.captureScreen();
     writeFileSync(filePath, buffer);
     return filePath;
@@ -440,4 +440,3 @@ export class DesktopController implements AppController {
     }));
   }
 }
-

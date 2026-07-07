@@ -1,5 +1,5 @@
 /**
- * Process Lock Manager for ZOYA Daemon
+ * Process Lock Manager for J.A.R.V.I.S. Daemon
  *
  * Uses flock()-based advisory locks to prevent duplicate daemon instances.
  * Unlike PID-based checks, flock locks are automatically released by the OS
@@ -23,21 +23,21 @@ import {
 import { cc } from 'bun:ffi';
 import flockSource from './flock.c' with { type: 'file' };
 
-const ZOYA_DIR = join(homedir(), '.zoya');
-const LOG_DIR = join(ZOYA_DIR, 'logs');
-const LOCK_PATH = join(ZOYA_DIR, 'zoya.pid');
-const LOG_PATH = join(LOG_DIR, 'zoya.log');
+const JARVIS_DIR = join(homedir(), '.jarvis');
+const LOG_DIR = join(JARVIS_DIR, 'logs');
+const LOCK_PATH = join(JARVIS_DIR, 'jarvis.pid');
+const LOG_PATH = join(LOG_DIR, 'jarvis.log');
 
 /**
  * Resolve the lock-file path for a given data dir. The daemon itself always
- * runs against `~/.zoya` (no override path today), but the encryption
+ * runs against `~/.jarvis` (no override path today), but the encryption
  * rotation script accepts `--data-dir` and needs to probe the lock for that
  * specific dir, not the default. Keep this in lock-step with `LOCK_PATH`
  * above: any change to the default lock-file name has to be reflected here.
  */
 export function lockPathFor(dataDir?: string): string {
   if (!dataDir) return LOCK_PATH;
-  return join(dataDir, 'zoya.pid');
+  return join(dataDir, 'jarvis.pid');
 }
 
 // ── flock() via Bun cc() ────────────────────────────────────────────
@@ -60,7 +60,7 @@ let flockSymbols: FlockSymbols | null = null;
 function getFlock(): FlockSymbols {
   if (process.platform === 'win32') {
     throw new Error(
-      'The ZOYA daemon is not compatible with native Windows. Use WSL2 or Docker.',
+      'The JARVIS daemon is not compatible with native Windows. Use WSL2 or Docker.',
     );
   }
   if (flockSymbols === null) {
@@ -98,7 +98,7 @@ export function acquireLock(pid: number): boolean {
     // we create the data dir or open an fd (nothing to leak / clean up).
     const flock = getFlock();
 
-    mkdirSync(ZOYA_DIR, { recursive: true });
+    mkdirSync(JARVIS_DIR, { recursive: true });
 
     // Open (or create) the lock file — don't truncate before locking
     const fd = openSync(LOCK_PATH, constants.O_WRONLY | constants.O_CREAT, 0o644);
@@ -129,7 +129,7 @@ export function acquireLock(pid: number): boolean {
  *
  * Accepts an optional explicit `lockPath` to probe a non-default location
  * (used by the encryption rotation script when given `--data-dir`). The
- * default probes `~/.zoya/zoya.pid`.
+ * default probes `~/.jarvis/jarvis.pid`.
  */
 export function isLocked(lockPath: string = LOCK_PATH): number | null {
   if (!existsSync(lockPath)) return null;
@@ -173,7 +173,7 @@ export function isLocked(lockPath: string = LOCK_PATH): number | null {
 /**
  * Acquire an exclusive lock at an arbitrary `lockPath`. Returns a handle that
  * releases the lock + unlinks the file. Distinct from `acquireLock`, which
- * always targets the default `~/.zoya/zoya.pid` and is only used by the
+ * always targets the default `~/.jarvis/jarvis.pid` and is only used by the
  * daemon itself. This helper exists for tests and tools (e.g. the rotation
  * script's test fixture) that need to simulate "a daemon is running against
  * this data dir" without colliding with a real daemon on the dev machine.
@@ -268,7 +268,7 @@ export function readLockedPort(): number | null {
 
 /**
  * Record the port the daemon has successfully bound to. Called from the
- * daemon itself after port resolution so `zoya stop` knows exactly which
+ * daemon itself after port resolution so `jarvis stop` knows exactly which
  * port to verify, regardless of how the daemon was launched (CLI flag, env
  * var, config file, or default).
  *
@@ -318,4 +318,3 @@ function isInsideContainer(): boolean {
     return false;
   }
 }
-

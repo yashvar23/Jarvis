@@ -285,4 +285,3 @@ describe('permissiveIntent — fallback shape', () => {
     expect(routeByConfidence(intent)).toBe('act');
   });
 });
-

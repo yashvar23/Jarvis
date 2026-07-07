@@ -68,14 +68,14 @@ describe("workflow API: piece catalog", () => {
     const { body } = await callJson(get, plainReq("GET", "http://x/api/workflows/pieces"));
 
     const ask = (body as Array<{ name: string; actions: Array<{ name: string; inputSchema: { fields: Array<{ name: string; required: boolean }> } | null }> }>)
-      .find((p) => p.name === "zoya-ask");
+      .find((p) => p.name === "jarvis-ask");
     const askSchema = ask?.actions[0]?.inputSchema;
     expect(askSchema).not.toBeNull();
     expect(askSchema?.fields.find((f) => f.name === "prompt")?.required).toBe(true);
     expect(askSchema?.fields.find((f) => f.name === "system")?.required).toBe(false);
 
     const trig = (body as Array<{ name: string; triggers: Array<{ name: string; inputSchema: { fields: Array<{ name: string }> } | null }> }>)
-      .find((p) => p.name === "zoya-trigger");
+      .find((p) => p.name === "jarvis-trigger");
     expect(trig?.triggers[0]?.inputSchema?.fields.some((f) => f.name === "eventType")).toBe(true);
   });
 
@@ -86,10 +86,10 @@ describe("workflow API: piece catalog", () => {
     const { status, body } = await callJson(get, plainReq("GET", "http://x/api/workflows/pieces"));
     expect(status).toBe(200);
     const names = (body as Array<{ name: string }>).map((p) => p.name).sort();
-    expect(names).toEqual(["zoya-ask", "zoya-notify", "zoya-trigger"]);
-    const trigger = (body as Array<{ name: string; triggers: Array<{ name: string }> }>).find((p) => p.name === "zoya-trigger");
+    expect(names).toEqual(["jarvis-ask", "jarvis-notify", "jarvis-trigger"]);
+    const trigger = (body as Array<{ name: string; triggers: Array<{ name: string }> }>).find((p) => p.name === "jarvis-trigger");
     expect(trigger?.triggers.map((t) => t.name)).toEqual(["on_event"]);
-    const ask = (body as Array<{ name: string; actions: Array<{ name: string }> }>).find((p) => p.name === "zoya-ask");
+    const ask = (body as Array<{ name: string; actions: Array<{ name: string }> }>).find((p) => p.name === "jarvis-ask");
     expect(ask?.actions.map((a) => a.name)).toEqual(["ask"]);
   });
 
@@ -103,8 +103,8 @@ describe("workflow API: piece catalog", () => {
       await import("../runtime/piece-catalog")
     ).PieceCatalog([
       {
-        name: "@zoyapieces/piece-zoya-trigger",
-        displayName: "Zoya: Trigger",
+        name: "@jarvispieces/piece-jarvis-trigger",
+        displayName: "Jarvis: Trigger",
         description: "",
         actions: {},
         triggers: {
@@ -889,9 +889,9 @@ describe("workflow API: pieces library", () => {
     const { mkdtempSync, rmSync } = await import("node:fs");
     const { tmpdir } = await import("node:os");
     const { join } = await import("node:path");
-    const tempDir = mkdtempSync(join(tmpdir(), "zoya-lib-api-"));
-    const prev = process.env.ZOYA_PIECES_DIR;
-    process.env.ZOYA_PIECES_DIR = tempDir;
+    const tempDir = mkdtempSync(join(tmpdir(), "jarvis-lib-api-"));
+    const prev = process.env.JARVIS_PIECES_DIR;
+    process.env.JARVIS_PIECES_DIR = tempDir;
     try {
       const r = createWorkflowRoutes();
       const get = r["/api/workflows/pieces/library"]?.GET;
@@ -908,8 +908,8 @@ describe("workflow API: pieces library", () => {
         expect(entry.installed).toBeNull();
       }
     } finally {
-      if (prev === undefined) delete process.env.ZOYA_PIECES_DIR;
-      else process.env.ZOYA_PIECES_DIR = prev;
+      if (prev === undefined) delete process.env.JARVIS_PIECES_DIR;
+      else process.env.JARVIS_PIECES_DIR = prev;
       rmSync(tempDir, { recursive: true, force: true });
     }
   });
@@ -952,9 +952,9 @@ describe("workflow API: pieces library", () => {
     const { mkdtempSync, rmSync } = await import("node:fs");
     const { tmpdir } = await import("node:os");
     const { join } = await import("node:path");
-    const tempDir = mkdtempSync(join(tmpdir(), "zoya-lib-delete-"));
-    const prev = process.env.ZOYA_PIECES_DIR;
-    process.env.ZOYA_PIECES_DIR = tempDir;
+    const tempDir = mkdtempSync(join(tmpdir(), "jarvis-lib-delete-"));
+    const prev = process.env.JARVIS_PIECES_DIR;
+    process.env.JARVIS_PIECES_DIR = tempDir;
     try {
       const { writeManifest } = await import("../pieces-library/installer");
       await writeManifest(
@@ -988,8 +988,8 @@ describe("workflow API: pieces library", () => {
       expect(status).toBe(200);
       expect(body.uninstalled).toBe(true);
     } finally {
-      if (prev === undefined) delete process.env.ZOYA_PIECES_DIR;
-      else process.env.ZOYA_PIECES_DIR = prev;
+      if (prev === undefined) delete process.env.JARVIS_PIECES_DIR;
+      else process.env.JARVIS_PIECES_DIR = prev;
       rmSync(tempDir, { recursive: true, force: true });
     }
   });
@@ -998,9 +998,9 @@ describe("workflow API: pieces library", () => {
     const { mkdtempSync, rmSync } = await import("node:fs");
     const { tmpdir } = await import("node:os");
     const { join } = await import("node:path");
-    const tempDir = mkdtempSync(join(tmpdir(), "zoya-lib-delete-404-"));
-    const prev = process.env.ZOYA_PIECES_DIR;
-    process.env.ZOYA_PIECES_DIR = tempDir;
+    const tempDir = mkdtempSync(join(tmpdir(), "jarvis-lib-delete-404-"));
+    const prev = process.env.JARVIS_PIECES_DIR;
+    process.env.JARVIS_PIECES_DIR = tempDir;
     try {
       const r = createWorkflowRoutes();
       const del = r["/api/workflows/pieces/library/:id"]?.DELETE;
@@ -1015,10 +1015,9 @@ describe("workflow API: pieces library", () => {
       expect(status).toBe(404);
       expect(body.error).toMatch(/unknown piece id/);
     } finally {
-      if (prev === undefined) delete process.env.ZOYA_PIECES_DIR;
-      else process.env.ZOYA_PIECES_DIR = prev;
+      if (prev === undefined) delete process.env.JARVIS_PIECES_DIR;
+      else process.env.JARVIS_PIECES_DIR = prev;
       rmSync(tempDir, { recursive: true, force: true });
     }
   });
 });
-

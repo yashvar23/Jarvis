@@ -365,7 +365,7 @@ func StartObservers(ctx context.Context, cfg *SidecarConfig, availableCaps []Sid
 	}
 
 	if caps[CapFileWatch] {
-		// Watch the user's home, excluding the shared ~/.zoya data dir so the
+		// Watch the user's home, excluding the shared ~/.jarvis data dir so the
 		// sidecar's own captures/logs don't generate awareness noise.
 		fo := NewFileObserver([]string{homeDir()}, []string{configDir}, 5000)
 		goSafeObserver("file-watcher", func() { fo.Run(ctx, send) })

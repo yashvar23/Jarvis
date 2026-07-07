@@ -33,7 +33,7 @@ export const err = (message: string, status = 400): Response =>
  * Parse a request as a JSON object. Returns the object on success, an `err`
  * Response on parse failure or when the body is valid JSON but not a plain
  * object (e.g. a string, number, array, or null). Use at the top of every
- * `/v1/zoya/*` POST handler so route behavior is consistent for malformed
+ * `/v1/jarvis/*` POST handler so route behavior is consistent for malformed
  * envelopes regardless of whether the route's required fields happen to be
  * absent on a non-object body.
  */
@@ -51,4 +51,3 @@ export async function parseJsonObject(
   }
   return raw as Record<string, unknown>;
 }
-

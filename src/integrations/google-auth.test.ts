@@ -7,7 +7,7 @@ import { GoogleAuth } from './google-auth.ts';
 
 describe('GoogleAuth token storage', () => {
   test('saves OAuth tokens with owner-only permissions', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'zoya-google-auth-'));
+    const dir = await mkdtemp(join(tmpdir(), 'jarvis-google-auth-'));
     const tokensPath = join(dir, 'google-tokens.json');
     const auth = new GoogleAuth('client-id', 'client-secret', { tokensPath });
 
@@ -25,7 +25,7 @@ describe('GoogleAuth token storage', () => {
 
   test('does not chmod cwd for bare relative token paths', async () => {
     const originalCwd = process.cwd();
-    const dir = await mkdtemp(join(tmpdir(), 'zoya-google-auth-cwd-'));
+    const dir = await mkdtemp(join(tmpdir(), 'jarvis-google-auth-cwd-'));
     await chmod(dir, 0o755);
 
     try {
@@ -49,4 +49,3 @@ describe('GoogleAuth token storage', () => {
     }
   });
 });
-

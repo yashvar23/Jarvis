@@ -49,7 +49,7 @@ export async function resetOnboarding(
 
   // Wipe the client-side caches the daemon told us about. These survive
   // a config reset on their own (they're in localStorage, not
-  // ~/.zoya/), so we have to clear them explicitly to truly reproduce
+  // ~/.jarvis/), so we have to clear them explicitly to truly reproduce
   // a fresh-install experience.
   if (typeof window !== "undefined") {
     for (const key of data.client_cache_keys ?? []) {
@@ -117,4 +117,3 @@ export async function maybeRunUrlReset(): Promise<void> {
     window.history.replaceState(null, "", url.pathname + url.search + url.hash);
   }
 }
-

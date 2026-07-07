@@ -1,6 +1,6 @@
 /**
- * Glue layer: wraps existing Zoya adapters into the function-shape that the
- * SandboxApi service-backend slots expect. Each `/v1/zoya/*` route takes a
+ * Glue layer: wraps existing Jarvis adapters into the function-shape that the
+ * SandboxApi service-backend slots expect. Each `/v1/jarvis/*` route takes a
  * function or object on `SandboxApiServices`; the legacy adapters expose
  * different signatures that grew before this engine wiring landed. This
  * module lives here (not in the daemon) so the wiring is testable + reused
@@ -19,21 +19,20 @@ import type { AuthorityEngine } from "../../authority/engine";
 import type { AuditTrail } from "../../authority/audit";
 import type { EmergencyController } from "../../authority/emergency";
 import type { RoleDefinition } from "../../roles/types";
-import { ZoyaLlmClient } from "../adapters/llm-client";
-import { ZoyaToolRegistryAdapter } from "../adapters/tool-registry";
-import { ZoyaNotifierAdapter, type NotifierDeps } from "../adapters/notifier";
-import { ZoyaContextProviderAdapter } from "../adapters/context-provider";
+import { JarvisLlmClient } from "../adapters/llm-client";
+import { JarvisToolRegistryAdapter } from "../adapters/tool-registry";
+import { JarvisNotifierAdapter, type NotifierDeps } from "../adapters/notifier";
+import { JarvisContextProviderAdapter } from "../adapters/context-provider";
 import { LlmOnlyAgentDelegator } from "../adapters/agent-delegator";
 import { M7AgentDelegator } from "../adapters/m7-agent-delegator";
-import { ZoyaWorkflowRunnerAdapter } from "../adapters/workflow-runner";
-import type { LlmChatFn } from "../sandbox-api/routes/zoya-llm";
-import type { SystemPromptParts } from "../../roles/prompt-builder";
-import type { ToolsInvokeFn } from "../sandbox-api/routes/zoya-tools";
-import type { NotifyFn } from "../sandbox-api/routes/zoya-notify";
-import type { ZoyaContextProvider } from "../sandbox-api/routes/zoya-context";
-import type { AgentDelegateFn } from "../sandbox-api/routes/zoya-agent";
-import type { EventsPollFn } from "../sandbox-api/routes/zoya-events";
-import type { WorkflowsStartFn } from "../sandbox-api/routes/zoya-workflows";
+import { JarvisWorkflowRunnerAdapter } from "../adapters/workflow-runner";
+import type { LlmChatFn } from "../sandbox-api/routes/jarvis-llm";
+import type { ToolsInvokeFn } from "../sandbox-api/routes/jarvis-tools";
+import type { NotifyFn } from "../sandbox-api/routes/jarvis-notify";
+import type { JarvisContextProvider } from "../sandbox-api/routes/jarvis-context";
+import type { AgentDelegateFn } from "../sandbox-api/routes/jarvis-agent";
+import type { EventsPollFn } from "../sandbox-api/routes/jarvis-events";
+import type { WorkflowsStartFn } from "../sandbox-api/routes/jarvis-workflows";
 import type { SandboxApiServices } from "../sandbox-api/server";
 import type { CredentialResolver } from "../credentials/adapter";
 import { WorkflowEventBuffer } from "./event-buffer";
@@ -49,7 +48,7 @@ export interface BuildServiceBackendsOptions {
    * passes a function that calls `sendDesktopNotification` with normal urgency.
    */
   sendDesktop?: (title: string, body: string) => Promise<void>;
-  /** Recent-events buffer for `zoya-trigger:on_event` polling. */
+  /** Recent-events buffer for `jarvis-trigger:on_event` polling. */
   eventBuffer: WorkflowEventBuffer;
   /**
    * URL prefix used to mint resumeUrl values for waitpoints. Should be a
@@ -58,7 +57,7 @@ export interface BuildServiceBackendsOptions {
    */
   resumeUrlPrefix?: string;
   /**
-   * M7 sub-agent dependencies. When all of these are supplied, `zoya-agent.delegate`
+   * M7 sub-agent dependencies. When all of these are supplied, `jarvis-agent.delegate`
    * runs the full LLM + tool loop via `runSubAgent`. When any are missing,
    * the backend falls back to the single-shot `LlmOnlyAgentDelegator`.
    *
@@ -76,63 +75,53 @@ export interface BuildServiceBackendsOptions {
   auditTrail?: AuditTrail;
   emergencyController?: EmergencyController;
   /**
-   * Optional callback that builds the Zoya-flavoured system prompt for
-   * a workflow LLM call. When set, the `zoya-ask` piece will pass this
-   * prompt to the LLM so the model knows it's Zoya (role, personality,
+   * Optional callback that builds the Jarvis-flavoured system prompt for
+   * a workflow LLM call. When set, the `jarvis-ask` piece will pass this
+   * prompt to the LLM so the model knows it's Jarvis (role, personality,
    * vault context). Skipped when the piece's `system` field is set --
    * that's the user's explicit override.
    *
-   * Returned split at the prompt-cache boundary (static role prompt vs
-   * per-call context) so the provider can cache the static prefix across
-   * workflow LLM calls.
-   *
-   * Production wiring passes `AgentService.buildFullSystemPromptParts`.
+   * Production wiring passes `AgentService.buildFullSystemPrompt`.
    */
-  buildZoyaSystemPrompt?: (userMessage: string) => SystemPromptParts;
+  buildJarvisSystemPrompt?: (userMessage: string) => string;
 }
 
 export function buildSandboxServiceBackends(
   opts: BuildServiceBackendsOptions,
 ): SandboxApiServices {
-  const llmClient = new ZoyaLlmClient(opts.llmManager);
+  const llmClient = new JarvisLlmClient(opts.llmManager);
   const llmChat: LlmChatFn = async (req) => {
     // System-prompt composition:
-    //   - overrideSystem=true       : use `req.system` only. Zoya
+    //   - overrideSystem=true       : use `req.system` only. Jarvis
     //                                 context (role, personality, vault
     //                                 knowledge) is dropped. Picked when
     //                                 the user wants generic LLM behaviour
     //                                 (text transforms, summarisation of
     //                                 inputs that shouldn't be coloured
-    //                                 by Zoya's identity).
-    //   - `req.system` set, default : Zoya prompt + "\n\n" + req.system.
+    //                                 by Jarvis's identity).
+    //   - `req.system` set, default : Jarvis prompt + "\n\n" + req.system.
     //                                 Lets the user steer the reply (e.g.
     //                                 "respond in JSON") while keeping the
-    //                                 Zoya identity.
-    //   - no `req.system`           : Zoya prompt alone. Default for
-    //                                 plain "ask Zoya" steps.
+    //                                 Jarvis identity.
+    //   - no `req.system`           : Jarvis prompt alone. Default for
+    //                                 plain "ask Jarvis" steps.
     //   - no prompt builder wired   : whatever the piece sent (or nothing).
     //                                 Defensive fallback for tests / pre-
     //                                 agent-service bootstrap windows.
-    const zoyaParts = opts.buildZoyaSystemPrompt
-      ? opts.buildZoyaSystemPrompt(req.prompt)
+    const jarvisSystem = opts.buildJarvisSystemPrompt
+      ? opts.buildJarvisSystemPrompt(req.prompt)
       : undefined;
     let system: string | undefined;
-    let systemParts: { static: string; dynamic?: string } | undefined;
     if (req.overrideSystem) {
       system = req.system;
-    } else if (zoyaParts) {
-      // Static Zoya prefix stays cacheable; per-call context and the
-      // piece's steering prompt ride on the dynamic half. Rendered text is
-      // identical to the old `zoya + '\n\n' + req.system` join.
-      const dynamic = [zoyaParts.dynamic, req.system].filter(Boolean).join('\n\n');
-      systemParts = { static: zoyaParts.static, ...(dynamic ? { dynamic } : {}) };
+    } else if (req.system && jarvisSystem) {
+      system = `${jarvisSystem}\n\n${req.system}`;
     } else {
-      system = req.system;
+      system = req.system ?? jarvisSystem;
     }
     const reply = await llmClient.chat({
       prompt: req.prompt,
       ...(system !== undefined ? { system } : {}),
-      ...(systemParts !== undefined ? { systemParts } : {}),
     });
     if (req.parseJson) {
       try {
@@ -147,7 +136,7 @@ export function buildSandboxServiceBackends(
   };
 
   const toolAdapter = opts.toolRegistry
-    ? new ZoyaToolRegistryAdapter(opts.toolRegistry)
+    ? new JarvisToolRegistryAdapter(opts.toolRegistry)
     : null;
   const toolsInvoke: ToolsInvokeFn | undefined = toolAdapter
     ? async (req) => {
@@ -187,7 +176,7 @@ export function buildSandboxServiceBackends(
     },
     ...(opts.sendDesktop ? { sendDesktop: opts.sendDesktop } : {}),
   };
-  const notifierAdapter = new ZoyaNotifierAdapter(notifierDeps);
+  const notifierAdapter = new JarvisNotifierAdapter(notifierDeps);
   const notify: NotifyFn = async (req) => {
     const result = await notifierAdapter.notify({
       message: req.message,
@@ -197,8 +186,8 @@ export function buildSandboxServiceBackends(
     return { delivered: result.delivered, failed: result.failed };
   };
 
-  const contextAdapter = new ZoyaContextProviderAdapter();
-  const contextProvider: ZoyaContextProvider = {
+  const contextAdapter = new JarvisContextProviderAdapter();
+  const contextProvider: JarvisContextProvider = {
     vaultSearch: (input) =>
       contextAdapter.vaultSearch(
         input as Parameters<typeof contextAdapter.vaultSearch>[0],
@@ -237,7 +226,7 @@ export function buildSandboxServiceBackends(
 
   const eventsPoll: EventsPollFn = async (req) => {
     const reply = opts.eventBuffer.poll(req);
-    // The route's `ZoyaEvent` types `id` as a string (consistent with all
+    // The route's `JarvisEvent` types `id` as a string (consistent with all
     // other engine ids); the buffer assigns monotonic numbers internally.
     // Stringify at the boundary so the wire shape stays uniform.
     return {
@@ -251,7 +240,7 @@ export function buildSandboxServiceBackends(
     };
   };
 
-  const runnerAdapter = new ZoyaWorkflowRunnerAdapter();
+  const runnerAdapter = new JarvisWorkflowRunnerAdapter();
   const workflowsStart: WorkflowsStartFn = async (req, ctx) => {
     const out = await runnerAdapter.start(
       {
@@ -279,4 +268,3 @@ export function buildSandboxServiceBackends(
   if (toolsInvoke) services.toolsInvoke = toolsInvoke;
   return services;
 }
-

@@ -1,5 +1,5 @@
 /**
- * Startup pass that reconciles `~/.zoya/pieces/installed.json` with the
+ * Startup pass that reconciles `~/.jarvis/pieces/installed.json` with the
  * on-disk `node_modules/`. Two scenarios this exists for:
  *
  *   1. Fresh container start (Docker volume restored from backup, fresh dev
@@ -145,4 +145,3 @@ export async function hasInstalledPieces(
     return false;
   }
 }
-

@@ -198,4 +198,3 @@ export function getRoleStats(roles: Map<string, RoleDefinition>): {
     authorityDistribution,
   };
 }
-

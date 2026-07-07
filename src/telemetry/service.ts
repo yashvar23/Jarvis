@@ -1,5 +1,5 @@
 import type { Service, ServiceStatus } from '../daemon/services.ts';
-import type { ZoyaConfig } from '../config/types.ts';
+import type { JarvisConfig } from '../config/types.ts';
 import { getSetting, setSetting } from '../vault/settings.ts';
 import { resolveTelemetryEnabled } from './config.ts';
 import { buildPayload, sendPing, type SendOutcome, type TelemetryPayload } from './client.ts';
@@ -12,11 +12,11 @@ const FIRST_SEEN_KEY = 'telemetry.first_seen_at';
 export type Sender = (payload: TelemetryPayload) => Promise<SendOutcome>;
 
 export type TelemetryServiceOptions = {
-  config: ZoyaConfig;
+  config: JarvisConfig;
   packageRoot: string;
   /** Override the sender (tests). Defaults to the real network sendPing. */
   sender?: Sender;
-  /** Override debug logging (tests). Defaults to the ZOYA_TELEMETRY_DEBUG env. */
+  /** Override debug logging (tests). Defaults to the JARVIS_TELEMETRY_DEBUG env. */
   debug?: boolean;
 };
 
@@ -37,7 +37,7 @@ export class TelemetryService implements Service {
 
   constructor(private readonly opts: TelemetryServiceOptions) {
     this.send = opts.sender ?? ((p) => sendPing(p));
-    this.debug = opts.debug ?? envFlag(process.env.ZOYA_TELEMETRY_DEBUG);
+    this.debug = opts.debug ?? envFlag(process.env.JARVIS_TELEMETRY_DEBUG);
   }
 
   status(): ServiceStatus {
@@ -135,22 +135,21 @@ export class TelemetryService implements Service {
         [
           '',
           '+--- Anonymous usage metrics --------------------------------------+',
-          '| ZOYA sends a small anonymous ping at startup and every hour     |',
+          '| JARVIS sends a small anonymous ping at startup and every hour     |',
           '| so we can count unique installs and retention. No personal data,  |',
           '| no config, no content - just a hashed machine id, app version,    |',
           '| install method, and OS. Details: docs/TELEMETRY.md                |',
           '|                                                                   |',
           '| Opt out anytime: set `telemetry.enabled: false` in config.yaml,   |',
-          '| or run with ZOYA_TELEMETRY=0 (DO_NOT_TRACK=1 is honored too).    |',
+          '| or run with JARVIS_TELEMETRY=0 (DO_NOT_TRACK=1 is honored too).    |',
           '+-------------------------------------------------------------------+',
           '',
         ].join('\n'),
       );
     } else {
       console.log(
-        '[Telemetry] Anonymous metrics on (opt out: telemetry.enabled=false or ZOYA_TELEMETRY=0).',
+        '[Telemetry] Anonymous metrics on (opt out: telemetry.enabled=false or JARVIS_TELEMETRY=0).',
       );
     }
   }
 }
-

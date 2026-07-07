@@ -1,6 +1,6 @@
 # Activepieces Upstream
 
-This directory contains a vendored subtree of the [Activepieces](https://github.com/activepieces/activepieces) project, used as the foundation of the Zoya Workflow system.
+This directory contains a vendored subtree of the [Activepieces](https://github.com/activepieces/activepieces) project, used as the foundation of the Jarvis Workflow system.
 
 ## Pinned version
 
@@ -31,7 +31,7 @@ A CI guard (`scripts/check-no-ee-imports.ts`) enforces this on every push and pr
 
 We also intentionally do not vendor:
 
-- `packages/server/api` -- NestJS HTTP server. Replaced by integration into the Zoya daemon's HTTP surface (Phase 2).
+- `packages/server/api` -- NestJS HTTP server. Replaced by integration into the Jarvis daemon's HTTP surface (Phase 2).
 - Anything depending on Postgres or Redis. Replaced by `bun:sqlite` and an in-process queue (Phase 2).
 
 ## Post-copy patches
@@ -60,7 +60,7 @@ catalog policy and per-piece pin strategy.
 
 Plus the piece SDK and shared utilities: `packages/pieces/framework`, `packages/pieces/common`.
 
-Plus the Zoya-native pieces (Phase 3): `zoya-ask`, `zoya-agent`, `zoya-tool`, `zoya-context`, `zoya-notify`, `zoya-trigger`.
+Plus the Jarvis-native pieces (Phase 3): `jarvis-ask`, `jarvis-agent`, `jarvis-tool`, `jarvis-context`, `jarvis-notify`, `jarvis-trigger`.
 
 Additional pieces can be added later by editing `VENDOR_PATHS` in `scripts/sync-activepieces.ts` and re-running the sync.
 
@@ -86,4 +86,3 @@ To re-sync to a different upstream version:
 3. Run `bun run scripts/sync-activepieces.ts` to perform the sync.
 4. Run `bun run check:no-ee` to confirm the EE guard is still green.
 5. Resolve any local patches against new upstream.
-

@@ -22,4 +22,3 @@ function formatErrorMessage(errorMessage: string): string {
 export const testStepUtils = {
   formatErrorMessage,
 };
-

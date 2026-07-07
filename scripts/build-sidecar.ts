@@ -39,7 +39,7 @@ async function build() {
   // Determine output directory
   let outputDir: string;
   if (winHome) {
-    outputDir = await bridge.convertToWindowsPath(join(winHome, '.zoya', 'sidecar'));
+    outputDir = await bridge.convertToWindowsPath(join(winHome, '.jarvis', 'sidecar'));
   } else {
     // Fallback: output next to project
     outputDir = await bridge.convertToWindowsPath(join(SIDECAR_DIR, 'bin', 'publish'));
@@ -81,4 +81,3 @@ build().catch((err) => {
   console.error('[build-sidecar] Error:', err);
   process.exit(1);
 });
-

@@ -16,4 +16,3 @@ export type WorkerNotifyContract = {
     stdout(input: EngineStdout): void
     stderr(input: EngineStderr): void
 }
-

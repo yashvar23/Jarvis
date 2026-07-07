@@ -124,7 +124,7 @@ export class DialogueCompactor {
     const transcript = head
       .map(m => {
         const content = typeof m.content === 'string' ? m.content : '[non-text content]';
-        const role = m.role === 'user' ? 'USER' : m.role === 'assistant' ? 'ZOYA' : m.role.toUpperCase();
+        const role = m.role === 'user' ? 'USER' : m.role === 'assistant' ? 'JARVIS' : m.role.toUpperCase();
         return `${role}: ${content.slice(0, 800)}`;
       })
       .join('\n');
@@ -139,4 +139,3 @@ export class DialogueCompactor {
     return response.content?.trim() || '(prior turns omitted)';
   }
 }
-

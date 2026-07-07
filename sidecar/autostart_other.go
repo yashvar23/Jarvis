@@ -16,7 +16,7 @@ func platformSetAutoStart(enabled bool) error {
 		return err
 	}
 	dir := filepath.Join(home, ".config", "autostart")
-	desktop := filepath.Join(dir, "zoya-sidecar.desktop")
+	desktop := filepath.Join(dir, "jarvis-sidecar.desktop")
 
 	if !enabled {
 		if err := os.Remove(desktop); err != nil && !os.IsNotExist(err) {
@@ -35,7 +35,7 @@ func platformSetAutoStart(enabled bool) error {
 	// the XDG Desktop Entry spec.
 	content := fmt.Sprintf("[Desktop Entry]\n"+
 		"Type=Application\n"+
-		"Name=ZOYA Sidecar\n"+
+		"Name=JARVIS Sidecar\n"+
 		"Exec=%q\n"+
 		"X-GNOME-Autostart-enabled=true\n", exe)
 	return os.WriteFile(desktop, []byte(content), 0644)
