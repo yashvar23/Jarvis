@@ -125,7 +125,7 @@ export function mergeSTTConfig(
   const patch = { ...incoming };
   const merged: AnyRec = { ...base };
 
-  for (const p of ['openai', 'groq', 'sarvam'] as const) {
+  for (const p of ['openai', 'groq', 'sarvam', 'gemini'] as const) {
     const inc = patch[p] as AnyRec | undefined;
     if (inc) {
       merged[p] = mergeCloudSubBlock((base as AnyRec)[p] as AnyRec | undefined, inc);

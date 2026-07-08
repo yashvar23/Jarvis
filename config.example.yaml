@@ -77,9 +77,12 @@ tts:
 
 # Speech-to-Text (voice input)
 # stt:
-#   provider: "openai"         # openai, groq, or local
+#   provider: "openai"         # openai, groq, gemini, or local
 #   openai:
 #     api_key: "sk-..."
+#   gemini:
+#     api_key: "AIzaSy..."
+#     model: "gemini-2.5-flash"
 
 # Active role (must match a filename in roles/ without extension)
 active_role: "personal-assistant"

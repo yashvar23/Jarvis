@@ -183,7 +183,7 @@ export function SettingsRoomBody({ mode }: { mode: RoomBodyMode }) {
       }
       case "set_stt_provider": {
         const provider = String(args.provider).toLowerCase();
-        if (!["openai", "groq", "sarvam", "local"].includes(provider)) return false;
+        if (!["openai", "groq", "sarvam", "local", "gemini"].includes(provider)) return false;
         setTab("channels");
         (async () => {
           const r = await data.setSTTProvider(provider as any);

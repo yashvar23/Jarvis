@@ -70,7 +70,7 @@ export type LLMProvider = LLMProviderKind;
 export const LLM_PROVIDERS = LLM_PROVIDER_KINDS;
 export const LLM_PROVIDER_LABELS = LLM_PROVIDER_KIND_LABELS;
 
-export type STTProvider = "openai" | "groq" | "sarvam" | "local";
+export type STTProvider = "openai" | "groq" | "sarvam" | "local" | "gemini";
 export type TTSProvider = "edge" | "elevenlabs" | "sarvam";
 
 /**
@@ -138,6 +138,7 @@ export interface STTConfig {
   has_openai_key: boolean;
   has_groq_key: boolean;
   has_sarvam_key: boolean;
+  has_gemini_key: boolean;
   local_endpoint: string | null;
   local_server_type: string;
 }

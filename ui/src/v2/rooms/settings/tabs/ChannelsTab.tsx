@@ -300,6 +300,7 @@ export function ChannelsTab({
           >
             <option value="openai">OpenAI Whisper</option>
             <option value="groq">Groq Whisper</option>
+            <option value="gemini">Gemini</option>
             <option value="sarvam">Sarvam AI</option>
             <option value="local">Local Whisper (whisper.cpp)</option>
           </select>
@@ -307,6 +308,7 @@ export function ChannelsTab({
 
         {(sttCfg?.provider === "openai" ||
           sttCfg?.provider === "groq" ||
+          sttCfg?.provider === "gemini" ||
           sttCfg?.provider === "sarvam") && (
           <div className="v2-set__field">
             <label className="v2-set__field-label">API key for {sttCfg?.provider}</label>
@@ -338,6 +340,7 @@ export function ChannelsTab({
             <p className="v2-set__hint">
               {(sttCfg?.provider === "openai" && sttCfg?.has_openai_key) ||
               (sttCfg?.provider === "groq" && sttCfg?.has_groq_key) ||
+              (sttCfg?.provider === "gemini" && sttCfg?.has_gemini_key) ||
               (sttCfg?.provider === "sarvam" && sttCfg?.has_sarvam_key)
                 ? "API key configured."
                 : "No key configured."}

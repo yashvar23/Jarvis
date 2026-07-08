@@ -199,6 +199,65 @@ export class SarvamSTT implements STTProvider {
 }
 
 /**
+ * Gemini STT Provider — uses Gemini's generateContent endpoint to transcribe audio.
+ */
+export class GeminiSTT implements STTProvider {
+  private apiKey: string;
+  private model: string;
+
+  constructor(apiKey: string, model: string = 'gemini-2.5-flash') {
+    this.apiKey = apiKey;
+    this.model = model;
+  }
+
+  async transcribe(audio: Buffer): Promise<string> {
+    const base64Audio = audio.toString('base64');
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${this.model}:generateContent?key=${this.apiKey}`;
+
+    const body = {
+      contents: [
+        {
+          parts: [
+            {
+              inlineData: {
+                mimeType: 'audio/wav',
+                data: base64Audio,
+              },
+            },
+            {
+              text: 'Transcribe the audio accurately. Output only the transcription, with no other text, commentary, or formatting.',
+            },
+          ],
+        },
+      ],
+      generationConfig: {
+        temperature: 0.0,
+      },
+    };
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      const err = await response.text();
+      throw new Error(`Gemini STT error (${response.status}): ${err}`);
+    }
+
+    const result = await response.json() as any;
+    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (typeof text !== 'string') {
+      throw new Error(`Gemini STT returned no transcript: ${JSON.stringify(result).slice(0, 200)}`);
+    }
+    return text.trim();
+  }
+}
+
+/**
  * Factory: create the right STT provider from config.
  * Returns null if the selected provider lacks required credentials.
  */
@@ -215,6 +274,9 @@ export function createSTTProvider(config: STTConfig): STTProvider | null {
     case 'sarvam':
       if (!config.sarvam?.api_key) return null;
       return new SarvamSTT(config.sarvam.api_key, config.sarvam.model, config.sarvam.language);
+    case 'gemini':
+      if (!config.gemini?.api_key) return null;
+      return new GeminiSTT(config.gemini.api_key, config.gemini.model);
     default:
       return null;
   }

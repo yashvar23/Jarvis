@@ -90,11 +90,12 @@ export type VoiceConfig = {
 };
 
 export type STTConfig = {
-  provider: 'openai' | 'groq' | 'local' | 'sarvam';
+  provider: 'openai' | 'groq' | 'local' | 'sarvam' | 'gemini';
   openai?: { api_key: string; model?: string };
   groq?: { api_key: string; model?: string };
   local?: { endpoint: string; model?: string; server_type?: 'whisper_cpp' | 'openai_compatible' };
   sarvam?: { api_key: string; model?: string; language?: string };
+  gemini?: { api_key: string; model?: string };
 };
 
 export type TTSConfig = {

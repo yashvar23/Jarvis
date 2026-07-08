@@ -6,6 +6,7 @@ import {
   GroqWhisperSTT,
   LocalWhisperSTT,
   SarvamSTT,
+  GeminiSTT,
   EdgeTTSProvider,
   SarvamTTSProvider,
   splitIntoSentences,
@@ -112,6 +113,19 @@ describe('createSTTProvider factory', () => {
 
   test('returns null when provider=sarvam and no key', () => {
     const config: STTConfig = { provider: 'sarvam' };
+    expect(createSTTProvider(config)).toBeNull();
+  });
+
+  test('returns GeminiSTT when provider=gemini and key present', () => {
+    const config: STTConfig = {
+      provider: 'gemini',
+      gemini: { api_key: 'test-gemini-key' },
+    };
+    expect(createSTTProvider(config)).toBeInstanceOf(GeminiSTT);
+  });
+
+  test('returns null when provider=gemini and no key', () => {
+    const config: STTConfig = { provider: 'gemini' };
     expect(createSTTProvider(config)).toBeNull();
   });
 });
@@ -523,5 +537,61 @@ describe('SarvamSTT.transcribe', () => {
     ) as any;
 
     await expect(stt.transcribe(wav)).rejects.toThrow(/Sarvam STT error \(401\)/);
+  });
+});
+
+describe('GeminiSTT.transcribe', () => {
+  const originalFetch = globalThis.fetch;
+  afterEach(() => { globalThis.fetch = originalFetch; });
+
+  test('sends base64 audio and transcription prompt to Gemini API', async () => {
+    const stt = new GeminiSTT('ai_key_not_real', 'gemini-2.5-flash');
+    const wav = makeWavBuffer();
+    let sentUrl = '';
+    let sentBody: any = null;
+
+    globalThis.fetch = mock(async (url: string, init: any) => {
+      sentUrl = url;
+      sentBody = JSON.parse(init.body);
+      return new Response(JSON.stringify({
+        candidates: [{
+          content: {
+            parts: [{ text: 'hello gemini' }]
+          }
+        }]
+      }), {
+        headers: { 'content-type': 'application/json' },
+      });
+    }) as any;
+
+    const res = await stt.transcribe(wav);
+    expect(res).toBe('hello gemini');
+    expect(sentUrl).toContain('models/gemini-2.5-flash:generateContent?key=ai_key_not_real');
+    expect(sentBody.contents[0].parts[0].inlineData.mimeType).toBe('audio/wav');
+    expect(sentBody.contents[0].parts[0].inlineData.data).toBe(wav.toString('base64'));
+  });
+
+  test('throws when Gemini API returns empty or invalid text', async () => {
+    const stt = new GeminiSTT('ai_key_not_real');
+    const wav = makeWavBuffer();
+
+    globalThis.fetch = mock(async () =>
+      new Response(JSON.stringify({ unexpected: 'shape' }), {
+        headers: { 'content-type': 'application/json' },
+      })
+    ) as any;
+
+    await expect(stt.transcribe(wav)).rejects.toThrow('Gemini STT returned no transcript');
+  });
+
+  test('throws on Gemini API HTTP error', async () => {
+    const stt = new GeminiSTT('ai_key_not_real');
+    const wav = makeWavBuffer();
+
+    globalThis.fetch = mock(async () =>
+      new Response('Internal Server Error', { status: 500 })
+    ) as any;
+
+    await expect(stt.transcribe(wav)).rejects.toThrow(/Gemini STT error \(500\)/);
   });
 });

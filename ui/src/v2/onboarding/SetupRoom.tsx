@@ -128,7 +128,7 @@ const PROVIDERS: ReadonlyArray<{
   },
 ];
 
-type STTChoice = "skip" | "openai" | "groq" | "local";
+type STTChoice = "skip" | "openai" | "groq" | "local" | "gemini";
 
 type LocalSTTServer = "whisper_cpp" | "openai_compatible";
 
@@ -415,7 +415,7 @@ export function SetupRoom({ onComplete }: { onComplete: () => void }) {
       const payload: Record<string, unknown> = { llm: llmBlock, tts: ttsBlock };
       if (sttChoice !== "skip") {
         const sttBlock: Record<string, unknown> = { provider: sttChoice };
-        if (sttChoice === "openai" || sttChoice === "groq") {
+        if (sttChoice === "openai" || sttChoice === "groq" || sttChoice === "gemini") {
           if (sttKey) sttBlock[sttChoice] = { api_key: sttKey };
         } else if (sttChoice === "local") {
           sttBlock.local = {
@@ -839,6 +839,14 @@ export function SetupRoom({ onComplete }: { onComplete: () => void }) {
                 body="Fastest hosted Whisper. Needs a Groq API key."
               />
               <ChoiceCard
+                id="gemini"
+                active={sttChoice === "gemini"}
+                onClick={() => setSttChoice("gemini")}
+                icon={Mic}
+                title="Gemini"
+                body="Google Gemini audio transcription. Needs a Gemini API key."
+              />
+              <ChoiceCard
                 id="local"
                 active={sttChoice === "local"}
                 onClick={() => setSttChoice("local")}
@@ -848,10 +856,10 @@ export function SetupRoom({ onComplete }: { onComplete: () => void }) {
               />
             </div>
 
-            {(sttChoice === "openai" || sttChoice === "groq") && (
+            {(sttChoice === "openai" || sttChoice === "groq" || sttChoice === "gemini") && (
               <div className="v2-setup__field">
                 <label className="v2-setup__label" htmlFor="setup-stt-key">
-                  {sttChoice === "openai" ? "OpenAI" : "Groq"} API key
+                  {sttChoice === "openai" ? "OpenAI" : sttChoice === "groq" ? "Groq" : "Gemini"} API key
                 </label>
                 <input
                   id="setup-stt-key"
@@ -864,7 +872,7 @@ export function SetupRoom({ onComplete }: { onComplete: () => void }) {
                 />
                 <p className="v2-setup__hint">
                   Stored locally in your JARVIS config — never sent anywhere
-                  except {sttChoice === "openai" ? "OpenAI" : "Groq"}.
+                  except {sttChoice === "openai" ? "OpenAI" : sttChoice === "groq" ? "Groq" : "Gemini"}.
                 </p>
               </div>
             )}

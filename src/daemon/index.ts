@@ -1183,7 +1183,7 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
         }
       };
 
-      const applySTTProvider = async (provider: 'openai' | 'groq' | 'sarvam' | 'local'): Promise<boolean> => {
+      const applySTTProvider = async (provider: 'openai' | 'groq' | 'sarvam' | 'local' | 'gemini'): Promise<boolean> => {
         const { loadConfig, saveConfig } = await import('../config/loader.ts');
         const fresh = await loadConfig();
         if (!fresh.stt) fresh.stt = { provider };
@@ -1396,13 +1396,13 @@ export async function startDaemon(userConfig?: Partial<DaemonConfig>): Promise<v
 
         // STT provider switch.
         const sttMatch =
-          /\b(switch|change)\s+(?:the\s+)?(stt|speech[- ]to[- ]text|transcription|speech recognition|listening)\s+(?:to|provider to)\s+(openai|whisper|groq|sarvam|local)\b/.exec(t) ||
-          /\buse\s+(openai|whisper|groq|sarvam|local)\s+(?:for\s+(?:stt|speech[- ]to[- ]text|transcription|speech recognition|listening|hearing))\b/.exec(t);
+          /\b(switch|change)\s+(?:the\s+)?(stt|speech[- ]to[- ]text|transcription|speech recognition|listening)\s+(?:to|provider to)\s+(openai|whisper|groq|sarvam|local|gemini)\b/.exec(t) ||
+          /\buse\s+(openai|whisper|groq|sarvam|local|gemini)\s+(?:for\s+(?:stt|speech[- ]to[- ]text|transcription|speech recognition|listening|hearing))\b/.exec(t);
         if (sttMatch) {
-          let target = (sttMatch[2] === 'whisper' ? 'openai' : sttMatch[2]) as 'openai' | 'groq' | 'sarvam' | 'local';
+          let target = (sttMatch[2] === 'whisper' ? 'openai' : sttMatch[2]) as 'openai' | 'groq' | 'sarvam' | 'local' | 'gemini';
           // The first capture group depends on which alternative matched.
           const candidate = (sttMatch[3] || sttMatch[1]) as string;
-          if (candidate && /^(openai|whisper|groq|sarvam|local)$/.test(candidate)) {
+          if (candidate && /^(openai|whisper|groq|sarvam|local|gemini)$/.test(candidate)) {
             target = (candidate === 'whisper' ? 'openai' : candidate) as typeof target;
           }
           const ok = await applySTTProvider(target);
