@@ -63,6 +63,8 @@ RUN bun build ui/index.html --outdir ui/dist
 # ─── Stage 3: Production image ─────────────────────────────────────
 FROM oven/bun:1-slim AS production
 
+LABEL org.opencontainers.image.source="https://github.com/yashvar23/Jarvis"
+
 # ca-certificates: HTTPS calls to LLM APIs
 # git: required by the Site Builder for project version control
 RUN apt-get update && \

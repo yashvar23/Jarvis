@@ -151,10 +151,10 @@ Run JARVIS on any OS with a single command — no Bun or dependencies required. 
 docker run -d --name jarvis \
   -p 3142:3142 \
   -v jarvis-data:/data \
-  ghcr.io/yashvar23/jarvis:latest
+  yashvarking/jarvis:latest
 ```
 
-The image is available on [GHCR](https://ghcr.io/yashvar23/jarvis). Non-LLM configuration can be provided via environment variables or by mounting a `config.yaml` into the `/data` volume. LLM providers, API keys, and model routing are configured from the settings dashboard (open http://localhost:3142 after first boot) and stored in the database + encrypted keychain - they are not set via env vars or `config.yaml`.
+The image is available on [Docker Hub](https://hub.docker.com/r/yashvarking/jarvis). Non-LLM configuration can be provided via environment variables or by mounting a `config.yaml` into the `/data` volume. LLM providers, API keys, and model routing are configured from the settings dashboard (open http://localhost:3142 after first boot) and stored in the database + encrypted keychain - they are not set via env vars or `config.yaml`.
 
 > **Note:** Docker runs in an isolated container, so the daemon inside it cannot access your host desktop, browser, or clipboard directly. You must still install the [sidecar](#️-sidecar-setup) on each machine where you want JARVIS to have desktop awareness and automation capabilities.
 
